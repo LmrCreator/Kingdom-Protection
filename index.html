@@ -3,85 +3,164 @@
 <head>
     <title>Kingdom Protection</title>
     <style>
+        /* 1. Reset e Fundo Temático */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: 'Georgia', serif; /* Fonte mais clássica */
+            margin: 0;
+            padding: 20px;
+            /* Simulação de textura de fundo de jogo */
+            background-color: #333; 
+            /* Importante: Substitua esta URL por uma imagem de castelo/madeira/estratégia que você hospede */
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://via.placeholder.com/1500x800.png?text=Fundo+de+Castelo'); 
+            background-size: cover;
+            background-attachment: fixed;
+            color: #ddd; /* Texto claro */
         }
-        h1, h2 {
-            color: #0056b3;
+        
+        /* 2. Títulos e Headers */
+        h1 {
+            text-align: center;
+            color: #FFD700; /* Dourado */
+            text-shadow: 2px 2px 4px #000;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
         }
-        #idioma-selector {
+        h2 {
+            color: #FFD700; /* Dourado */
+            border-bottom: 1px solid #555;
+            padding-bottom: 5px;
+            margin-top: 15px;
+        }
+
+        /* 3. Painéis Principais */
+        #cidade, #acoes, #cartas, #cartas-escolhidas, #inimigo-status, #idioma-selector {
+            background-color: rgba(30, 30, 30, 0.9); /* Fundo escuro semi-transparente */
+            padding: 20px;
             margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1); /* Sombra externa e interna para profundidade */
+            border: 2px solid #555;
         }
-        #cidade, #acoes, #cartas, #cartas-escolhidas, #inimigo-status {
-            background-color: #fff;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        
+        /* 4. Botões Estilizados */
         button {
-            background-color: #007bff;
+            background-color: #A52A2A; /* Marrom-avermelhado (tom de guerra) */
             color: white;
-            padding: 10px 15px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            transition: background-color 0.3s ease;
+            margin-right: 15px;
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease, transform 0.1s;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 4px #771919; /* Sombra 3D */
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #8B1A1A;
+            transform: translateY(-1px);
+            box-shadow: 0 5px #771919;
+        }
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px #771919;
         }
         button:disabled {
-            background-color: #ccc;
+            background-color: #555;
+            box-shadow: 0 4px #333;
             cursor: not-allowed;
         }
-        #lista-cartas, #lista-cartas-escolhidas {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        #lista-cartas li, #lista-cartas-escolhidas li {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        #lista-cartas li:hover {
-            background-color: #f0f0f0;
-        }
-        #cartas-escolhidas {
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
+
+        /* 5. Barras de Progresso */
         .progress-bar-container {
-            background-color: #e0e0e0;
+            background-color: #555;
+            border: 1px solid #FFD700;
             border-radius: 5px;
             overflow: hidden;
-            height: 20px;
+            height: 25px;
             margin-top: 5px;
             margin-bottom: 10px;
         }
         .progress-bar {
             height: 100%;
-            background-color: #28a745;
-            text-align: center;
+            background-color: #28a745; /* Verde para Vida do Reino */
+            text-align: right; /* Mudar para direita para texto */
+            padding-right: 5px;
             color: white;
-            line-height: 20px;
+            line-height: 25px;
+            font-weight: bold;
             transition: width 0.5s ease;
         }
         #inimigo-progress-bar {
-            background-color: #dc3545;
+            background-color: #dc3545; /* Vermelho para Inimigo */
         }
+        
+        /* 6. Listas de Cartas */
+        #lista-cartas li, #lista-cartas-escolhidas li {
+            background-color: rgba(60, 60, 60, 0.9); /* Fundo escuro para itens da lista */
+            border-bottom: 1px solid #444;
+            padding: 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border 0.3s ease;
+        }
+        #lista-cartas li:hover {
+            background-color: rgba(90, 90, 90, 0.9);
+            border: 1px solid #FFD700;
+        }
+
+        /* 7. Estilos para o Modal de Regras */
+        #regras-modal {
+            display: none; 
+            position: fixed; 
+            z-index: 100; /* Garante que fique acima de tudo */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        #regras-conteudo {
+            background-color: rgba(30, 30, 30, 0.95);
+            margin: 10% auto; /* 10% do topo e centralizado */
+            padding: 20px;
+            border: 3px solid #FFD700;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            color: #ddd;
+        }
+
+        #fechar-modal {
+            color: #FFD700;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        #fechar-modal:hover, #fechar-modal:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #regras-conteudo ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        
+        /* 8. Outros */
         footer {
             text-align: center;
-            margin-top: 30px;
-            color: #777;
+            margin-top: 40px;
+            color: #aaa;
             font-size: 0.9em;
         }
     </style>
@@ -131,6 +210,7 @@
         <button id="recuperar-saude">Adicionar/Recuperar Saúde (250 Ouro)</button>
         <button id="salvar-jogo">Salvar Jogo</button>
         <button id="carregar-jogo">Carregar Jogo</button>
+        <button id="mostrar-regras">Regras do Jogo</button>
     </div>
 
     <div id="cartas">
@@ -146,6 +226,32 @@
         </ul>
     </div>
 
+    <div id="regras-modal" style="display:none;">
+        <div id="regras-conteudo">
+            <span id="fechar-modal">&times;</span>
+            <h2 id="titulo-regras">Regras do Jogo</h2>
+            <p id="paragrafo-regras-1">
+                Seu objetivo é sobreviver aos ataques de 15 inimigos, fortalecendo seu Reino a cada ano.
+            </p>
+            <p id="paragrafo-regras-2">
+                **Recursos:** Você usa **Ouro** para construir Edifícios e recrutar Unidades.
+            </p>
+            <p id="paragrafo-regras-3">
+                **Turnos (Anos):** A cada 30 segundos (ou 30 *ticks*), um ano se passa. Você ganha ouro por ano, e o Inimigo Atual ataca.
+            </p>
+            <p id="paragrafo-regras-4">
+                **Ações:**
+                <ul>
+                    <li id="regra-acao-1">**Construir Edifício:** Aumenta o limite de Unidades que você pode ter (45 unidades/edifício).</li>
+                    <li id="regra-acao-2">**Recrutar Unidades:** Aumenta seu poder de ataque base (5 Dano/Unidade).</li>
+                    <li id="regra-acao-3">**Cartas:** Oferecem *buffs* permanentes (mais Ouro, mais Vida Máxima, mais Dano). Use-as com sabedoria.</li>
+                </ul>
+            </p>
+            <p id="paragrafo-regras-5">
+                **Combate:** Clique em "Atacar Inimigo" para usar suas Unidades e Cartas de Dano. Se a Vida do Inimigo zerar, você avança para o próximo nível. Se sua Vida zerar, o jogo acaba.
+            </p>
+        </div>
+    </div>
     <script>
         // Variáveis do Jogo
         const CUSTO_EDIFICIO = 35;
@@ -191,8 +297,14 @@
         const btnComprarCartas = document.getElementById("comprar-cartas");
         const idiomaSelect = document.getElementById("idioma-select");
 
+        // Elementos do Modal de Regras (NOVOS)
+        const btnMostrarRegras = document.getElementById("mostrar-regras");
+        const regrasModal = document.getElementById("regras-modal");
+        const fecharModal = document.getElementById("fechar-modal");
+
         let idiomaAtual = "pt-br";
 
+        // Variável de traduções atualizada com as regras
         const traducoes = {
             "pt-br": {
                 titulo: "Kingdom Protection",
@@ -226,6 +338,16 @@
                 jogoSalvo: "Jogo salvo com sucesso!",
                 semJogoSalvo: "Nenhum jogo salvo encontrado.",
                 jogoCarregado: "Jogo carregado com sucesso!",
+                // NOVAS TRADUÇÕES DE REGRAS
+                regrasJogo: "Regras do Jogo",
+                paragrafoRegras1: "Seu objetivo é sobreviver aos ataques de 15 inimigos, fortalecendo seu Reino a cada ano.",
+                paragrafoRegras2: "Você usa **Ouro** para construir Edifícios e recrutar Unidades.",
+                paragrafoRegras3: "Turnos (Anos): A cada 30 segundos, um ano se passa. Você ganha ouro por ano, e o Inimigo Atual ataca.",
+                paragrafoRegras4_1: "**Construir Edifício:** Aumenta o limite de Unidades que você pode ter (45 unidades/edifício).",
+                paragrafoRegras4_2: "**Recrutar Unidades:** Aumenta seu poder de ataque base (5 Dano/Unidade).",
+                paragrafoRegras4_3: "**Cartas:** Oferecem *buffs* permanentes (mais Ouro, mais Vida Máxima, mais Dano). Use-as com sabedoria.",
+                paragrafoRegras5: "Combate: Clique em 'Atacar Inimigo' para usar suas Unidades e Cartas de Dano. Se a Vida do Inimigo zerar, você avança. Se sua Vida zerar, o jogo acaba.",
+                // FIM NOVAS TRADUÇÕES DE REGRAS
                 carta: {
                     guerreiro: {nome: "Guerreiro", descricao: "Aumenta seu dano base em 50."},
                     arqueiro: {nome: "Arqueiro", descricao: "Aumenta seu dano base em 25."},
@@ -271,6 +393,16 @@
                 jogoSalvo: "Jogo guardado com sucesso!",
                 semJogoSalvo: "Não foi encontrado nenhum jogo guardado.",
                 jogoCarregado: "Jogo carregado com sucesso!",
+                 // NOVAS TRADUÇÕES DE REGRAS
+                regrasJogo: "Regras do Jogo",
+                paragrafoRegras1: "O seu objetivo é sobreviver aos ataques de 15 inimigos, fortalecendo o seu Reino a cada ano.",
+                paragrafoRegras2: "Você usa **Ouro** para construir Edifícios e recrutar Unidades.",
+                paragrafoRegras3: "Turnos (Anos): A cada 30 segundos, um ano passa. Você ganha ouro por ano, e o Inimigo Atual ataca.",
+                paragrafoRegras4_1: "**Construir Edifício:** Aumenta o limite de Unidades que pode ter (45 unidades/edifício).",
+                paragrafoRegras4_2: "**Recrutar Unidades:** Aumenta o seu poder de ataque base (5 Dano/Unidade).",
+                paragrafoRegras4_3: "**Cartas:** Oferecem *buffs* permanentes (mais Ouro, mais Vida Máxima, mais Dano). Use-as com sabedoria.",
+                paragrafoRegras5: "Combate: Clique em 'Atacar Inimigo' para usar as suas Unidades e Cartas de Dano. Se a Vida do Inimigo zerar, avança. Se a sua Vida zerar, o jogo acaba.",
+                // FIM NOVAS TRADUÇÕES DE REGRAS
                 carta: {
                     guerreiro: {nome: "Guerreiro", descricao: "Aumenta o seu dano base em 50."},
                     arqueiro: {nome: "Arqueiro", descricao: "Aumenta o seu dano base em 25."},
@@ -316,6 +448,16 @@
                 jogoSalvo: "Game saved successfully!",
                 semJogoSalvo: "No saved game found.",
                 jogoCarregado: "Game loaded successfully!",
+                // NOVAS TRADUÇÕES DE REGRAS
+                regrasJogo: "Game Rules",
+                paragrafoRegras1: "Your objective is to survive the attacks of 15 enemies by strengthening your Kingdom each year.",
+                paragrafoRegras2: "Resources: You use **Gold** to build Buildings and recruit Units.",
+                paragrafoRegras3: "Turns (Years): Every 30 seconds, a year passes. You gain gold per year, and the Current Enemy attacks.",
+                paragrafoRegras4_1: "**Build a Building:** Increases the limit of Units you can have (45 units/building).",
+                paragrafoRegras4_2: "**Recruit Units:** Increases your base attack power (5 Damage/Unit).",
+                paragrafoRegras4_3: "**Cards:** Offer permanent buffs (more Gold, more Max Health, more Damage). Use them wisely.",
+                paragrafoRegras5: "Combat: Click 'Attack Enemy' to use your Units and Damage Cards. If the Enemy's Health reaches zero, you advance. If your Health reaches zero, the game ends.",
+                // FIM NOVAS TRADUÇÕES DE REGRAS
                 carta: {
                     guerreiro: {nome: "Warrior", descricao: "Increases your base damage by 50."},
                     arqueiro: {nome: "Archer", descricao: "Increases your base damage by 25."},
@@ -361,6 +503,16 @@
                 jogoSalvo: "Game saved successfully!",
                 semJogoSalvo: "No saved game found.",
                 jogoCarregado: "Game loaded successfully!",
+                // NOVAS TRADUÇÕES DE REGRAS
+                regrasJogo: "Game Rules",
+                paragrafoRegras1: "Your objective is to survive the attacks of 15 enemies by strengthening your Kingdom each year.",
+                paragrafoRegras2: "Resources: You use **Gold** to build Buildings and recruit Units.",
+                paragrafoRegras3: "Turns (Years): Every 30 seconds, a year passes. You gain gold per year, and the Current Enemy attacks.",
+                paragrafoRegras4_1: "**Build a Building:** Increases the limit of Units you can have (45 units/building).",
+                paragrafoRegras4_2: "**Recruit Units:** Increases your base attack power (5 Damage/Unit).",
+                paragrafoRegras4_3: "**Cards:** Offer permanent buffs (more Gold, more Max Health, more Damage). Use them wisely.",
+                paragrafoRegras5: "Combat: Click 'Attack Enemy' to use your Units and Damage Cards. If the Enemy's Health reaches zero, you advance. If your Health reaches zero, the game ends.",
+                // FIM NOVAS TRADUÇÕES DE REGRAS
                 carta: {
                     guerreiro: {nome: "Warrior", descricao: "Increases your base damage by 50."},
                     arqueiro: {nome: "Archer", descricao: "Increases your base damage by 25."},
@@ -406,6 +558,16 @@
                 jogoSalvo: "¡Partida guardada con éxito!",
                 semJogoSalvo: "No se encontró ninguna partida guardada.",
                 jogoCarregado: "¡Partida cargada con éxito!",
+                 // NOVAS TRADUÇÕES DE REGRAS
+                regrasJogo: "Reglas del Juego",
+                paragrafoRegras1: "Tu objetivo es sobrevivir a los ataques de 15 enemigos fortaleciendo tu Reino cada año.",
+                paragrafoRegras2: "Recursos: Utilizas **Oro** para construir Edificios y reclutar Unidades.",
+                paragrafoRegras3: "Turnos (Años): Cada 30 segundos, pasa un año. Ganas oro por año, y el Enemigo Actual ataca.",
+                paragrafoRegras4_1: "**Construir Edificio:** Aumenta el límite de Unidades que puedes tener (45 unidades/edificio).",
+                paragrafoRegras4_2: "**Reclutar Unidades:** Aumenta tu poder de ataque base (5 Daño/Unidad).",
+                paragrafoRegras4_3: "**Cartas:** Ofrecen *mejoras* permanentes (más Oro, más Vida Máxima, más Daño). Úsalas sabiamente.",
+                paragrafoRegras5: "Combate: Haz clic en 'Atacar Enemigo' para usar tus Unidades y Cartas de Daño. Si la Vida del Enemigo llega a cero, avanzas. Si tu Vida llega a cero, el juego termina.",
+                // FIM NOVAS TRADUÇÕES DE REGRAS
                 carta: {
                     guerreiro: {nome: "Guerrero", descricao: "Aumenta tu daño base en 50."},
                     arqueiro: {nome: "Arquero", descricao: "Aumenta tu daño base en 25."},
@@ -451,6 +613,16 @@
                 jogoSalvo: "¡Partida guardada con éxito!",
                 semJogoSalvo: "No se encontró ninguna partida guardada.",
                 jogoCarregado: "¡Partida cargada con éxito!",
+                // NOVAS TRADUÇÕES DE REGRAS
+                regrasJogo: "Reglas del Juego",
+                paragrafoRegras1: "Tu objetivo es sobrevivir a los ataques de 15 enemigos fortaleciendo tu Reino cada año.",
+                paragrafoRegras2: "Recursos: Utilizas **Oro** para construir Edificios y reclutar Unidades.",
+                paragrafoRegras3: "Turnos (Años): Cada 30 segundos, pasa un año. Ganas oro por año, y el Enemigo Actual ataca.",
+                paragrafoRegras4_1: "**Construir Edificio:** Aumenta el límite de Unidades que puedes tener (45 unidades/edificio).",
+                paragrafoRegras4_2: "**Recrutar Unidades:** Aumenta tu poder de ataque base (5 Daño/Unidad).",
+                paragrafoRegras4_3: "**Cartas:** Ofrecen *mejoras* permanentes (más Oro, más Vida Máxima, más Daño). Úsalas sabiamente.",
+                paragrafoRegras5: "Combate: Haz clic en 'Atacar Enemigo' para usar tus Unidades y Cartas de Daño. Si la Vida del Enemigo llega a cero, avanzas. Si tu Vida llega a cero, el juego termina.",
+                // FIM NOVAS TRADUÇÕES DE REGRAS
                 carta: {
                     guerreiro: {nome: "Guerrero", descricao: "Aumenta tu daño base en 50."},
                     arqueiro: {nome: "Arquero", descricao: "Aumenta tu daño base en 25."},
@@ -543,6 +715,20 @@
             btnComprarCartas.textContent = `${t.comprarCartas} (${CUSTO_COMPRAR_CARTAS} ${t.ouro})`;
             tituloCartasCompradas.textContent = t.tituloCartasCompradas;
             
+            // ATUALIZAÇÃO DO BOTÃO DE REGRAS
+            btnMostrarRegras.textContent = t.regrasJogo;
+
+            // ATUALIZAÇÃO DO CONTEÚDO DO MODAL COM TRADUÇÕES
+            document.getElementById("titulo-regras").textContent = t.regrasJogo;
+            document.getElementById("paragrafo-regras-1").innerHTML = t.paragrafoRegras1;
+            document.getElementById("paragrafo-regras-2").innerHTML = `${t.ouro}: ${t.paragrafoRegras2}`;
+            document.getElementById("paragrafo-regras-3").innerHTML = t.paragrafoRegras3;
+            document.getElementById("regra-acao-1").innerHTML = t.paragrafoRegras4_1;
+            document.getElementById("regra-acao-2").innerHTML = t.paragrafoRegras4_2;
+            document.getElementById("regra-acao-3").innerHTML = t.paragrafoRegras4_3;
+            document.getElementById("paragrafo-regras-5").innerHTML = t.paragrafoRegras5;
+
+
             ouroElement.textContent = ouro;
             hpElement.textContent = hp;
             hpMaxElement.textContent = hpMaximo;
@@ -769,6 +955,22 @@
         document.getElementById("salvar-jogo").addEventListener("click", salvarJogo);
         document.getElementById("carregar-jogo").addEventListener("click", carregarJogo);
         idiomaSelect.addEventListener("change", trocarIdioma);
+
+        // EVENTOS DO MODAL DE REGRAS (NOVOS)
+        btnMostrarRegras.addEventListener("click", () => {
+            regrasModal.style.display = "block";
+        });
+
+        fecharModal.addEventListener("click", () => {
+            regrasModal.style.display = "none";
+        });
+
+        window.addEventListener("click", (event) => {
+            if (event.target == regrasModal) {
+                regrasModal.style.display = "none";
+            }
+        });
+        // FIM EVENTOS DO MODAL DE REGRAS
 
         // Inicialização
         atualizarInterface();
