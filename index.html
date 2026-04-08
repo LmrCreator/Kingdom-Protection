@@ -4,1002 +4,656 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Jogo Roguelike inspirado em Nine Kings onde você precisa defender seu reino e vencer 15 inimigos.">
-    <meta name="keywords" content="Jogo, Kingdom Protection, Jogo Roguelike, Nine Kings, Luiz Miguel Rodrigues">
-    <meta name="author" content="Luiz Miguel Rodrigues">
-    <meta name="robots" content="index, follow">
-    <meta http-equiv="content-language" content="pt-br">
-    <title>Kingdom Protection</title>
+    <title>Kingdom Protection - Nova atualização</title>
     <link rel="icon" href="https://png.pngtree.com/png-clipart/20220706/ourmid/pngtree-king-golden-crown-with-red-diamonds-vector-logo-png-image_5687935.png" type="image/png">
     <style>
-        /* 1. Reset e Fundo Temático */
         body {
-            font-family: 'Georgia', serif; /* Fonte mais clássica */
-            margin: 0;
-            padding: 20px;
-            /* Simulação de textura de fundo de jogo */
-            background-color: #333; 
-            /* Importante: Substitua esta URL por uma imagem de castelo/madeira/estratégia que você hospede */
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://via.placeholder.com/1500x800.png?text=Fundo+de+Castelo'); 
-            background-size: cover;
-            background-attachment: fixed;
-            color: #ddd; /* Texto claro */
+            font-family: 'Georgia', serif; margin: 0; padding: 20px;
+            background-color: #222; 
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://via.placeholder.com/1500x800.png?text=Fundo+de+Guerra'); 
+            background-size: cover; background-attachment: fixed; color: #ddd;
         }
-        
-        /* 2. Títulos e Headers */
-        h1 {
-            text-align: center;
-            color: #FFD700; /* Dourado */
-            text-shadow: 2px 2px 4px #000;
-            border-bottom: 2px solid #FFD700;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
+        h1 { text-align: center; color: #FFD700; text-shadow: 2px 2px 4px #000; border-bottom: 2px solid #FFD700; padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { color: #FFD700; border-bottom: 1px solid #555; padding-bottom: 5px; margin-top: 0px; }
+        .painel {
+            background-color: rgba(30, 30, 30, 0.95); padding: 20px; margin-bottom: 20px;
+            border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.05); border: 2px solid #555;
         }
-        h2 {
-            color: #FFD700; /* Dourado */
-            border-bottom: 1px solid #555;
-            padding-bottom: 5px;
-            margin-top: 15px;
-        }
-
-        /* 3. Painéis Principais */
-        #cidade, #acoes, #cartas, #cartas-escolhidas, #inimigo-status, #idioma-selector {
-            background-color: rgba(30, 30, 30, 0.9); /* Fundo escuro semi-transparente */
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1); /* Sombra externa e interna para profundidade */
-            border: 2px solid #555;
-        }
-        
-        /* 4. Botões Estilizados */
         button {
-            background-color: #A52A2A; /* Marrom-avermelhado (tom de guerra) */
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-right: 15px;
-            margin-bottom: 15px;
-            transition: background-color 0.3s ease, transform 0.1s;
-            text-transform: uppercase;
-            font-weight: bold;
-            box-shadow: 0 4px #771919; /* Sombra 3D */
+            background-color: #A52A2A; color: white; padding: 12px 20px; border: none; border-radius: 6px;
+            cursor: pointer; margin-right: 10px; margin-bottom: 10px; transition: all 0.2s ease;
+            text-transform: uppercase; font-weight: bold; box-shadow: 0 4px #771919;
         }
-        button:hover {
-            background-color: #8B1A1A;
-            transform: translateY(-1px);
-            box-shadow: 0 5px #771919;
-        }
-        button:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px #771919;
-        }
-        button:disabled {
-            background-color: #555;
-            box-shadow: 0 4px #333;
-            cursor: not-allowed;
-        }
-
-        /* 5. Barras de Progresso */
-        .progress-bar-container {
-            background-color: #555;
-            border: 1px solid #FFD700;
-            border-radius: 5px;
-            overflow: hidden;
-            height: 25px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: #28a745; /* Verde para Vida do Reino */
-            text-align: right; /* Mudar para direita para texto */
-            padding-right: 5px;
-            color: white;
-            line-height: 25px;
-            font-weight: bold;
-            transition: width 0.5s ease;
-        }
-        #inimigo-progress-bar {
-            background-color: #dc3545; /* Vermelho para Inimigo */
-        }
+        button:hover { background-color: #8B1A1A; transform: translateY(-1px); box-shadow: 0 5px #771919; }
+        button:active { transform: translateY(3px); box-shadow: 0 1px #771919; }
+        button:disabled { background-color: #555; box-shadow: 0 4px #333; cursor: not-allowed; color: #aaa; }
+        button.batalha { background-color: #28a745; box-shadow: 0 4px #1c7c30; }
+        button.batalha:hover { background-color: #218838; box-shadow: 0 5px #1c7c30; }
+        button.loja { background-color: #0056b3; box-shadow: 0 4px #003d82; }
+        button.loja:hover { background-color: #004494; box-shadow: 0 5px #003d82; }
         
-        /* 6. Listas de Cartas */
-        #lista-cartas li, #lista-cartas-escolhidas li {
-            background-color: rgba(60, 60, 60, 0.9); /* Fundo escuro para itens da lista */
-            border-bottom: 1px solid #444;
-            padding: 15px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, border 0.3s ease;
+        #grid-tabuleiro {
+            display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; min-height: 120px;
+            background-color: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px dashed #777;
         }
-        #lista-cartas li:hover {
-            background-color: rgba(90, 90, 90, 0.9);
-            border: 1px solid #FFD700;
+        .carta-tropa {
+            background: linear-gradient(145deg, #444, #222); border: 2px solid #FFD700; border-radius: 8px;
+            padding: 15px; width: 120px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.7);
+            cursor: pointer; position: relative;
         }
-
-        /* 7. Estilos para o Modal de Regras */
-        #regras-modal {
-            display: none; 
-            position: fixed; 
-            z-index: 100; /* Garante que fique acima de tudo */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.8);
+        .carta-tropa:hover { border-color: #ff4444; } 
+        .carta-tropa::after {
+            content: "Vender"; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
+            background: #ff4444; color: white; padding: 2px 5px; font-size: 0.8em; border-radius: 3px;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none;
         }
-
-        #regras-conteudo {
-            background-color: rgba(30, 30, 30, 0.95);
-            margin: 10% auto; /* 10% do topo e centralizado */
-            padding: 20px;
-            border: 3px solid #FFD700;
-            width: 80%;
-            max-width: 600px;
-            border-radius: 12px;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-            color: #ddd;
-        }
-
-        #fechar-modal {
-            color: #FFD700;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        #fechar-modal:hover, #fechar-modal:focus {
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        #regras-conteudo ul {
-            list-style-type: disc;
-            margin-left: 20px;
-        }
+        .carta-tropa:hover::after { opacity: 1; }
+        .carta-tropa span { display: block; font-size: 1.1em; font-weight: bold; color: #fff; margin-bottom: 8px; }
+        .carta-tropa small { color: #ff9999; font-weight: bold; font-size: 1.1em; display: block;}
+        .carta-tropa .sinergia { color: #5bc0de; font-size: 0.85em; font-weight: normal; }
         
-        /* 8. Outros */
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #aaa;
-            font-size: 0.9em;
+        .progress-bar-container { background-color: #444; border: 1px solid #FFD700; border-radius: 5px; overflow: hidden; height: 25px; margin-top: 5px; margin-bottom: 10px; }
+        .progress-bar { height: 100%; background-color: #28a745; text-align: right; padding-right: 5px; color: white; line-height: 25px; font-weight: bold; transition: width 0.3s ease; }
+        #inimigo-progress-bar { background-color: #dc3545; }
+        
+        #lista-cartas { display: flex; gap: 15px; list-style: none; padding: 0; flex-wrap: wrap; }
+        #lista-cartas li {
+            background: linear-gradient(145deg, #333, #111); border: 2px solid #555; padding: 20px;
+            border-radius: 8px; cursor: pointer; flex: 1; min-width: 200px; text-align: center; transition: all 0.3s ease;
         }
+        #lista-cartas li:hover { border: 2px solid #FFD700; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(255,215,0,0.2); }
+        .custo-carta { display: inline-block; background: #FFD700; color: #000; padding: 3px 8px; border-radius: 12px; font-weight: bold; margin-bottom: 10px; }
+        
+        #lista-cartas-escolhidas li { background-color: rgba(60, 60, 60, 0.9); border-bottom: 1px solid #444; padding: 10px; margin-bottom: 5px; border-radius: 5px; list-style: none; display: flex; justify-content: space-between;}
+        .btn-vender-edificio { background-color: #dc3545; padding: 5px 10px; font-size: 0.8em; margin: 0; box-shadow: none;}
+        
+        #regras-modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
+        #regras-conteudo { background-color: rgba(30, 30, 30, 0.95); margin: 10% auto; padding: 20px; border: 3px solid #FFD700; width: 80%; max-width: 600px; border-radius: 12px; color: #ddd; }
+        #fechar-modal { color: #FFD700; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+
+        .diff-btn { width: 100%; margin-bottom: 15px; font-size: 1.1em; }
+        #game-screen { display: none; }
+        #tutorial-msg { color: #17a2b8; font-weight: bold; margin-top: 10px; font-size: 1.1em; }
     </style>
 </head>
 <body>
-    <h1>Kingdom Protection</h1>
+    <h1 id="main-title">Kingdom Protection</h1>
+    <h3 id="main-subtitle">Nova atualização</h3>
 
-    <div id="idioma-selector">
-        <label for="idioma-select">Selecione o idioma:</label>
+    <div id="idioma-selector" class="painel" style="padding: 10px;">
+        <label for="idioma-select" id="lbl-idioma">Idioma:</label>
         <select id="idioma-select">
             <option value="pt-br">Português (Brasil)</option>
-            <option value="pt-pt">Português (Portugal)</option>
             <option value="en-us">English (USA)</option>
-            <option value="en-gb">English (UK)</option>
-            <option value="es-es">Español (España)</option>
-            <option value="es-la">Español (América Latina)</option>
+            <option value="es-es">Español</option>
         </select>
     </div>
 
-    <div id="cidade">
-        <h2 id="titulo-cidade">Seu Reino</h2>
-        <p><span id="label-hp">Sua Vida</span>: <span id="hp">800</span> / <span id="hp-max">800</span></p>
-        <div class="progress-bar-container">
-            <div id="hp-progress-bar" class="progress-bar" style="width: 100%;"></div>
+    <div id="start-screen" class="painel">
+        <h2 id="title-diff">Escolha sua Dificuldade</h2>
+        <p id="desc-diff">Sua escolha afeta a vida e o dano dos inimigos. Não pode ser alterada depois!</p>
+        <button class="diff-btn" data-diff="arqueiro" style="background-color: #17a2b8;">Arqueiro (Tutorial / Muito Fácil)</button>
+        <button class="diff-btn" data-diff="escudeiro" style="background-color: #28a745;">Escudeiro (Fácil)</button>
+        <button class="diff-btn" data-diff="cavaleiro" style="background-color: #ffc107; color: black;">Cavaleiro (Normal)</button>
+        <button class="diff-btn" data-diff="comandante" style="background-color: #fd7e14;">Comandante (Difícil)</button>
+        <button class="diff-btn" data-diff="duque" style="background-color: #dc3545;">Duque (Insano)</button>
+        <button id="carregar-jogo-inicio" style="margin-top:20px; width:100%;">Carregar Jogo Salvo</button>
+    </div>
+
+    <div id="game-screen">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div id="cidade" class="painel" style="flex: 1; min-width: 300px;">
+                <h2 id="titulo-cidade">Seu Reino</h2>
+                <p><strong id="lbl-ouro">Ouro:</strong> <span id="ouro" style="color: #FFD700; font-size: 1.2em;">120</span> <small id="lbl-ouro-turno" style="color:#aaa;">(+25/turno)</small></p>
+                <p><span id="lbl-vida">Vida:</span> <span id="hp">500</span> / <span id="hp-max">500</span></p>
+                <div class="progress-bar-container">
+                    <div id="hp-progress-bar" class="progress-bar" style="width: 100%;"></div>
+                </div>
+                <p id="ano" style="font-weight: bold; color: #aaa;"></p>
+                <div id="tutorial-msg"></div>
+            </div>
+
+            <div id="inimigo-status" class="painel" style="flex: 1; min-width: 300px;">
+                <h2 id="inimigo-nome">Rei Inimigo 1</h2>
+                <p><span id="lbl-inimigo-poder">Poder do Inimigo (Dano):</span> <span id="inimigo-ataque" style="color: #ff9999; font-weight: bold;"></span></p>
+                <p><span id="lbl-inimigo-vida">Vida do Inimigo:</span> <span id="inimigo-vida"></span></p>
+                <div class="progress-bar-container">
+                    <div id="inimigo-progress-bar" class="progress-bar" style="width: 100%;"></div>
+                </div>
+            </div>
         </div>
-        <p><span id="label-ouro">Ouro</span>: <span id="ouro">1500</span></p>
-        <p><span id="label-edificios">Edifícios</span>: <span id="edificios">1</span></p>
-        <p><span id="label-unidades">Unidades</span>: <span id="unidades">0</span></p>
-        <p id="ano"></p>
-    </div>
 
-    <div id="inimigo-status">
-        <h2 id="inimigo-nome">Inimigo Atual:</h2>
-        <p><span id="label-inimigo-vida">Vida</span>: <span id="inimigo-vida"></span></p>
-        <div class="progress-bar-container">
-            <div id="inimigo-progress-bar" class="progress-bar" style="width: 100%;"></div>
+        <div id="tabuleiro" class="painel">
+            <h2 id="titulo-tabuleiro">Seu Exército</h2>
+            <p style="margin:0; color:#ccc;"><span id="lbl-espacos">Espaços Usados:</span> <span id="espacos-usados">0</span> / <span id="espacos-max">3</span></p>
+            <p style="margin:0; color:#888; font-size: 0.8em;" id="lbl-dica-vender">Clique em uma carta para vendê-la por metade do valor.</p>
+            <div id="grid-tabuleiro"></div>
+            <p style="margin-top: 15px; color: #aaa;"><span id="lbl-dano-total">Dano Total do Exército (com Sinergias):</span> <strong id="dano-total" style="color: #FFD700;">0</strong></p>
+        </div>
+
+        <div id="acoes" class="painel">
+            <h2 id="titulo-acoes">Ações do Turno</h2>
+            <button id="abrir-loja" class="loja">Rolar Loja (10 Ouro)</button>
+            <button id="recuperar-saude">Curar 50 PV (50 Ouro)</button>
+            <button id="passar-turno" class="batalha">Iniciar Batalha (Fim de Turno)</button>
+            <br><br>
+            <button id="salvar-jogo" style="background-color: #555;">Salvar</button>
+            <button id="carregar-jogo" style="background-color: #555;">Carregar</button>
+            <button id="mostrar-regras" style="background-color: #555;">Regras</button>
+        </div>
+
+        <div id="cartas" class="painel" style="display: none; border-color: #0056b3;">
+            <h2 id="titulo-cartas">Loja: Compre 1 carta (ou pule)</h2>
+            <ul id="lista-cartas"></ul>
+            <button id="pular-loja" style="background-color: #555; width: 100%; margin-top: 10px;">Fechar Loja</button>
+        </div>
+
+        <div id="cartas-escolhidas" class="painel">
+            <h2 id="titulo-cartas-compradas">Edifícios Ativos (Efeitos Passivos)</h2>
+            <ul id="lista-cartas-escolhidas" style="padding-left: 0;"></ul>
         </div>
     </div>
 
-    <div id="acoes">
-        <h2 id="titulo-acoes">Ações</h2>
-        <button id="construir-edificio">Construir Edifício (35 Ouro)</button>
-        <button id="recrutar-15-unidade">Recrutar 15 Unidades (150 Ouro)</button>
-        <button id="recrutar-5-unidade">Recrutar 5 Unidades (50 Ouro)</button>
-        <button id="recrutar-unidade">Recrutar 1 Unidade (10 Ouro)</button>
-        <button id="atacar-inimigo">Atacar Inimigo</button>
-        <button id="recuperar-saude">Adicionar/Recuperar Saúde (250 Ouro)</button>
-        <button id="salvar-jogo">Salvar Jogo</button>
-        <button id="carregar-jogo">Carregar Jogo</button>
-        <button id="mostrar-regras">Regras do Jogo</button>
-    </div>
-
-    <div id="cartas">
-        <h2 id="titulo-cartas">Cartas (Escolha uma ou compre novas)</h2>
-        <button id="comprar-cartas">Comprar 3 Cartas (50 Ouro)</button>
-        <ul id="lista-cartas">
-            </ul>
-    </div>
-
-    <div id="cartas-escolhidas">
-        <h2 id="titulo-cartas-compradas">Cartas Compradas</h2>
-        <ul id="lista-cartas-escolhidas">
-        </ul>
-    </div>
-
-    <div id="regras-modal" style="display:none;">
+    <div id="regras-modal">
         <div id="regras-conteudo">
             <span id="fechar-modal">&times;</span>
-            <h2 id="titulo-regras">Regras do Jogo</h2>
-            <p id="paragrafo-regras-1">
-                Seu objetivo é sobreviver aos ataques de 15 inimigos, fortalecendo seu Reino a cada ano.
-            </p>
-            <p id="paragrafo-regras-2">
-                **Recursos:** Você usa **Ouro** para construir Edifícios e recrutar Unidades.
-            </p>
-            <p id="paragrafo-regras-3">
-                **Turnos (Anos):** A cada 30 segundos (ou 30 *ticks*), um ano se passa. Você ganha ouro por ano, e o Inimigo Atual ataca.
-            </p>
-            <p id="paragrafo-regras-4">
-                **Ações:**
-                <ul>
-                    <li id="regra-acao-1">**Construir Edifício:** Aumenta o limite de Unidades que você pode ter (45 unidades/edifício).</li>
-                    <li id="regra-acao-2">**Recrutar Unidades:** Aumenta seu poder de ataque base (5 Dano/Unidade).</li>
-                    <li id="regra-acao-3">**Cartas:** Oferecem *buffs* permanentes (mais Ouro, mais Vida Máxima, mais Dano). Use-as com sabedoria.</li>
-                </ul>
-            </p>
-            <p id="paragrafo-regras-5">
-                **Combate:** Clique em "Atacar Inimigo" para usar suas Unidades e Cartas de Dano. Se a Vida do Inimigo zerar, você avança para o próximo nível. Se sua Vida zerar, o jogo acaba.
-            </p>
+            <h2 id="modal-titulo">Regras do Jogo</h2>
+            <p id="modal-p1">Defenda seu reino usando estratégia, sinergia e economia!</p>
+            <ul id="modal-list">
+                <li><strong>Ouro e Loja:</strong> Custa 10 de Ouro para ver 3 cartas. Para adicionar uma ao exército, você deve pagar o valor dela!</li>
+                <li><strong>Espaço:</strong> Quase tudo ocupa terreno. Se não tiver espaço, compre construções como Fortalezas ou Castelos para expandir.</li>
+                <li><strong>Sinergias:</strong> Tropas interagem. Arqueiros ficam mais fortes juntos, Magos precisam de Guerreiros/Cavaleiros em campo para dar dano extra.</li>
+                <li><strong>Venda:</strong> Clicar em uma tropa no campo a vende por 50% do valor e libera o espaço.</li>
+            </ul>
         </div>
     </div>
+
     <script>
-        // Variáveis do Jogo
-        const CUSTO_EDIFICIO = 35;
-        const CUSTO_RECRUTAR_15 = 150;
-        const CUSTO_RECRUTAR_5 = 50;
-        const CUSTO_RECRUTAR_1 = 10;
-        const CUSTO_ADICIONAR_RECUPERAR_SAUDE = 250;
-        const CUSTO_COMPRAR_CARTAS = 50;
-        const DANO_POR_UNIDADE = 5;
-        const HP_MAXIMO_LIMITE = 15000;
+        const CUSTO_REROLL = 10;
+        const CUSTO_CURA = 50;
+        const VALOR_CURA = 50;
+        const HP_MAXIMO_LIMITE = 50000;
 
-        // Elementos da interface
-        const ouroElement = document.getElementById("ouro");
-        const edificiosElement = document.getElementById("edificios");
-        const unidadesElement = document.getElementById("unidades");
-        const hpElement = document.getElementById("hp");
-        const hpMaxElement = document.getElementById("hp-max");
-        const anoElement = document.getElementById("ano");
-        const inimigoNomeElement = document.getElementById("inimigo-nome");
-        const inimigoVidaElement = document.getElementById("inimigo-vida");
-        const listaCartasElement = document.getElementById("lista-cartas");
-        const listaCartasEscolhidasElement = document.getElementById("lista-cartas-escolhidas");
-        const hpProgressBar = document.getElementById("hp-progress-bar");
-        const inimigoProgressBar = document.getElementById("inimigo-progress-bar");
-
-        const tituloCidade = document.getElementById("titulo-cidade");
-        const labelHp = document.getElementById("label-hp");
-        const labelOuro = document.getElementById("label-ouro");
-        const labelEdificios = document.getElementById("label-edificios");
-        const labelUnidades = document.getElementById("label-unidades");
-        const tituloAcoes = document.getElementById("titulo-acoes");
-        const tituloCartas = document.getElementById("titulo-cartas");
-        const tituloCartasCompradas = document.getElementById("titulo-cartas-compradas");
-        const labelInimigoVida = document.getElementById("label-inimigo-vida");
-        const btnConstruirEdificio = document.getElementById("construir-edificio");
-        const btnRecrutar15 = document.getElementById("recrutar-15-unidade");
-        const btnRecrutar5 = document.getElementById("recrutar-5-unidade");
-        const btnRecrutar1 = document.getElementById("recrutar-unidade");
-        const btnAtacar = document.getElementById("atacar-inimigo");
-        const btnRecuperarSaude = document.getElementById("recuperar-saude");
-        const btnSalvarJogo = document.getElementById("salvar-jogo");
-        const btnCarregarJogo = document.getElementById("carregar-jogo");
-        const btnComprarCartas = document.getElementById("comprar-cartas");
-        const idiomaSelect = document.getElementById("idioma-select");
-
-        // Elementos do Modal de Regras (NOVOS)
-        const btnMostrarRegras = document.getElementById("mostrar-regras");
-        const regrasModal = document.getElementById("regras-modal");
-        const fecharModal = document.getElementById("fechar-modal");
-
-        let idiomaAtual = "pt-br";
-
-        // Variável de traduções atualizada com as regras
         const traducoes = {
             "pt-br": {
-                titulo: "Kingdom Protection",
-                subtituloCidade: "Seu Reino",
-                suaVida: "Sua Vida",
-                ouro: "Ouro",
-                edificios: "Edifícios",
-                unidades: "Unidades",
-                inimigoAtual: "Inimigo Atual:",
-                vida: "Vida",
-                tituloAcoes: "Ações",
-                construirEdificio: "Construir Edifício",
-                recrutar15: "Recrutar 15 Unidades",
-                recrutar5: "Recrutar 5 Unidades",
-                recrutar1: "Recrutar 1 Unidade",
-                atacarInimigo: "Atacar Inimigo",
-                recuperarSaude: "Adicionar/Recuperar Saúde",
-                salvarJogo: "Salvar Jogo",
-                carregarJogo: "Carregar Jogo",
-                tituloCartas: "Cartas (Escolha uma ou compre novas)",
-                comprarCartas: "Comprar 3 Cartas",
-                tituloCartasCompradas: "Cartas Compradas",
-                ano: "Ano",
-                naoOuro: "Você não tem ouro suficiente para comprar!",
-                naoOuroCarta: "Você não tem ouro suficiente para escolher a carta",
-                limiteUnidades: "Você atingiu o limite de unidades por edifício!",
-                naoAtaque: "Você não tem unidades ou cartas de ataque para atacar o inimigo!",
-                venceuInimigo: "Você derrotou o",
-                venceuJogo: "Parabéns! Você venceu todos os 15 inimigos!",
-                perdeuJogo: "Você foi derrotado pelo",
-                jogoSalvo: "Jogo salvo com sucesso!",
-                semJogoSalvo: "Nenhum jogo salvo encontrado.",
-                jogoCarregado: "Jogo carregado com sucesso!",
-                // NOVAS TRADUÇÕES DE REGRAS
-                regrasJogo: "Regras do Jogo",
-                paragrafoRegras1: "Seu objetivo é sobreviver aos ataques de 15 inimigos, fortalecendo seu Reino a cada ano.",
-                paragrafoRegras2: "Você usa **Ouro** para construir Edifícios e recrutar Unidades.",
-                paragrafoRegras3: "Turnos (Anos): A cada 30 segundos, um ano se passa. Você ganha ouro por ano, e o Inimigo Atual ataca.",
-                paragrafoRegras4_1: "**Construir Edifício:** Aumenta o limite de Unidades que você pode ter (45 unidades/edifício).",
-                paragrafoRegras4_2: "**Recrutar Unidades:** Aumenta seu poder de ataque base (5 Dano/Unidade).",
-                paragrafoRegras4_3: "**Cartas:** Oferecem *buffs* permanentes (mais Ouro, mais Vida Máxima, mais Dano). Use-as com sabedoria.",
-                paragrafoRegras5: "Combate: Clique em 'Atacar Inimigo' para usar suas Unidades e Cartas de Dano. Se a Vida do Inimigo zerar, você avança. Se sua Vida zerar, o jogo acaba.",
-                // FIM NOVAS TRADUÇÕES DE REGRAS
+                ui: {
+                    mainTitle: "Kingdom Protection", mainSubtitle: "Nova Atualização",titleDiff: "Escolha sua Dificuldade",
+                    descDiff: "Sua escolha afeta a vida e o dano dos inimigos. Não pode ser alterada depois!",
+                    lblIdioma: "Idioma:", btnLoadStart: "Carregar Jogo Salvo", tituloCidade: "Seu Reino",
+                    lblOuro: "Ouro:", lblVida: "Vida:", lblAno: "Turno/Ano", lblOuroTurno: "/turno",
+                    lblInimigoPoder: "Poder do Inimigo (Dano):", lblInimigoVida: "Vida do Inimigo:",
+                    tituloTabuleiro: "Seu Exército", lblEspacos: "Espaços Usados:", lblDanoTotal: "Dano Total (com Sinergias):",
+                    lblDicaVender: "Clique em uma carta no exército/edifícios para vendê-la por metade do valor.",
+                    tituloAcoes: "Ações do Turno", btnComprar: "Rolar Loja (10 Ouro)", btnCurar: "Curar 50 PV (50 Ouro)",
+                    btnBatalha: "Iniciar Batalha (Fim de Turno)", btnSalvar: "Salvar", btnCarregar: "Carregar", btnRegras: "Regras",
+                    tituloCartas: "Loja: Compre 1 carta (ou pule)", tituloCartasCompradas: "Edifícios Ativos", btnPularLoja: "Fechar Loja",
+                    modalTitulo: "Regras do Jogo", btnVender: "Vender",
+                    modalP1: "Defenda seu reino usando estratégia, sinergia e economia!",
+                    modalList: `<li><strong>Ouro e Loja:</strong> Custa 10 para ver cartas. Você deve pagar o valor da carta para comprá-la!</li>
+                                <li><strong>Espaço:</strong> Compre construções para expandir limite.</li>
+                                <li><strong>Sinergias:</strong> Arqueiros agrupados são mais fortes. Magos causam mais dano atrás de Guerreiros/Cavaleiros.</li>`,
+                    tut1: "DICA: Gaste 10 de ouro para abrir a loja e compre tropas baratas!",
+                    tut2: "DICA: Preste atenção no custo de cada carta e se você tem espaço.",
+                    tut3: "DICA: Juntar cartas da mesma classe gera bônus ocultos de sinergia!"
+                },
+                msgs: {
+                    naoOuroReroll: "Ouro insuficiente para rolar a loja (Custa 10)!", naoOuroCarta: "Ouro insuficiente para comprar esta carta!",
+                    venceuInimigo: "Você derrotou o", venceuJogo: "Parabéns! Você venceu todos os Reis!",
+                    perdeuJogo: "Seu reino caiu para o", jogoSalvo: "Jogo salvo com sucesso!", semJogoSalvo: "Nenhum jogo salvo encontrado.",
+                    jogoCarregado: "Jogo carregado!", espacoCheio: "Espaço insuficiente! Venda unidades ou compre Edifícios de expansão.",
+                    naoOuroCurar: "Ouro insuficiente para curar!", mortePelaCarta: "Esta construção destruiria seu reino! Compra cancelada."
+                },
                 carta: {
-                    guerreiro: {nome: "Guerreiro", descricao: "Aumenta seu dano base em 50."},
-                    arqueiro: {nome: "Arqueiro", descricao: "Aumenta seu dano base em 25."},
-                    cavaleiro: {nome: "Cavaleiro", descricao: "Aumenta seu dano base em 75."},
-                    mago: {nome: "Mago", descricao: "Aumenta seu dano base em 100."},
-                    castelo: {nome: "Castelo", descricao: "+250 de saúde máxima, +50 de ouro por ano"},
-                    fortaleza: {nome: "Fortaleza", descricao: "+750 de saúde máxima, +100 de ouro por ano"},
-                    palacio: {nome: "Palácio", descricao: "+500 de saúde máxima, +100 de ouro por ano"},
-                    fazenda: {nome: "Fazenda", descricao: "+50 de ouro por ano, +25 de saúde máxima"},
-                    mercado: {nome: "Mercado", descricao: "+100 de ouro por ano, -50 de saúde máxima"},
-                    quartel: {nome: "Quartel", descricao: "+50 de dano base, +50 de saúde máxima"},
-                }
-            },
-            "pt-pt": {
-                titulo: "Kingdom Protection",
-                subtituloCidade: "O seu Reino",
-                suaVida: "A sua Vida",
-                ouro: "Ouro",
-                edificios: "Edifícios",
-                unidades: "Unidades",
-                inimigoAtual: "Inimigo Atual:",
-                vida: "Vida",
-                tituloAcoes: "Ações",
-                construirEdificio: "Construir Edifício",
-                recrutar15: "Recrutar 15 Unidades",
-                recrutar5: "Recrutar 5 Unidades",
-                recrutar1: "Recrutar 1 Unidade",
-                atacarInimigo: "Atacar Inimigo",
-                recuperarSaude: "Adicionar/Recuperar Saúde",
-                salvarJogo: "Guardar Jogo",
-                carregarJogo: "Carregar Jogo",
-                tituloCartas: "Cartas (Escolha uma ou compre novas)",
-                comprarCartas: "Comprar 3 Cartas",
-                tituloCartasCompradas: "Cartas Compradas",
-                ano: "Ano",
-                naoOuro: "Não tem ouro suficiente para comprar!",
-                naoOuroCarta: "Não tem ouro suficiente para escolher a carta",
-                limiteUnidades: "Atingiu o limite de unidades por edifício!",
-                naoAtaque: "Não tem unidades ou cartas de ataque para atacar o inimigo!",
-                venceuInimigo: "Derrotou o",
-                venceuJogo: "Parabéns! Derrotou todos os 15 inimigos!",
-                perdeuJogo: "Foi derrotado pelo",
-                jogoSalvo: "Jogo guardado com sucesso!",
-                semJogoSalvo: "Não foi encontrado nenhum jogo guardado.",
-                jogoCarregado: "Jogo carregado com sucesso!",
-                 // NOVAS TRADUÇÕES DE REGRAS
-                regrasJogo: "Regras do Jogo",
-                paragrafoRegras1: "O seu objetivo é sobreviver aos ataques de 15 inimigos, fortalecendo o seu Reino a cada ano.",
-                paragrafoRegras2: "Você usa **Ouro** para construir Edifícios e recrutar Unidades.",
-                paragrafoRegras3: "Turnos (Anos): A cada 30 segundos, um ano passa. Você ganha ouro por ano, e o Inimigo Atual ataca.",
-                paragrafoRegras4_1: "**Construir Edifício:** Aumenta o limite de Unidades que pode ter (45 unidades/edifício).",
-                paragrafoRegras4_2: "**Recrutar Unidades:** Aumenta o seu poder de ataque base (5 Dano/Unidade).",
-                paragrafoRegras4_3: "**Cartas:** Oferecem *buffs* permanentes (mais Ouro, mais Vida Máxima, mais Dano). Use-as com sabedoria.",
-                paragrafoRegras5: "Combate: Clique em 'Atacar Inimigo' para usar as suas Unidades e Cartas de Dano. Se a Vida do Inimigo zerar, avança. Se a sua Vida zerar, o jogo acaba.",
-                // FIM NOVAS TRADUÇÕES DE REGRAS
-                carta: {
-                    guerreiro: {nome: "Guerreiro", descricao: "Aumenta o seu dano base em 50."},
-                    arqueiro: {nome: "Arqueiro", descricao: "Aumenta o seu dano base em 25."},
-                    cavaleiro: {nome: "Cavaleiro", descricao: "Aumenta o seu dano base em 75."},
-                    mago: {nome: "Mago", descricao: "Aumenta o seu dano base em 100."},
-                    castelo: {nome: "Castelo", descricao: "+250 de vida máxima, +50 de ouro por ano"},
-                    fortaleza: {nome: "Fortaleza", descricao: "+750 de vida máxima, +100 de ouro por ano"},
-                    palacio: {nome: "Palácio", descricao: "+500 de vida máxima, +100 de ouro por ano"},
-                    fazenda: {nome: "Quinta", descricao: "+50 de ouro por ano, +25 de vida máxima"},
-                    mercado: {nome: "Mercado", descricao: "+100 de ouro por ano, -50 de vida máxima"},
-                    quartel: {nome: "Quartel", descricao: "+50 de dano base, +50 de vida máxima"},
+                    guerreiro: {nome: "Guerreiro", descricao: "Tropa básica. Dano: 25. Ocupa 1 espaço.", sinergiaText: ""},
+                    arqueiro: {nome: "Arqueiro", descricao: "Dano: 15. Sinergia: +10 Dano para CADA outro Arqueiro.", sinergiaText: "+{val} (Sinergia)"},
+                    cavaleiro: {nome: "Cavaleiro", descricao: "Tropa pesada. Dano: 55. Ocupa 1 espaço.", sinergiaText: ""},
+                    mago: {nome: "Mago", descricao: "Dano: 40. Sinergia: +20 Dano para CADA Guerreiro/Cavaleiro no campo.", sinergiaText: "+{val} (Protegido)"},
+                    castelo: {nome: "Castelo", descricao: "Ocupa 1, Dá 2 Espaços (Líquido +1). +50 Vida Max, +10 Ouro/turno.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortaleza", descricao: "Ocupa 1, Dá 3 Espaços (Líquido +2). +150 Vida Max, +25 Ouro/turno.", sinergiaText: ""},
+                    fazenda: {nome: "Fazenda", descricao: "Ocupa 1 espaço. +15 Ouro/turno.", sinergiaText: ""},
+                    mercado: {nome: "Mercado", descricao: "Ocupa 1 espaço. +30 Ouro/turno, -20 Vida Max.", sinergiaText: ""},
+                    quartel: {nome: "Quartel", descricao: "Ocupa 1, Dá 2 Espaços (Líquido +1). +30 Vida Max.", sinergiaText: ""}
                 }
             },
             "en-us": {
-                titulo: "Kingdom Protection",
-                subtituloCidade: "Your Kingdom",
-                suaVida: "Your Health",
-                ouro: "Gold",
-                edificios: "Buildings",
-                unidades: "Units",
-                inimigoAtual: "Current Enemy:",
-                vida: "Health",
-                tituloAcoes: "Actions",
-                construirEdificio: "Build a Building",
-                recrutar15: "Recruit 15 Units",
-                recrutar5: "Recruit 5 Units",
-                recrutar1: "Recruit 1 Unit",
-                atacarInimigo: "Attack Enemy",
-                recuperarSaude: "Add/Heal Health",
-                salvarJogo: "Save Game",
-                carregarJogo: "Load Game",
-                tituloCartas: "Cards (Choose one or buy new ones)",
-                comprarCartas: "Buy 3 Cards",
-                tituloCartasCompradas: "Purchased Cards",
-                ano: "Year",
-                naoOuro: "You don't have enough gold to buy!",
-                naoOuroCarta: "You don't have enough gold to choose the card",
-                limiteUnidades: "You have reached the unit limit per building!",
-                naoAtaque: "You have no units or attack cards to attack the enemy!",
-                venceuInimigo: "You defeated the",
-                venceuJogo: "Congratulations! You defeated all 15 enemies!",
-                perdeuJogo: "You were defeated by the",
-                jogoSalvo: "Game saved successfully!",
-                semJogoSalvo: "No saved game found.",
-                jogoCarregado: "Game loaded successfully!",
-                // NOVAS TRADUÇÕES DE REGRAS
-                regrasJogo: "Game Rules",
-                paragrafoRegras1: "Your objective is to survive the attacks of 15 enemies by strengthening your Kingdom each year.",
-                paragrafoRegras2: "Resources: You use **Gold** to build Buildings and recruit Units.",
-                paragrafoRegras3: "Turns (Years): Every 30 seconds, a year passes. You gain gold per year, and the Current Enemy attacks.",
-                paragrafoRegras4_1: "**Build a Building:** Increases the limit of Units you can have (45 units/building).",
-                paragrafoRegras4_2: "**Recruit Units:** Increases your base attack power (5 Damage/Unit).",
-                paragrafoRegras4_3: "**Cards:** Offer permanent buffs (more Gold, more Max Health, more Damage). Use them wisely.",
-                paragrafoRegras5: "Combat: Click 'Attack Enemy' to use your Units and Damage Cards. If the Enemy's Health reaches zero, you advance. If your Health reaches zero, the game ends.",
-                // FIM NOVAS TRADUÇÕES DE REGRAS
+                ui: {
+                    mainTitle: "Kingdom Protection", mainSubtitle: "New Actualization", titleDiff: "Choose your Difficulty",
+                    descDiff: "Your choice affects enemy health and damage. Cannot be changed later!",
+                    lblIdioma: "Language:", btnLoadStart: "Load Saved Game", tituloCidade: "Your Kingdom",
+                    lblOuro: "Gold:", lblVida: "Health:", lblAno: "Turn/Year", lblOuroTurno: "/turn",
+                    lblInimigoPoder: "Enemy Power (Damage):", lblInimigoVida: "Enemy Health:",
+                    tituloTabuleiro: "Your Army", lblEspacos: "Used Spaces:", lblDanoTotal: "Total Damage (with Synergy):",
+                    lblDicaVender: "Click a card in the army/buildings to sell it for half price.",
+                    tituloAcoes: "Turn Actions", btnComprar: "Roll Shop (10 Gold)", btnCurar: "Heal 50 HP (50 Gold)",
+                    btnBatalha: "Start Battle (End Turn)", btnSalvar: "Save", btnCarregar: "Load", btnRegras: "Rules",
+                    tituloCartas: "Shop: Buy 1 card (or skip)", tituloCartasCompradas: "Active Buildings", btnPularLoja: "Close Shop",
+                    modalTitulo: "Game Rules", btnVender: "Sell",
+                    modalP1: "Defend your kingdom using strategy, synergy, and economy!",
+                    modalList: `<li><strong>Gold & Shop:</strong> Costs 10 to see cards. You must pay the card's price to buy it!</li>
+                                <li><strong>Space:</strong> Buy buildings to expand limits.</li>
+                                <li><strong>Synergies:</strong> Archers group up for damage. Mages deal more damage behind Warriors/Knights.</li>`,
+                    tut1: "HINT: Spend 10 gold to open the shop and buy cheap troops!",
+                    tut2: "HINT: Pay attention to card costs and your space limit.",
+                    tut3: "HINT: Grouping similar classes generates hidden synergy bonuses!"
+                },
+                msgs: {
+                    naoOuroReroll: "Not enough gold to roll the shop (Costs 10)!", naoOuroCarta: "Not enough gold to buy this card!",
+                    venceuInimigo: "You defeated", venceuJogo: "Congratulations! You defeated all Kings!",
+                    perdeuJogo: "Your kingdom fell to", jogoSalvo: "Game saved!", semJogoSalvo: "No saved game found.",
+                    jogoCarregado: "Game loaded!", espacoCheio: "Not enough space! Sell units or buy expansion Buildings.",
+                    naoOuroCurar: "Not enough gold to heal!", mortePelaCarta: "This building would destroy your kingdom! Purchase canceled."
+                },
                 carta: {
-                    guerreiro: {nome: "Warrior", descricao: "Increases your base damage by 50."},
-                    arqueiro: {nome: "Archer", descricao: "Increases your base damage by 25."},
-                    cavaleiro: {nome: "Knight", descricao: "Increases your base damage by 75."},
-                    mago: {nome: "Wizard", descricao: "Increases your base damage by 100."},
-                    castelo: {nome: "Castle", descricao: "+250 max health, +50 gold per year"},
-                    fortaleza: {nome: "Fortress", descricao: "+750 max health, +100 gold per year"},
-                    palacio: {nome: "Palace", descricao: "+500 max health, +100 gold per year"},
-                    fazenda: {nome: "Farm", descricao: "+50 gold per year, +25 max health"},
-                    mercado: {nome: "Market", descricao: "+100 gold per year, -50 max health"},
-                    quartel: {nome: "Barracks", descricao: "+50 base damage, +50 max health"},
-                }
-            },
-            "en-gb": {
-                titulo: "Kingdom Protection",
-                subtituloCidade: "Your Kingdom",
-                suaVida: "Your Health",
-                ouro: "Gold",
-                edificios: "Buildings",
-                unidades: "Units",
-                inimigoAtual: "Current Enemy:",
-                vida: "Health",
-                tituloAcoes: "Actions",
-                construirEdificio: "Build a Building",
-                recrutar15: "Recruit 15 Units",
-                recrutar5: "Recruit 5 Units",
-                recrutar1: "Recruit 1 Unit",
-                atacarInimigo: "Attack Enemy",
-                recuperarSaude: "Add/Heal Health",
-                salvarJogo: "Save Game",
-                carregarJogo: "Load Game",
-                tituloCartas: "Cards (Choose one or buy new ones)",
-                comprarCartas: "Buy 3 Cards",
-                tituloCartasCompradas: "Purchased Cards",
-                ano: "Year",
-                naoOuro: "You don't have enough gold to buy!",
-                naoOuroCarta: "You don't have enough gold to choose the card",
-                limiteUnidades: "You have reached the unit limit per building!",
-                naoAtaque: "You have no units or attack cards to attack the enemy!",
-                venceuInimigo: "You defeated the",
-                venceuJogo: "Congratulations! You defeated all 15 enemies!",
-                perdeuJogo: "You were defeated by the",
-                jogoSalvo: "Game saved successfully!",
-                semJogoSalvo: "No saved game found.",
-                jogoCarregado: "Game loaded successfully!",
-                // NOVAS TRADUÇÕES DE REGRAS
-                regrasJogo: "Game Rules",
-                paragrafoRegras1: "Your objective is to survive the attacks of 15 enemies by strengthening your Kingdom each year.",
-                paragrafoRegras2: "Resources: You use **Gold** to build Buildings and recruit Units.",
-                paragrafoRegras3: "Turns (Years): Every 30 seconds, a year passes. You gain gold per year, and the Current Enemy attacks.",
-                paragrafoRegras4_1: "**Build a Building:** Increases the limit of Units you can have (45 units/building).",
-                paragrafoRegras4_2: "**Recruit Units:** Increases your base attack power (5 Damage/Unit).",
-                paragrafoRegras4_3: "**Cards:** Offer permanent buffs (more Gold, more Max Health, more Damage). Use them wisely.",
-                paragrafoRegras5: "Combat: Click 'Attack Enemy' to use your Units and Damage Cards. If the Enemy's Health reaches zero, you advance. If your Health reaches zero, the game ends.",
-                // FIM NOVAS TRADUÇÕES DE REGRAS
-                carta: {
-                    guerreiro: {nome: "Warrior", descricao: "Increases your base damage by 50."},
-                    arqueiro: {nome: "Archer", descricao: "Increases your base damage by 25."},
-                    cavaleiro: {nome: "Knight", descricao: "Increases your base damage by 75."},
-                    mago: {nome: "Wizard", descricao: "Increases your base damage by 100."},
-                    castelo: {nome: "Castle", descricao: "+250 max health, +50 gold per year"},
-                    fortaleza: {nome: "Fortress", descricao: "+750 max health, +100 gold per year"},
-                    palacio: {nome: "Palace", descricao: "+500 max health, +100 gold per year"},
-                    fazenda: {nome: "Farm", descricao: "+50 gold per year, +25 max health"},
-                    mercado: {nome: "Market", descricao: "+100 gold per year, -50 max health"},
-                    quartel: {nome: "Barracks", descricao: "+50 base damage, +50 max health"},
+                    guerreiro: {nome: "Warrior", descricao: "Basic troop. Dmg: 25. Occupies 1 space.", sinergiaText: ""},
+                    arqueiro: {nome: "Archer", descricao: "Dmg: 15. Synergy: +10 Dmg for EACH other Archer.", sinergiaText: "+{val} (Synergy)"},
+                    cavaleiro: {nome: "Knight", descricao: "Heavy troop. Dmg: 55. Occupies 1 space.", sinergiaText: ""},
+                    mago: {nome: "Wizard", descricao: "Dmg: 40. Synergy: +20 Dmg for EACH Warrior/Knight.", sinergiaText: "+{val} (Protected)"},
+                    castelo: {nome: "Castle", descricao: "Takes 1, Gives 2 Space (Net +1). +50 Max HP, +10 Gold/turn.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortress", descricao: "Takes 1, Gives 3 Space (Net +2). +150 Max HP, +25 Gold/turn.", sinergiaText: ""},
+                    fazenda: {nome: "Farm", descricao: "Occupies 1 space. +15 Gold/turn.", sinergiaText: ""},
+                    mercado: {nome: "Market", descricao: "Occupies 1 space. +30 Gold/turn, -20 Max HP.", sinergiaText: ""},
+                    quartel: {nome: "Barracks", descricao: "Takes 1, Gives 2 Space (Net +1). +30 Max HP.", sinergiaText: ""}
                 }
             },
             "es-es": {
-                titulo: "Kingdom Protection",
-                subtituloCidade: "Tu Reino",
-                suaVida: "Tu Vida",
-                ouro: "Oro",
-                edificios: "Edificios",
-                unidades: "Unidades",
-                inimigoAtual: "Enemigo Actual:",
-                vida: "Vida",
-                tituloAcoes: "Acciones",
-                construirEdificio: "Construir Edificio",
-                recrutar15: "Reclutar 15 Unidades",
-                recrutar5: "Reclutar 5 Unidades",
-                recrutar1: "Reclutar 1 Unidad",
-                atacarInimigo: "Atacar Enemigo",
-                recuperarSaude: "Añadir/Recuperar Vida",
-                salvarJogo: "Guardar Partida",
-                carregarJogo: "Cargar Partida",
-                tituloCartas: "Cartas (Elige una o compra nuevas)",
-                comprarCartas: "Comprar 3 Cartas",
-                tituloCartasCompradas: "Cartas Compradas",
-                ano: "Año",
-                naoOuro: "¡No tienes suficiente oro para comprar!",
-                naoOuroCarta: "¡No tienes suficiente oro para elegir la carta",
-                limiteUnidades: "¡Has alcanzado el límite de unidades por edificio!",
-                naoAtaque: "¡No tienes unidades o cartas de ataque para atacar al enemigo!",
-                venceuInimigo: "Has derrotado al",
-                venceuJogo: "¡Felicidades! ¡Has derrotado a los 15 enemigos!",
-                perdeuJogo: "Has sido derrotado por el",
-                jogoSalvo: "¡Partida guardada con éxito!",
-                semJogoSalvo: "No se encontró ninguna partida guardada.",
-                jogoCarregado: "¡Partida cargada con éxito!",
-                 // NOVAS TRADUÇÕES DE REGRAS
-                regrasJogo: "Reglas del Juego",
-                paragrafoRegras1: "Tu objetivo es sobrevivir a los ataques de 15 enemigos fortaleciendo tu Reino cada año.",
-                paragrafoRegras2: "Recursos: Utilizas **Oro** para construir Edificios y reclutar Unidades.",
-                paragrafoRegras3: "Turnos (Años): Cada 30 segundos, pasa un año. Ganas oro por año, y el Enemigo Actual ataca.",
-                paragrafoRegras4_1: "**Construir Edificio:** Aumenta el límite de Unidades que puedes tener (45 unidades/edificio).",
-                paragrafoRegras4_2: "**Reclutar Unidades:** Aumenta tu poder de ataque base (5 Daño/Unidad).",
-                paragrafoRegras4_3: "**Cartas:** Ofrecen *mejoras* permanentes (más Oro, más Vida Máxima, más Daño). Úsalas sabiamente.",
-                paragrafoRegras5: "Combate: Haz clic en 'Atacar Enemigo' para usar tus Unidades y Cartas de Daño. Si la Vida del Enemigo llega a cero, avanzas. Si tu Vida llega a cero, el juego termina.",
-                // FIM NOVAS TRADUÇÕES DE REGRAS
+                ui: {
+                    mainTitle: "Kingdom Protection", mainSubtitle: "Nueva Actualización", titleDiff: "Elige tu Dificultad",
+                    descDiff: "Tu elección afecta la vida y daño enemigo. ¡No se puede cambiar después!",
+                    lblIdioma: "Idioma:", btnLoadStart: "Cargar Partida Guardada", tituloCidade: "Tu Reino",
+                    lblOuro: "Oro:", lblVida: "Vida:", lblAno: "Turno/Año", lblOuroTurno: "/turno",
+                    lblInimigoPoder: "Poder Enemigo:", lblInimigoVida: "Vida del Enemigo:",
+                    tituloTabuleiro: "Tu Ejército", lblEspacos: "Espacios Usados:", lblDanoTotal: "Daño Total (con Sinergia):",
+                    lblDicaVender: "Haz clic en una carta para venderla por la mitad de su precio.",
+                    tituloAcoes: "Acciones del Turno", btnComprar: "Rol Tienda (10 Oro)", btnCurar: "Curar 50 PV (50 Oro)",
+                    btnBatalha: "Iniciar Batalla (Fin de Turno)", btnSalvar: "Guardar", btnCarregar: "Cargar", btnRegras: "Reglas",
+                    tituloCartas: "Tienda: Compra 1 carta (o salta)", tituloCartasCompradas: "Edificios Activos", btnPularLoja: "Cerrar Tienda",
+                    modalTitulo: "Reglas del Juego", btnVender: "Vender",
+                    modalP1: "¡Defiende tu reino usando estrategia, sinergia y economía!",
+                    modalList: `<li><strong>Oro y Tienda:</strong> Cuesta 10 ver cartas. ¡Debes pagar el valor de la carta!</li>
+                                <li><strong>Espacio:</strong> Compra edificios para expandir límites.</li>
+                                <li><strong>Sinergias:</strong> Arqueros juntos son fuertes. Magos tras Guerreros/Caballeros hacen más daño.</li>`,
+                    tut1: "PISTA: ¡Gasta 10 de oro para abrir la tienda y comprar tropas!",
+                    tut2: "PISTA: Presta atención a los costos y a tu límite de espacio.",
+                    tut3: "PISTA: ¡Agrupar clases similares genera bonos de sinergia!"
+                },
+                msgs: {
+                    naoOuroReroll: "¡Oro insuficiente para rodar (Cuesta 10)!", naoOuroCarta: "¡Oro insuficiente para comprar esto!",
+                    venceuInimigo: "Derrotaste al", venceuJogo: "¡Felicidades! ¡Derrotaste a todos los Reyes!",
+                    perdeuJogo: "Tu reino cayó ante el", jogoSalvo: "¡Juego guardado!", semJogoSalvo: "No se encontró partida guardada.",
+                    jogoCarregado: "¡Juego cargado!", espacoCheio: "¡Espacio lleno! Vende unidades o compra Edificios de expansión.",
+                    naoOuroCurar: "¡Oro insuficiente para curar!", mortePelaCarta: "¡Este edificio destruiría tu reino! Compra cancelada."
+                },
                 carta: {
-                    guerreiro: {nome: "Guerrero", descricao: "Aumenta tu daño base en 50."},
-                    arqueiro: {nome: "Arquero", descricao: "Aumenta tu daño base en 25."},
-                    cavaleiro: {nome: "Caballero", descricao: "Aumenta tu daño base en 75."},
-                    mago: {nome: "Mago", descricao: "Aumenta tu daño base en 100."},
-                    castelo: {nome: "Castillo", descricao: "+250 de vida máxima, +50 de oro por año"},
-                    fortaleza: {nome: "Fortaleza", descricao: "+750 de vida máxima, +100 de oro por año"},
-                    palacio: {nome: "Palacio", descricao: "+500 de vida máxima, +100 de oro por año"},
-                    fazenda: {nome: "Granja", descricao: "+50 de oro por año, +25 de vida máxima"},
-                    mercado: {nome: "Mercado", descricao: "+100 de oro por año, -50 de vida máxima"},
-                    quartel: {nome: "Cuartel", descricao: "+50 de daño base, +50 de vida máxima"},
-                }
-            },
-            "es-la": {
-                titulo: "Kingdom Protection",
-                subtituloCidade: "Tu Reino",
-                suaVida: "Tu Vida",
-                ouro: "Oro",
-                edificios: "Edificios",
-                unidades: "Unidades",
-                inimigoAtual: "Enemigo Actual:",
-                vida: "Vida",
-                tituloAcoes: "Acciones",
-                construirEdificio: "Construir Edificio",
-                recrutar15: "Reclutar 15 Unidades",
-                recrutar5: "Reclutar 5 Unidades",
-                recrutar1: "Reclutar 1 Unidad",
-                atacarInimigo: "Atacar Enemigo",
-                recuperarSaude: "Añadir/Recuperar Vida",
-                salvarJogo: "Guardar Partida",
-                carregarJogo: "Cargar Partida",
-                tituloCartas: "Cartas (Elige una o compra nuevas)",
-                comprarCartas: "Comprar 3 Cartas",
-                tituloCartasCompradas: "Cartas Compradas",
-                ano: "Año",
-                naoOuro: "¡No tienes suficiente oro para comprar!",
-                naoOuroCarta: "¡No tienes suficiente oro para elegir la carta",
-                limiteUnidades: "¡Has alcanzado el límite de unidades por edificio!",
-                naoAtaque: "¡No tienes unidades o cartas de ataque para atacar al enemigo!",
-                venceuInimigo: "Has derrotado al",
-                venceuJogo: "¡Felicidades! ¡Has derrotado a los 15 enemigos!",
-                perdeuJogo: "Has sido derrotado por el",
-                jogoSalvo: "¡Partida guardada con éxito!",
-                semJogoSalvo: "No se encontró ninguna partida guardada.",
-                jogoCarregado: "¡Partida cargada con éxito!",
-                // NOVAS TRADUÇÕES DE REGRAS
-                regrasJogo: "Reglas del Juego",
-                paragrafoRegras1: "Tu objetivo es sobrevivir a los ataques de 15 enemigos fortaleciendo tu Reino cada año.",
-                paragrafoRegras2: "Recursos: Utilizas **Oro** para construir Edificios y reclutar Unidades.",
-                paragrafoRegras3: "Turnos (Años): Cada 30 segundos, pasa un año. Ganas oro por año, y el Enemigo Actual ataca.",
-                paragrafoRegras4_1: "**Construir Edificio:** Aumenta el límite de Unidades que puedes tener (45 unidades/edificio).",
-                paragrafoRegras4_2: "**Recrutar Unidades:** Aumenta tu poder de ataque base (5 Daño/Unidad).",
-                paragrafoRegras4_3: "**Cartas:** Ofrecen *mejoras* permanentes (más Oro, más Vida Máxima, más Daño). Úsalas sabiamente.",
-                paragrafoRegras5: "Combate: Haz clic en 'Atacar Enemigo' para usar tus Unidades y Cartas de Daño. Si la Vida del Enemigo llega a cero, avanzas. Si tu Vida llega a cero, el juego termina.",
-                // FIM NOVAS TRADUÇÕES DE REGRAS
-                carta: {
-                    guerreiro: {nome: "Guerrero", descricao: "Aumenta tu daño base en 50."},
-                    arqueiro: {nome: "Arquero", descricao: "Aumenta tu daño base en 25."},
-                    cavaleiro: {nome: "Caballero", descricao: "Aumenta tu daño base en 75."},
-                    mago: {nome: "Mago", descricao: "Aumenta tu daño base en 100."},
-                    castelo: {nome: "Castillo", descricao: "+250 de vida máxima, +50 de oro por año"},
-                    fortaleza: {nome: "Fortaleza", descricao: "+750 de vida máxima, +100 de oro por año"},
-                    palacio: {nome: "Palacio", descricao: "+500 de vida máxima, +100 de oro por año"},
-                    fazenda: {nome: "Granja", descricao: "+50 de oro por año, +25 de vida máxima"},
-                    mercado: {nome: "Mercado", descricao: "+100 de oro por año, -50 de vida máxima"},
-                    quartel: {nome: "Cuartel", descricao: "+50 de daño base, +50 de vida máxima"},
+                    guerreiro: {nome: "Guerrero", descricao: "Tropa básica. Daño: 25. Ocupa 1 espacio.", sinergiaText: ""},
+                    arqueiro: {nome: "Arquero", descricao: "Daño: 15. Sinergia: +10 Daño por CADA otro Arquero.", sinergiaText: "+{val} (Sinergia)"},
+                    cavaleiro: {nome: "Caballero", descricao: "Tropa pesada. Daño: 55. Ocupa 1.", sinergiaText: ""},
+                    mago: {nome: "Mago", descricao: "Daño: 40. Sinergia: +20 Daño por CADA Guerrero/Caballero.", sinergiaText: "+{val} (Protegido)"},
+                    castelo: {nome: "Castillo", descricao: "Usa 1, Da 2 Espacio. +50 Vida Max, +10 Oro/turno.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortaleza", descricao: "Usa 1, Da 3 Espacio. +150 Vida Max, +25 Oro/turno.", sinergiaText: ""},
+                    fazenda: {nome: "Granja", descricao: "Ocupa 1 espacio. +15 Oro/turno.", sinergiaText: ""},
+                    mercado: {nome: "Mercado", descricao: "Ocupa 1 espacio. +30 Oro/turno, -20 Vida Max.", sinergiaText: ""},
+                    quartel: {nome: "Cuartel", descricao: "Usa 1, Da 2 Espacio. +30 Vida Max.", sinergiaText: ""}
                 }
             }
         };
 
-        let cartasDisponiveis = {
-            tropas: [
-                { nome: "Guerreiro", id: "guerreiro", efeitos: { dano: 50, custo: 35 } },
-                { nome: "Arqueiro", id: "arqueiro", efeitos: { dano: 25, custo: 25 } },
-                { nome: "Cavaleiro", id: "cavaleiro", efeitos: { dano: 75, custo: 85 } },
-                { nome: "Mago", id: "mago", efeitos: { dano: 100, custo: 60 } },
-            ],
-            bases: [
-                { nome: "Castelo", id: "castelo", efeitos: { saude: 250, ouroPorAno: 50 } },
-                { nome: "Fortaleza", id: "fortaleza", efeitos: { saude: 750, ouroPorAno: 100 } },
-                { nome: "Palácio", id: "palacio", efeitos: { saude: 500, ouroPorAno: 100 } },
-            ],
-            edificios: [
-                { nome: "Fazenda", id: "fazenda", efeitos: { ouroPorAno: 50, saude: 25 } },
-                { nome: "Mercado", id: "mercado", efeitos: { ouroPorAno: 100, saude: -50 } },
-                { nome: "Quartel", id: "quartel", efeitos: { dano: 50, saude: 50 } },
-            ],
-        };
-
-        let inimigos = [
-            { nome: "Inimigo 1", vida: 300, ataque: 100 },
-            { nome: "Inimigo 2", vida: 400, ataque: 150 },
-            { nome: "Inimigo 3", vida: 500, ataque: 200 },
-            { nome: "Inimigo 4", vida: 650, ataque: 250 },
-            { nome: "Inimigo 5", vida: 800, ataque: 325 },
-            { nome: "Inimigo 6", vida: 1000, ataque: 400 },
-            { nome: "Inimigo 7", vida: 1300, ataque: 500 },
-            { nome: "Inimigo 8", vida: 1600, ataque: 650 },
-            { nome: "Inimigo 9", vida: 2000, ataque: 800 },
-            { nome: "Inimigo 10", vida: 2500, ataque: 950 },
-            { nome: "Inimigo 11", vida: 3000, ataque: 1100 },
-            { nome: "Inimigo 12", vida: 3500, ataque: 1350 },
-            { nome: "Inimigo 13", vida: 4000, ataque: 1700 },
-            { nome: "Inimigo 14", vida: 5000, ataque: 2000 },
-            { nome: "Inimigo 15", vida: 6000, ataque: 2500 },
+        // BALANCEAMENTO DE CUSTOS E EFEITOS
+        let cartasDisponiveis = [
+            { tipo: "tropa", id: "guerreiro", ocupaEspaco: 1, custo: 30, efeitos: { danoBase: 25 } },
+            { tipo: "tropa", id: "arqueiro", ocupaEspaco: 1, custo: 15, efeitos: { danoBase: 15 } },
+            { tipo: "tropa", id: "cavaleiro", ocupaEspaco: 1, custo: 70, efeitos: { danoBase: 50 } },
+            { tipo: "tropa", id: "mago", ocupaEspaco: 1, custo: 85, efeitos: { danoBase: 40 } },
+            { tipo: "edificio", id: "castelo", ocupaEspaco: 1, custo: 80, efeitos: { saude: 50, ouroPorAno: 10, espacoExtra: 2 } }, 
+            { tipo: "edificio", id: "fortaleza", ocupaEspaco: 1, custo: 170, efeitos: { saude: 150, ouroPorAno: 25, espacoExtra: 3 } },
+            { tipo: "edificio", id: "fazenda", ocupaEspaco: 1, custo: 50, efeitos: { ouroPorAno: 15, saude: 0 } },
+            { tipo: "edificio", id: "mercado", ocupaEspaco: 1, custo: 80, efeitos: { ouroPorAno: 30, saude: -20 } },
+            { tipo: "edificio", id: "quartel", ocupaEspaco: 1, custo: 70, efeitos: { saude: 30, espacoExtra: 2 } },
         ];
 
-        // Variáveis de estado do jogo
-        let ouro = 1500;
-        let hp = 800;
-        let hpMaximo = 800;
-        let edificios = 1;
-        let unidades = 0;
-        let nivel = 1;
-        let ano = 1;
-        let ouroPorAno = 200;
-        let tempo = 0;
-        let cartasEscolhidas = [];
-        let inimigoAtual = JSON.parse(JSON.stringify(inimigos[nivel - 1]));
-        let inimigoAtualVidaMax = inimigoAtual.vida;
-        let cartasNaMao = [];
+        let baseInimigos = [
+            { vida: 100, ataque: 40 }, 
+            { vida: 200, ataque: 80 }, 
+            { vida: 400, ataque: 150 }, 
+            { vida: 650, ataque: 220 },
+            { vida: 1000, ataque: 350 }, 
+            { vida: 1500, ataque: 500 }, 
+            { vida: 2000, ataque: 650 }, 
+            { vida: 2600, ataque: 900 },
+            { vida: 3400, ataque: 1100 }, 
+            { vida: 4600, ataque: 1300 }, 
+            { vida: 6200, ataque: 1600 }, 
+            { vida: 8300, ataque: 2000 },
+            { vida: 10500, ataque: 2500 }, 
+            { vida: 13000, ataque: 3200 }, 
+            { vida: 18000, ataque: 4500 }
+        ];
 
-        // Funções do jogo
+        let nomesInimigos = ["Rei do Simples", "Rei dos Insetos", "Rei do Papel", "Rei dos Livros", "Rei da Comida", "Rei da Arquitetura", "Rei do Estudo", "Rei da Água", "Rei do Movimento", "Rei dos Animais", "Rei do Fogo", "Rei da Espada", "Rei da Ilusão", "Rei do Magma", "Imperador da Devastação"];
+        let inimigos = [];
+        const multiplicadoresDiff = { "arqueiro": 0.5, "escudeiro": 0.75, "cavaleiro": 1.0, "comandante": 1.5, "duque": 2.0 };
+
+        let ouro = 120, hp = 500, hpMaximo = 500, espacosMaximosIniciais = 3, nivel = 1, ano = 1, ouroPorAnoBase = 50;
+        let tabuleiro = [], cartasEscolhidas = [], cartasNaMao = [];
+        let dificuldadeAtual = "cavaleiro";
+        let inimigoAtual = null, inimigoAtualVidaMax = 0;
+        let idiomaAtual = "pt-br";
+
+        function inicializarInimigos(diffKey) {
+            dificuldadeAtual = diffKey;
+            const mult = multiplicadoresDiff[diffKey];
+            inimigos = baseInimigos.map((base, index) => {
+                return { nome: nomesInimigos[index], vida: Math.floor(base.vida * mult), ataque: Math.floor(base.ataque * mult) };
+            });
+            inimigoAtual = JSON.parse(JSON.stringify(inimigos[0]));
+            inimigoAtualVidaMax = inimigoAtual.vida;
+        }
+
+        function traduzirElementosEstaticos() {
+            const ui = traducoes[idiomaAtual].ui;
+            document.getElementById("main-title").innerText = ui.mainTitle;
+            document.getElementById("main-subtitle").innerText = ui.mainSubtitle;
+            document.getElementById("title-diff").innerText = ui.titleDiff;
+            document.getElementById("desc-diff").innerText = ui.descDiff;
+            document.getElementById("lbl-idioma").innerText = ui.lblIdioma;
+            document.getElementById("carregar-jogo-inicio").innerText = ui.btnLoadStart;
+            document.getElementById("titulo-cidade").innerText = ui.tituloCidade;
+            document.getElementById("lbl-ouro").innerText = ui.lblOuro;
+            document.getElementById("lbl-vida").innerText = ui.lblVida;
+            document.getElementById("lbl-inimigo-poder").innerText = ui.lblInimigoPoder;
+            document.getElementById("lbl-inimigo-vida").innerText = ui.lblInimigoVida;
+            document.getElementById("titulo-tabuleiro").innerText = ui.tituloTabuleiro;
+            document.getElementById("lbl-espacos").innerText = ui.lblEspacos;
+            document.getElementById("lbl-dano-total").innerText = ui.lblDanoTotal;
+            document.getElementById("lbl-dica-vender").innerText = ui.lblDicaVender;
+            document.getElementById("titulo-acoes").innerText = ui.tituloAcoes;
+            document.getElementById("abrir-loja").innerText = ui.btnComprar;
+            document.getElementById("recuperar-saude").innerText = ui.btnCurar;
+            document.getElementById("passar-turno").innerText = ui.btnBatalha;
+            document.getElementById("salvar-jogo").innerText = ui.btnSalvar;
+            document.getElementById("carregar-jogo").innerText = ui.btnCarregar;
+            document.getElementById("mostrar-regras").innerText = ui.btnRegras;
+            document.getElementById("titulo-cartas").innerText = ui.tituloCartas;
+            document.getElementById("pular-loja").innerText = ui.btnPularLoja;
+            document.getElementById("titulo-cartas-compradas").innerText = ui.tituloCartasCompradas;
+            document.getElementById("modal-titulo").innerText = ui.modalTitulo;
+            document.getElementById("modal-p1").innerText = ui.modalP1;
+            document.getElementById("modal-list").innerHTML = ui.modalList;
+        }
+
+        function getEspacosUsados() {
+            let count = 0;
+            tabuleiro.forEach(c => count += (c.ocupaEspaco || 0));
+            cartasEscolhidas.forEach(c => count += (c.ocupaEspaco || 0));
+            return count;
+        }
+
+        function getEspacosMaximos() {
+            let limit = espacosMaximosIniciais;
+            cartasEscolhidas.forEach(c => { if(c.efeitos.espacoExtra) limit += (c.efeitos.espacoExtra - 1); }); 
+            return limit;
+        }
+
+        function getOuroTurno() {
+            let g = ouroPorAnoBase;
+            cartasEscolhidas.forEach(c => { if(c.efeitos.ouroPorAno) g += c.efeitos.ouroPorAno; });
+            return g;
+        }
+
+        function calcularDanoESinergias() {
+            let total = 0;
+            let qtdArqueiros = tabuleiro.filter(t => t.id === "arqueiro").length;
+            let qtdTanks = tabuleiro.filter(t => t.id === "guerreiro" || t.id === "cavaleiro").length;
+
+            let tabSinergizado = tabuleiro.map(tropa => {
+                let dano = tropa.efeitos.danoBase;
+                let bonusSinergia = 0;
+
+                if (tropa.id === "arqueiro") { bonusSinergia = (qtdArqueiros - 1) * 10; dano += bonusSinergia; }
+                if (tropa.id === "mago") { bonusSinergia = qtdTanks * 20; dano += bonusSinergia; }
+                
+                total += dano;
+                return { ...tropa, danoCalculado: dano, bonusInfo: bonusSinergia };
+            });
+
+            return { total, tabSinergizado };
+        }
+
         function atualizarInterface() {
-            const t = traducoes[idiomaAtual];
-            document.title = t.titulo;
-            document.querySelector("h1").textContent = t.titulo;
-            tituloCidade.textContent = t.subtituloCidade;
-            labelHp.textContent = t.suaVida;
-            labelOuro.textContent = t.ouro;
-            labelEdificios.textContent = t.edificios;
-            labelUnidades.textContent = t.unidades;
-            inimigoNomeElement.textContent = `${t.inimigoAtual} ${inimigoAtual.nome}`;
-            labelInimigoVida.textContent = t.vida;
-            tituloAcoes.textContent = t.tituloAcoes;
-            btnConstruirEdificio.textContent = `${t.construirEdificio} (${CUSTO_EDIFICIO} ${t.ouro})`;
-            btnRecrutar15.textContent = `${t.recrutar15} (${CUSTO_RECRUTAR_15} ${t.ouro})`;
-            btnRecrutar5.textContent = `${t.recrutar5} (${CUSTO_RECRUTAR_5} ${t.ouro})`;
-            btnRecrutar1.textContent = `${t.recrutar1} (${CUSTO_RECRUTAR_1} ${t.ouro})`;
-            btnAtacar.textContent = t.atacarInimigo;
-            btnRecuperarSaude.textContent = `${t.recuperarSaude} (${CUSTO_ADICIONAR_RECUPERAR_SAUDE} ${t.ouro})`;
-            btnSalvarJogo.textContent = t.salvarJogo;
-            btnCarregarJogo.textContent = t.carregarJogo;
-            tituloCartas.textContent = t.tituloCartas;
-            btnComprarCartas.textContent = `${t.comprarCartas} (${CUSTO_COMPRAR_CARTAS} ${t.ouro})`;
-            tituloCartasCompradas.textContent = t.tituloCartasCompradas;
+            traduzirElementosEstaticos();
+            const ui = traducoes[idiomaAtual].ui;
+            document.title = ui.mainTitle;
             
-            // ATUALIZAÇÃO DO BOTÃO DE REGRAS
-            btnMostrarRegras.textContent = t.regrasJogo;
+            document.getElementById("ouro").textContent = ouro;
+            document.getElementById("lbl-ouro-turno").textContent = `(+${getOuroTurno()}${ui.lblOuroTurno})`;
+            document.getElementById("hp").textContent = hp;
+            document.getElementById("hp-max").textContent = hpMaximo;
+            document.getElementById("ano").textContent = `${ui.lblAno}: ${ano}`;
+            
+            document.getElementById("inimigo-nome").textContent = inimigoAtual.nome;
+            document.getElementById("inimigo-ataque").textContent = inimigoAtual.ataque;
+            document.getElementById("inimigo-vida").textContent = `${Math.max(0, inimigoAtual.vida)} / ${inimigoAtualVidaMax}`;
+            
+            document.getElementById("espacos-usados").textContent = getEspacosUsados();
+            document.getElementById("espacos-max").textContent = getEspacosMaximos();
 
-            // ATUALIZAÇÃO DO CONTEÚDO DO MODAL COM TRADUÇÕES
-            document.getElementById("titulo-regras").textContent = t.regrasJogo;
-            document.getElementById("paragrafo-regras-1").innerHTML = t.paragrafoRegras1;
-            document.getElementById("paragrafo-regras-2").innerHTML = `${t.ouro}: ${t.paragrafoRegras2}`;
-            document.getElementById("paragrafo-regras-3").innerHTML = t.paragrafoRegras3;
-            document.getElementById("regra-acao-1").innerHTML = t.paragrafoRegras4_1;
-            document.getElementById("regra-acao-2").innerHTML = t.paragrafoRegras4_2;
-            document.getElementById("regra-acao-3").innerHTML = t.paragrafoRegras4_3;
-            document.getElementById("paragrafo-regras-5").innerHTML = t.paragrafoRegras5;
+            const hpPorcentagem = Math.max(0, Math.min(100, (hp / hpMaximo) * 100));
+            document.getElementById("hp-progress-bar").style.width = `${hpPorcentagem}%`;
+            
+            const inimigoPorcentagem = Math.max(0, Math.min(100, (inimigoAtual.vida / inimigoAtualVidaMax) * 100));
+            document.getElementById("inimigo-progress-bar").style.width = `${inimigoPorcentagem}%`;
 
+            const tutDiv = document.getElementById("tutorial-msg");
+            tutDiv.innerText = "";
+            if (dificuldadeAtual === "arqueiro") {
+                if (ano === 1) tutDiv.innerText = ui.tut1;
+                else if (ano === 2) tutDiv.innerText = ui.tut2;
+                else if (ano === 3) tutDiv.innerText = ui.tut3;
+            }
 
-            ouroElement.textContent = ouro;
-            hpElement.textContent = hp;
-            hpMaxElement.textContent = hpMaximo;
-            edificiosElement.textContent = edificios;
-            unidadesElement.textContent = unidades;
-            anoElement.textContent = `${t.ano}: ${ano}`;
-            inimigoVidaElement.textContent = `${Math.max(0, inimigoAtual.vida)} / ${inimigoAtualVidaMax}`;
-
-            const hpPorcentagem = (hp / hpMaximo) * 100;
-            hpProgressBar.style.width = `${hpPorcentagem}%`;
-            hpProgressBar.textContent = `${Math.floor(hpPorcentagem)}%`;
-
-            const inimigoPorcentagem = (inimigoAtual.vida / inimigoAtualVidaMax) * 100;
-            inimigoProgressBar.style.width = `${inimigoPorcentagem}%`;
-            inimigoProgressBar.textContent = `${Math.floor(inimigoPorcentagem)}%`;
-
-            // Atualiza cartas na mão
-            mostrarCartas();
-            // Atualiza cartas compradas
+            renderizarTabuleiroEDano();
             mostrarCartasEscolhidas();
         }
 
-        function aplicarEfeitosCartas(carta) {
-            const t = traducoes[idiomaAtual];
-            if (ouro < carta.efeitos.custo) {
-                alert(`${t.naoOuroCarta} ${traducoes["pt-br"].carta[carta.id].nome}! Custo: ${carta.efeitos.custo}`);
-                return false;
-            }
-
-            if (carta.efeitos.custo) {
-                ouro -= carta.efeitos.custo;
-            }
-            if (carta.efeitos.saude) {
-                hpMaximo = Math.min(hpMaximo + carta.efeitos.saude, HP_MAXIMO_LIMITE);
-                hp = Math.min(hp + carta.efeitos.saude, hpMaximo);
-            }
-            if (carta.efeitos.ouroPorAno) {
-                ouroPorAno += carta.efeitos.ouroPorAno;
-            }
+        function venderCarta(index, isTropa) {
+            let carta = isTropa ? tabuleiro[index] : cartasEscolhidas[index];
+            let valorVenda = Math.floor(carta.custo / 2);
+            ouro += valorVenda;
             
-            cartasEscolhidas.push(carta);
-            mostrarCartasEscolhidas();
-            return true;
-        }
-
-        function comprarCartas() {
-            const t = traducoes[idiomaAtual];
-            if (ouro < CUSTO_COMPRAR_CARTAS) {
-                alert(`${t.naoOuro}`);
-                return;
-            }
-            ouro -= CUSTO_COMPRAR_CARTAS;
-            atualizarInterface();
-            mostrarCartas();
-        }
-
-        function mostrarCartas() {
-            const t = traducoes[idiomaAtual];
-            const todasCartas = Object.values(cartasDisponiveis).flat();
-            cartasNaMao = [];
-            
-            while (cartasNaMao.length < 3) {
-                const cartaAleatoria = todasCartas[Math.floor(Math.random() * todasCartas.length)];
-                if (!cartasNaMao.includes(cartaAleatoria)) {
-                    cartasNaMao.push(cartaAleatoria);
+            if (isTropa) {
+                tabuleiro.splice(index, 1);
+            } else {
+                if (carta.efeitos.saude !== undefined) {
+                    hpMaximo = Math.max(1, hpMaximo - carta.efeitos.saude);
+                    hp = Math.min(hp, hpMaximo);
                 }
+                cartasEscolhidas.splice(index, 1);
+            }
+            atualizarInterface();
+        }
+
+        function renderizarTabuleiroEDano() {
+            const grid = document.getElementById("grid-tabuleiro");
+            grid.innerHTML = "";
+            const tCartas = traducoes[idiomaAtual].carta;
+            
+            let calc = calcularDanoESinergias();
+
+            calc.tabSinergizado.forEach((tropa, index) => {
+                const cartaTrad = tCartas[tropa.id];
+                const div = document.createElement("div");
+                div.className = "carta-tropa";
+                div.onclick = () => venderCarta(index, true);
+
+                let sinergiaHtml = "";
+                if (tropa.bonusInfo > 0) {
+                    sinergiaHtml = `<div class="sinergia">${cartaTrad.sinergiaText.replace('{val}', tropa.bonusInfo)}</div>`;
+                }
+
+                div.innerHTML = `<span>${cartaTrad.nome}</span><small>⚔️ ${tropa.danoCalculado}</small>${sinergiaHtml}`;
+                grid.appendChild(div);
+            });
+            document.getElementById("dano-total").textContent = calc.total;
+        }
+
+        function abrirLoja() {
+            const msgs = traducoes[idiomaAtual].msgs;
+            if (ouro < CUSTO_REROLL) { alert(msgs.naoOuroReroll); return; }
+            ouro -= CUSTO_REROLL;
+            
+            cartasNaMao = [];
+            while (cartasNaMao.length < 3) {
+                const cartaAleatoria = cartasDisponiveis[Math.floor(Math.random() * cartasDisponiveis.length)];
+                if (!cartasNaMao.includes(cartaAleatoria)) cartasNaMao.push(cartaAleatoria);
             }
 
-            listaCartasElement.innerHTML = "";
+            const painelCartas = document.getElementById("cartas");
+            const lista = document.getElementById("lista-cartas");
+            lista.innerHTML = "";
+            painelCartas.style.display = "block";
+            document.getElementById("abrir-loja").disabled = true;
+            document.getElementById("passar-turno").disabled = true;
+
+            const tCartas = traducoes[idiomaAtual].carta;
+
             cartasNaMao.forEach((carta) => {
                 const item = document.createElement("li");
-                const cartaTraduzida = t.carta[carta.id];
-                item.innerHTML = `<strong>${cartaTraduzida.nome}</strong> - ${cartaTraduzida.descricao}`;
+                const cartaTrad = tCartas[carta.id];
+                item.innerHTML = `<strong style="font-size:1.2em; color:#FFD700;">${cartaTrad.nome}</strong><br>
+                                  <div class="custo-carta">💰 ${carta.custo} Ouro</div><br>
+                                  ${cartaTrad.descricao}`;
+                
                 item.addEventListener("click", () => {
-                    if (aplicarEfeitosCartas(carta)) {
-                        listaCartasElement.innerHTML = "";
+                    if (getEspacosUsados() + (carta.ocupaEspaco || 0) > getEspacosMaximos()) { alert(msgs.espacoCheio); return; }
+                    if (ouro < carta.custo) { alert(msgs.naoOuroCarta); return; }
+                    
+                    ouro -= carta.custo;
+
+                    if (carta.tipo === "tropa") {
+                        tabuleiro.push(carta);
+                    } else {
+                        if (carta.efeitos.saude !== undefined) {
+                            // Previne que a compra de um prédio com saúde negativa mate o jogador na hora
+                            if (hp + carta.efeitos.saude <= 0) {
+                                alert(msgs.mortePelaCarta);
+                                ouro += carta.custo; // devolve o dinheiro
+                                return;
+                            }
+                            hpMaximo = Math.min(hpMaximo + carta.efeitos.saude, HP_MAXIMO_LIMITE);
+                            hp = Math.min(hp + carta.efeitos.saude, hpMaximo);
+                        }
+                        cartasEscolhidas.push(carta);
                     }
+                    painelCartas.style.display = "none";
+                    document.getElementById("abrir-loja").disabled = false;
+                    document.getElementById("passar-turno").disabled = false;
+                    atualizarInterface();
                 });
-                listaCartasElement.appendChild(item);
+                lista.appendChild(item);
             });
+            atualizarInterface();
         }
 
         function mostrarCartasEscolhidas() {
-            const t = traducoes[idiomaAtual];
-            listaCartasEscolhidasElement.innerHTML = "";
-            cartasEscolhidas.forEach((carta) => {
-                const cartaTraduzida = t.carta[carta.id];
+            const tCartas = traducoes[idiomaAtual].carta;
+            const ui = traducoes[idiomaAtual].ui;
+            const lista = document.getElementById("lista-cartas-escolhidas");
+            lista.innerHTML = "";
+            cartasEscolhidas.forEach((carta, index) => {
+                const cartaTrad = tCartas[carta.id];
                 const item = document.createElement("li");
-                item.textContent = `${cartaTraduzida.nome} - ${cartaTraduzida.descricao}`;
-                listaCartasEscolhidasElement.appendChild(item);
+                item.innerHTML = `<span><strong>${cartaTrad.nome}</strong> (${cartaTrad.descricao})</span>
+                                  <button class="btn-vender-edificio" onclick="venderCarta(${index}, false)">${ui.btnVender}</button>`;
+                lista.appendChild(item);
             });
         }
 
-        function recrutarUnidades(quantidade, custo) {
-            const t = traducoes[idiomaAtual];
-            const limiteUnidades = edificios * 45;
-            if (ouro < custo) {
-                alert(`${t.naoOuro}`);
-            } else if (unidades + quantidade > limiteUnidades) {
-                alert(`${t.limiteUnidades}`);
-            } else {
-                ouro -= custo;
-                unidades += quantidade;
-                atualizarInterface();
-            }
-        }
+        function passarTurno() {
+            const msgs = traducoes[idiomaAtual].msgs;
+            let calc = calcularDanoESinergias();
 
-        function atacarInimigo() {
-            const t = traducoes[idiomaAtual];
-            let ataqueTotal = unidades * DANO_POR_UNIDADE;
-            cartasEscolhidas.forEach((carta) => {
-                if (carta.efeitos.dano) {
-                    ataqueTotal += carta.efeitos.dano;
-                }
-            });
-
-            if (ataqueTotal === 0) {
-                alert(`${t.naoAtaque}`);
-                return;
-            }
-
-            inimigoAtual.vida -= ataqueTotal;
+            inimigoAtual.vida -= calc.total;
 
             if (inimigoAtual.vida <= 0) {
-                alert(`${t.venceuInimigo} ${inimigoAtual.nome}!`);
                 nivel++;
-                if (nivel > inimigos.length) {
-                    alert(`${t.venceuJogo}`);
-                    location.reload();
-                    return;
-                } else {
-                    inimigoAtual = JSON.parse(JSON.stringify(inimigos[nivel - 1]));
-                    inimigoAtualVidaMax = inimigoAtual.vida;
-                    ouro += 500 + (nivel * 100);
-                    mostrarCartas();
-                }
-            }
-            atualizarInterface();
-        }
-
-        function inimigoAtaca() {
-            const t = traducoes[idiomaAtual];
-            hp -= inimigoAtual.ataque;
-            if (hp <= 0) {
-                alert(`${t.perdeuJogo} ${inimigoAtual.nome}! Tente novamente.`);
-                location.reload();
-            }
-            atualizarInterface();
-        }
-
-        function salvarJogo() {
-            const t = traducoes[idiomaAtual];
-            const estadoDoJogo = {
-                ouro, hp, hpMaximo, edificios, unidades, nivel, ano, ouroPorAno,
-                inimigoAtual, inimigoAtualVidaMax, cartasEscolhidas, idiomaAtual
-            };
-            localStorage.setItem("jogoSalvo", JSON.stringify(estadoDoJogo));
-            alert(`${t.jogoSalvo}`);
-        }
-
-        function carregarJogo() {
-            const t = traducoes[idiomaAtual];
-            const jogoSalvo = localStorage.getItem("jogoSalvo");
-            if (jogoSalvo) {
-                const estado = JSON.parse(jogoSalvo);
-                ouro = estado.ouro;
-                hp = estado.hp;
-                hpMaximo = estado.hpMaximo;
-                edificios = estado.edificios;
-                unidades = estado.unidades;
-                nivel = estado.nivel;
-                ano = estado.ano;
-                ouroPorAno = estado.ouroPorAno;
-                inimigoAtual = estado.inimigoAtual;
-                inimigoAtualVidaMax = estado.inimigoAtualVidaMax;
-                cartasEscolhidas = estado.cartasEscolhidas;
-                idiomaAtual = estado.idiomaAtual || 'pt-br';
-                idiomaSelect.value = idiomaAtual;
-                
-                atualizarInterface();
-                alert(`${t.jogoCarregado}`);
+                if (nivel > inimigos.length) { alert(msgs.venceuJogo); location.reload(); return; }
+                alert(`${msgs.venceuInimigo} ${inimigoAtual.nome}!`);
+                inimigoAtual = JSON.parse(JSON.stringify(inimigos[nivel - 1]));
+                inimigoAtualVidaMax = inimigoAtual.vida;
+                ouro += (nivel * 60); // Bônus de boss
             } else {
-                alert(`${t.semJogoSalvo}`);
+                hp -= inimigoAtual.ataque;
+                if (hp <= 0) { alert(`${msgs.perdeuJogo} ${inimigoAtual.nome}!`); location.reload(); return; }
             }
+
+            ano++;
+            ouro += getOuroTurno();
+            atualizarInterface();
         }
+
+        function iniciarJogoUI() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("game-screen").style.display = "block";
+            atualizarInterface();
+        }
+
+        document.querySelectorAll(".diff-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => { inicializarInimigos(e.target.dataset.diff); iniciarJogoUI(); });
+        });
+
+        document.getElementById("abrir-loja").addEventListener("click", abrirLoja);
         
-        function trocarIdioma() {
-            idiomaAtual = idiomaSelect.value;
-            atualizarInterface();
-        }
-
-        // Eventos
-        document.getElementById("construir-edificio").addEventListener("click", () => {
-            const t = traducoes[idiomaAtual];
-            if (ouro >= CUSTO_EDIFICIO) {
-                ouro -= CUSTO_EDIFICIO;
-                edificios += 1;
-                atualizarInterface();
-            } else {
-                alert(`${t.naoOuro}`);
-            }
+        document.getElementById("pular-loja").addEventListener("click", () => {
+            document.getElementById("cartas").style.display = "none";
+            document.getElementById("abrir-loja").disabled = false;
+            document.getElementById("passar-turno").disabled = false;
         });
 
         document.getElementById("recuperar-saude").addEventListener("click", () => {
-            const t = traducoes[idiomaAtual];
-            if (ouro >= CUSTO_ADICIONAR_RECUPERAR_SAUDE) {
-                ouro -= CUSTO_ADICIONAR_RECUPERAR_SAUDE;
-                if (hp < hpMaximo) {
-                    hp = Math.min(hp + 100, hpMaximo);
-                } else {
-                    hp = Math.min(hp + 100, HP_MAXIMO_LIMITE);
-                }
-                atualizarInterface();
-            } else {
-                alert(`${t.naoOuro}`);
-            }
+            const msgs = traducoes[idiomaAtual].msgs;
+            if (ouro >= CUSTO_CURA) {
+                if(hp >= hpMaximo) return;
+                ouro -= CUSTO_CURA; hp = Math.min(hp + VALOR_CURA, hpMaximo); atualizarInterface();
+            } else { alert(msgs.naoOuroCurar); }
         });
 
-        document.getElementById("recrutar-15-unidade").addEventListener("click", () => recrutarUnidades(15, CUSTO_RECRUTAR_15));
-        document.getElementById("recrutar-5-unidade").addEventListener("click", () => recrutarUnidades(5, CUSTO_RECRUTAR_5));
-        document.getElementById("recrutar-unidade").addEventListener("click", () => recrutarUnidades(1, CUSTO_RECRUTAR_1));
-        document.getElementById("atacar-inimigo").addEventListener("click", atacarInimigo);
-        document.getElementById("comprar-cartas").addEventListener("click", comprarCartas);
-        document.getElementById("salvar-jogo").addEventListener("click", salvarJogo);
-        document.getElementById("carregar-jogo").addEventListener("click", carregarJogo);
-        idiomaSelect.addEventListener("change", trocarIdioma);
+        document.getElementById("passar-turno").addEventListener("click", passarTurno);
 
-        // EVENTOS DO MODAL DE REGRAS (NOVOS)
-        btnMostrarRegras.addEventListener("click", () => {
-            regrasModal.style.display = "block";
+        function salvarGameState() {
+            const estado = { ouro, hp, hpMaximo, espacosMaximosIniciais, nivel, ano, inimigoAtual, inimigoAtualVidaMax, tabuleiro, cartasEscolhidas, idiomaAtual, dificuldadeAtual, inimigos };
+            localStorage.setItem("jogoSalvoNKB", JSON.stringify(estado));
+            alert(traducoes[idiomaAtual].msgs.jogoSalvo);
+        }
+
+        function carregarGameState() {
+            const salvo = localStorage.getItem("jogoSalvoNKB");
+            if (salvo) {
+                const est = JSON.parse(salvo);
+                ouro = est.ouro; hp = est.hp; hpMaximo = est.hpMaximo; espacosMaximosIniciais = est.espacosMaximosIniciais;
+                nivel = est.nivel; ano = est.ano; inimigoAtual = est.inimigoAtual;
+                inimigoAtualVidaMax = est.inimigoAtualVidaMax; tabuleiro = est.tabuleiro; cartasEscolhidas = est.cartasEscolhidas;
+                idiomaAtual = est.idiomaAtual; dificuldadeAtual = est.dificuldadeAtual || "cavaleiro"; inimigos = est.inimigos || [];
+                
+                document.getElementById("idioma-select").value = idiomaAtual;
+                iniciarJogoUI();
+                alert(traducoes[idiomaAtual].msgs.jogoCarregado);
+            } else { alert(traducoes[idiomaAtual].msgs.semJogoSalvo); }
+        }
+
+        document.getElementById("salvar-jogo").addEventListener("click", salvarGameState);
+        document.getElementById("carregar-jogo").addEventListener("click", carregarGameState);
+        document.getElementById("carregar-jogo-inicio").addEventListener("click", carregarGameState);
+
+        document.getElementById("idioma-select").addEventListener("change", (e) => {
+            idiomaAtual = e.target.value; traduzirElementosEstaticos();
+            if (document.getElementById("game-screen").style.display === "block") { atualizarInterface(); }
         });
 
-        fecharModal.addEventListener("click", () => {
-            regrasModal.style.display = "none";
-        });
+        const modal = document.getElementById("regras-modal");
+        document.getElementById("mostrar-regras").addEventListener("click", () => modal.style.display = "block");
+        document.getElementById("fechar-modal").addEventListener("click", () => modal.style.display = "none");
+        window.addEventListener("click", (e) => { if (e.target == modal) modal.style.display = "none"; });
 
-        window.addEventListener("click", (event) => {
-            if (event.target == regrasModal) {
-                regrasModal.style.display = "none";
-            }
-        });
-        // FIM EVENTOS DO MODAL DE REGRAS
-
-        // Inicialização
-        atualizarInterface();
-
-        setInterval(() => {
-            tempo++;
-            if (tempo >= 30) {
-                ano++;
-                ouro += ouroPorAno;
-                hp = Math.min(hp + 250, hpMaximo);
-                inimigoAtaca();
-                tempo = 0;
-            }
-            atualizarInterface();
-        }, 1000);
+        traduzirElementosEstaticos();
     </script>
-<footer>
-    <h4><b>Inspirado em: Nine Kings (André Young). Desenvolvido por: Luiz Miguel Rodrigues.</b></h4>
-    <h4><b><a href="https://luizmr.neocities.org/">Meus outros sites</a></b></h4>
-</footer>
 </body>
-
 </html>
-
