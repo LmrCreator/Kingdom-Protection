@@ -625,36 +625,18 @@
         }
 
         function carregarGameState() {
-function carregarGameState() {
             const salvo = localStorage.getItem("jogoSalvoNKB");
             if (salvo) {
                 const est = JSON.parse(salvo);
-                ouro = est.ouro; hp = est.hp; hpMaximo = est.hpMaximo; 
-                espacosMaximosIniciais = est.espacosMaximosIniciais;
-                nivel = est.nivel; ano = est.ano; 
-                inimigoAtual = est.inimigoAtual;
-                inimigoAtualVidaMax = est.inimigoAtualVidaMax; 
-                tabuleiro = est.tabuleiro; 
-                cartasEscolhidas = est.cartasEscolhidas;
-                idiomaAtual = est.idiomaAtual; 
-                dificuldadeAtual = est.dificuldadeAtual || "cavaleiro";
+                ouro = est.ouro; hp = est.hp; hpMaximo = est.hpMaximo; espacosMaximosIniciais = est.espacosMaximosIniciais;
+                nivel = est.nivel; ano = est.ano; inimigoAtual = est.inimigoAtual;
+                inimigoAtualVidaMax = est.inimigoAtualVidaMax; tabuleiro = est.tabuleiro; cartasEscolhidas = est.cartasEscolhidas;
+                idiomaAtual = est.idiomaAtual; dificuldadeAtual = est.dificuldadeAtual || "cavaleiro"; inimigos = est.inimigos || [];
                 
-                // CORREÇÃO: Reconstroi a lista de inimigos caso o save esteja incompleto
-                const mult = multiplicadoresDiff[dificuldadeAtual];
-                inimigos = baseInimigos.map((base, index) => {
-                    return { 
-                        nome: nomesInimigos[index], 
-                        vida: Math.floor(base.vida * mult), 
-                        ataque: Math.floor(base.ataque * mult) 
-                    };
-                });
-
                 document.getElementById("idioma-select").value = idiomaAtual;
                 iniciarJogoUI();
                 alert(traducoes[idiomaAtual].msgs.jogoCarregado);
-            } else { 
-                alert(traducoes[idiomaAtual].msgs.semJogoSalvo); 
-            }
+            } else { alert(traducoes[idiomaAtual].msgs.semJogoSalvo); }
         }
 
         document.getElementById("salvar-jogo").addEventListener("click", salvarGameState);
