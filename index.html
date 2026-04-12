@@ -104,7 +104,7 @@
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
             <div id="cidade" class="painel" style="flex: 1; min-width: 300px;">
                 <h2 id="titulo-cidade">Seu Reino</h2>
-                <p><strong id="lbl-ouro">Ouro:</strong> <span id="ouro" style="color: #FFD700; font-size: 1.2em;">120</span> <small id="lbl-ouro-turno" style="color:#aaa;">(+25/turno)</small></p>
+                <p><strong id="lbl-ouro">Ouro:</strong> <span id="ouro" style="color: #FFD700; font-size: 1.2em;">200</span> <small id="lbl-ouro-turno" style="color:#aaa;">(+25/turno)</small></p>
                 <p><span id="lbl-vida">Vida:</span> <span id="hp">500</span> / <span id="hp-max">500</span></p>
                 <div class="progress-bar-container">
                     <div id="hp-progress-bar" class="progress-bar" style="width: 100%;"></div>
@@ -133,8 +133,8 @@
 
         <div id="acoes" class="painel">
             <h2 id="titulo-acoes">Ações do Turno</h2>
-            <button id="abrir-loja" class="loja">Rolar Loja (10 Ouro)</button>
-            <button id="recuperar-saude">Curar 50 PV (50 Ouro)</button>
+            <button id="abrir-loja" class="loja">Rolar Loja (5 Ouro)</button>
+            <button id="recuperar-saude">Curar 50 PV (25 Ouro)</button>
             <button id="passar-turno" class="batalha">Iniciar Batalha (Fim de Turno)</button>
             <br><br>
             <button id="salvar-jogo" style="background-color: #555;">Salvar</button>
@@ -160,7 +160,7 @@
             <h2 id="modal-titulo">Regras do Jogo</h2>
             <p id="modal-p1">Defenda seu reino usando estratégia, sinergia e economia!</p>
             <ul id="modal-list">
-                <li><strong>Ouro e Loja:</strong> Custa 10 de Ouro para ver 3 cartas. Para adicionar uma ao exército, você deve pagar o valor dela!</li>
+                <li><strong>Ouro e Loja:</strong> Custa 5 de Ouro para ver 3 cartas. Para adicionar uma ao exército, você deve pagar o valor dela!</li>
                 <li><strong>Espaço:</strong> Quase tudo ocupa terreno. Se não tiver espaço, compre construções como Fortalezas ou Castelos para expandir.</li>
                 <li><strong>Sinergias:</strong> Tropas interagem. Arqueiros ficam mais fortes juntos, Magos precisam de Guerreiros/Cavaleiros em campo para dar dano extra.</li>
                 <li><strong>Venda:</strong> Clicar em uma tropa no campo a vende por 50% do valor e libera o espaço.</li>
@@ -169,8 +169,8 @@
     </div>
 
     <script>
-        const CUSTO_REROLL = 10;
-        const CUSTO_CURA = 50;
+        const CUSTO_REROLL = 5;
+        const CUSTO_CURA = 25;
         const VALOR_CURA = 50;
         const HP_MAXIMO_LIMITE = 50000;
 
@@ -184,20 +184,20 @@
                     lblInimigoPoder: "Poder do Inimigo (Dano):", lblInimigoVida: "Vida do Inimigo:",
                     tituloTabuleiro: "Seu Exército", lblEspacos: "Espaços Usados:", lblDanoTotal: "Dano Total (com Sinergias):",
                     lblDicaVender: "Clique em uma carta no exército/edifícios para vendê-la por metade do valor.",
-                    tituloAcoes: "Ações do Turno", btnComprar: "Rolar Loja (10 Ouro)", btnCurar: "Curar 50 PV (50 Ouro)",
+                    tituloAcoes: "Ações do Turno", btnComprar: "Rolar Loja (5 Ouro)", btnCurar: "Curar 50 PV (25 Ouro)",
                     btnBatalha: "Iniciar Batalha (Fim de Turno)", btnSalvar: "Salvar", btnCarregar: "Carregar", btnRegras: "Regras",
                     tituloCartas: "Loja: Compre 1 carta (ou pule)", tituloCartasCompradas: "Edifícios Ativos", btnPularLoja: "Fechar Loja",
                     modalTitulo: "Regras do Jogo", btnVender: "Vender",
                     modalP1: "Defenda seu reino usando estratégia, sinergia e economia!",
-                    modalList: `<li><strong>Ouro e Loja:</strong> Custa 10 para ver cartas. Você deve pagar o valor da carta para comprá-la!</li>
+                    modalList: `<li><strong>Ouro e Loja:</strong> Custa 5 para ver cartas. Você deve pagar o valor da carta para comprá-la!</li>
                                 <li><strong>Espaço:</strong> Compre construções para expandir limite.</li>
                                 <li><strong>Sinergias:</strong> Arqueiros agrupados são mais fortes. Magos causam mais dano atrás de Guerreiros/Cavaleiros.</li>`,
-                    tut1: "DICA: Gaste 10 de ouro para abrir a loja e compre tropas baratas!",
+                    tut1: "DICA: Gaste 5 de ouro para abrir a loja e compre tropas baratas!",
                     tut2: "DICA: Preste atenção no custo de cada carta e se você tem espaço.",
                     tut3: "DICA: Juntar cartas da mesma classe gera bônus ocultos de sinergia!"
                 },
                 msgs: {
-                    naoOuroReroll: "Ouro insuficiente para rolar a loja (Custa 10)!", naoOuroCarta: "Ouro insuficiente para comprar esta carta!",
+                    naoOuroReroll: "Ouro insuficiente para rolar a loja (Custa 5)!", naoOuroCarta: "Ouro insuficiente para comprar esta carta!",
                     venceuInimigo: "Você derrotou o", venceuJogo: "Parabéns! Você venceu todos os Reis!",
                     perdeuJogo: "Seu reino caiu para o", jogoSalvo: "Jogo salvo com sucesso!", semJogoSalvo: "Nenhum jogo salvo encontrado.",
                     jogoCarregado: "Jogo carregado!", espacoCheio: "Espaço insuficiente! Venda unidades ou compre Edifícios de expansão.",
@@ -206,10 +206,10 @@
                 carta: {
                     guerreiro: {nome: "Guerreiro", descricao: "Tropa básica. Dano: 25. Ocupa 1 espaço.", sinergiaText: ""},
                     arqueiro: {nome: "Arqueiro", descricao: "Dano: 15. Sinergia: +10 Dano para CADA outro Arqueiro.", sinergiaText: "+{val} (Sinergia)"},
-                    cavaleiro: {nome: "Cavaleiro", descricao: "Tropa pesada. Dano: 55. Ocupa 1 espaço.", sinergiaText: ""},
-                    mago: {nome: "Mago", descricao: "Dano: 40. Sinergia: +20 Dano para CADA Guerreiro/Cavaleiro no campo.", sinergiaText: "+{val} (Protegido)"},
-                    castelo: {nome: "Castelo", descricao: "Ocupa 1, Dá 2 Espaços (Líquido +1). +50 Vida Max, +10 Ouro/turno.", sinergiaText: ""},
-                    fortaleza: {nome: "Fortaleza", descricao: "Ocupa 1, Dá 3 Espaços (Líquido +2). +150 Vida Max, +25 Ouro/turno.", sinergiaText: ""},
+                    cavaleiro: {nome: "Cavaleiro", descricao: "Tropa pesada. Dano: 50. Ocupa 1 espaço.", sinergiaText: ""},
+                    mago: {nome: "Mago", descricao: "Dano: 40. Sinergia: +25 Dano para CADA Guerreiro/Cavaleiro no campo.", sinergiaText: "+{val} (Protegido)"},
+                    castelo: {nome: "Castelo", descricao: "Ocupa 1, Dá 3 Espaços (Líquido +2). +50 Vida Max, +10 Ouro/turno.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortaleza", descricao: "Ocupa 1, Dá 4 Espaços (Líquido +3). +150 Vida Max, +25 Ouro/turno.", sinergiaText: ""},
                     fazenda: {nome: "Fazenda", descricao: "Ocupa 1 espaço. +15 Ouro/turno.", sinergiaText: ""},
                     mercado: {nome: "Mercado", descricao: "Ocupa 1 espaço. +30 Ouro/turno, -20 Vida Max.", sinergiaText: ""},
                     quartel: {nome: "Quartel", descricao: "Ocupa 1, Dá 2 Espaços (Líquido +1). +30 Vida Max.", sinergiaText: ""}
@@ -224,20 +224,20 @@
                     lblInimigoPoder: "Enemy Power (Damage):", lblInimigoVida: "Enemy Health:",
                     tituloTabuleiro: "Your Army", lblEspacos: "Used Spaces:", lblDanoTotal: "Total Damage (with Synergy):",
                     lblDicaVender: "Click a card in the army/buildings to sell it for half price.",
-                    tituloAcoes: "Turn Actions", btnComprar: "Roll Shop (10 Gold)", btnCurar: "Heal 50 HP (50 Gold)",
+                    tituloAcoes: "Turn Actions", btnComprar: "Roll Shop (5 Gold)", btnCurar: "Heal 50 HP (25 Gold)",
                     btnBatalha: "Start Battle (End Turn)", btnSalvar: "Save", btnCarregar: "Load", btnRegras: "Rules",
                     tituloCartas: "Shop: Buy 1 card (or skip)", tituloCartasCompradas: "Active Buildings", btnPularLoja: "Close Shop",
                     modalTitulo: "Game Rules", btnVender: "Sell",
                     modalP1: "Defend your kingdom using strategy, synergy, and economy!",
-                    modalList: `<li><strong>Gold & Shop:</strong> Costs 10 to see cards. You must pay the card's price to buy it!</li>
+                    modalList: `<li><strong>Gold & Shop:</strong> Costs 5 to see cards. You must pay the card's price to buy it!</li>
                                 <li><strong>Space:</strong> Buy buildings to expand limits.</li>
                                 <li><strong>Synergies:</strong> Archers group up for damage. Mages deal more damage behind Warriors/Knights.</li>`,
-                    tut1: "HINT: Spend 10 gold to open the shop and buy cheap troops!",
+                    tut1: "HINT: Spend 5 gold to open the shop and buy cheap troops!",
                     tut2: "HINT: Pay attention to card costs and your space limit.",
                     tut3: "HINT: Grouping similar classes generates hidden synergy bonuses!"
                 },
                 msgs: {
-                    naoOuroReroll: "Not enough gold to roll the shop (Costs 10)!", naoOuroCarta: "Not enough gold to buy this card!",
+                    naoOuroReroll: "Not enough gold to roll the shop (Costs 5)!", naoOuroCarta: "Not enough gold to buy this card!",
                     venceuInimigo: "You defeated", venceuJogo: "Congratulations! You defeated all Kings!",
                     perdeuJogo: "Your kingdom fell to", jogoSalvo: "Game saved!", semJogoSalvo: "No saved game found.",
                     jogoCarregado: "Game loaded!", espacoCheio: "Not enough space! Sell units or buy expansion Buildings.",
@@ -247,9 +247,9 @@
                     guerreiro: {nome: "Warrior", descricao: "Basic troop. Dmg: 25. Occupies 1 space.", sinergiaText: ""},
                     arqueiro: {nome: "Archer", descricao: "Dmg: 15. Synergy: +10 Dmg for EACH other Archer.", sinergiaText: "+{val} (Synergy)"},
                     cavaleiro: {nome: "Knight", descricao: "Heavy troop. Dmg: 55. Occupies 1 space.", sinergiaText: ""},
-                    mago: {nome: "Wizard", descricao: "Dmg: 40. Synergy: +20 Dmg for EACH Warrior/Knight.", sinergiaText: "+{val} (Protected)"},
-                    castelo: {nome: "Castle", descricao: "Takes 1, Gives 2 Space (Net +1). +50 Max HP, +10 Gold/turn.", sinergiaText: ""},
-                    fortaleza: {nome: "Fortress", descricao: "Takes 1, Gives 3 Space (Net +2). +150 Max HP, +25 Gold/turn.", sinergiaText: ""},
+                    mago: {nome: "Wizard", descricao: "Dmg: 40. Synergy: +25 Dmg for EACH Warrior/Knight.", sinergiaText: "+{val} (Protected)"},
+                    castelo: {nome: "Castle", descricao: "Takes 1, Gives 3 Space (Net +2). +50 Max HP, +10 Gold/turn.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortress", descricao: "Takes 1, Gives 4 Space (Net +3). +150 Max HP, +25 Gold/turn.", sinergiaText: ""},
                     fazenda: {nome: "Farm", descricao: "Occupies 1 space. +15 Gold/turn.", sinergiaText: ""},
                     mercado: {nome: "Market", descricao: "Occupies 1 space. +30 Gold/turn, -20 Max HP.", sinergiaText: ""},
                     quartel: {nome: "Barracks", descricao: "Takes 1, Gives 2 Space (Net +1). +30 Max HP.", sinergiaText: ""}
@@ -264,15 +264,15 @@
                     lblInimigoPoder: "Poder Enemigo:", lblInimigoVida: "Vida del Enemigo:",
                     tituloTabuleiro: "Tu Ejército", lblEspacos: "Espacios Usados:", lblDanoTotal: "Daño Total (con Sinergia):",
                     lblDicaVender: "Haz clic en una carta para venderla por la mitad de su precio.",
-                    tituloAcoes: "Acciones del Turno", btnComprar: "Rol Tienda (10 Oro)", btnCurar: "Curar 50 PV (50 Oro)",
+                    tituloAcoes: "Acciones del Turno", btnComprar: "Rol Tienda (5 Oro)", btnCurar: "Curar 50 PV (25 Oro)",
                     btnBatalha: "Iniciar Batalla (Fin de Turno)", btnSalvar: "Guardar", btnCarregar: "Cargar", btnRegras: "Reglas",
                     tituloCartas: "Tienda: Compra 1 carta (o salta)", tituloCartasCompradas: "Edificios Activos", btnPularLoja: "Cerrar Tienda",
                     modalTitulo: "Reglas del Juego", btnVender: "Vender",
                     modalP1: "¡Defiende tu reino usando estrategia, sinergia y economía!",
-                    modalList: `<li><strong>Oro y Tienda:</strong> Cuesta 10 ver cartas. ¡Debes pagar el valor de la carta!</li>
+                    modalList: `<li><strong>Oro y Tienda:</strong> Cuesta 5 ver cartas. ¡Debes pagar el valor de la carta!</li>
                                 <li><strong>Espacio:</strong> Compra edificios para expandir límites.</li>
                                 <li><strong>Sinergias:</strong> Arqueros juntos son fuertes. Magos tras Guerreros/Caballeros hacen más daño.</li>`,
-                    tut1: "PISTA: ¡Gasta 10 de oro para abrir la tienda y comprar tropas!",
+                    tut1: "PISTA: ¡Gasta 5 de oro para abrir la tienda y comprar tropas!",
                     tut2: "PISTA: Presta atención a los costos y a tu límite de espacio.",
                     tut3: "PISTA: ¡Agrupar clases similares genera bonos de sinergia!"
                 },
@@ -287,9 +287,9 @@
                     guerreiro: {nome: "Guerrero", descricao: "Tropa básica. Daño: 25. Ocupa 1 espacio.", sinergiaText: ""},
                     arqueiro: {nome: "Arquero", descricao: "Daño: 15. Sinergia: +10 Daño por CADA otro Arquero.", sinergiaText: "+{val} (Sinergia)"},
                     cavaleiro: {nome: "Caballero", descricao: "Tropa pesada. Daño: 55. Ocupa 1.", sinergiaText: ""},
-                    mago: {nome: "Mago", descricao: "Daño: 40. Sinergia: +20 Daño por CADA Guerrero/Caballero.", sinergiaText: "+{val} (Protegido)"},
-                    castelo: {nome: "Castillo", descricao: "Usa 1, Da 2 Espacio. +50 Vida Max, +10 Oro/turno.", sinergiaText: ""},
-                    fortaleza: {nome: "Fortaleza", descricao: "Usa 1, Da 3 Espacio. +150 Vida Max, +25 Oro/turno.", sinergiaText: ""},
+                    mago: {nome: "Mago", descricao: "Daño: 40. Sinergia: +25 Daño por CADA Guerrero/Caballero.", sinergiaText: "+{val} (Protegido)"},
+                    castelo: {nome: "Castillo", descricao: "Usa 1, Da 3 Espacio. +50 Vida Max, +10 Oro/turno.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortaleza", descricao: "Usa 1, Da 4 Espacio. +150 Vida Max, +25 Oro/turno.", sinergiaText: ""},
                     fazenda: {nome: "Granja", descricao: "Ocupa 1 espacio. +15 Oro/turno.", sinergiaText: ""},
                     mercado: {nome: "Mercado", descricao: "Ocupa 1 espacio. +30 Oro/turno, -20 Vida Max.", sinergiaText: ""},
                     quartel: {nome: "Cuartel", descricao: "Usa 1, Da 2 Espacio. +30 Vida Max.", sinergiaText: ""}
@@ -303,10 +303,10 @@
             { tipo: "tropa", id: "arqueiro", ocupaEspaco: 1, custo: 15, efeitos: { danoBase: 15 } },
             { tipo: "tropa", id: "cavaleiro", ocupaEspaco: 1, custo: 70, efeitos: { danoBase: 50 } },
             { tipo: "tropa", id: "mago", ocupaEspaco: 1, custo: 85, efeitos: { danoBase: 40 } },
-            { tipo: "edificio", id: "castelo", ocupaEspaco: 1, custo: 80, efeitos: { saude: 50, ouroPorAno: 10, espacoExtra: 2 } }, 
-            { tipo: "edificio", id: "fortaleza", ocupaEspaco: 1, custo: 170, efeitos: { saude: 150, ouroPorAno: 25, espacoExtra: 3 } },
+            { tipo: "edificio", id: "castelo", ocupaEspaco: 1, custo: 80, efeitos: { saude: 50, ouroPorAno: 10, espacoExtra: 3 } }, 
+            { tipo: "edificio", id: "fortaleza", ocupaEspaco: 1, custo: 170, efeitos: { saude: 150, ouroPorAno: 25, espacoExtra: 4 } },
             { tipo: "edificio", id: "fazenda", ocupaEspaco: 1, custo: 50, efeitos: { ouroPorAno: 15, saude: 0 } },
-            { tipo: "edificio", id: "mercado", ocupaEspaco: 1, custo: 80, efeitos: { ouroPorAno: 30, saude: -20 } },
+            { tipo: "edificio", id: "mercado", ocupaEspaco: 1, custo: 80, efeitos: { ouroPorAno: 30, saude: -10 } },
             { tipo: "edificio", id: "quartel", ocupaEspaco: 1, custo: 70, efeitos: { saude: 30, espacoExtra: 2 } },
         ];
 
@@ -332,7 +332,7 @@
         let inimigos = [];
         const multiplicadoresDiff = { "arqueiro": 0.5, "escudeiro": 0.75, "cavaleiro": 1.0, "comandante": 1.5, "duque": 2.0 };
 
-        let ouro = 120, hp = 500, hpMaximo = 500, espacosMaximosIniciais = 3, nivel = 1, ano = 1, ouroPorAnoBase = 50;
+        let ouro = 200, hp = 500, hpMaximo = 500, espacosMaximosIniciais = 3, nivel = 1, ano = 1, ouroPorAnoBase = 50;
         let tabuleiro = [], cartasEscolhidas = [], cartasNaMao = [];
         let dificuldadeAtual = "cavaleiro";
         let inimigoAtual = null, inimigoAtualVidaMax = 0;
@@ -409,7 +409,7 @@
                 let bonusSinergia = 0;
 
                 if (tropa.id === "arqueiro") { bonusSinergia = (qtdArqueiros - 1) * 10; dano += bonusSinergia; }
-                if (tropa.id === "mago") { bonusSinergia = qtdTanks * 20; dano += bonusSinergia; }
+                if (tropa.id === "mago") { bonusSinergia = qtdTanks * 25; dano += bonusSinergia; }
                 
                 total += dano;
                 return { ...tropa, danoCalculado: dano, bonusInfo: bonusSinergia };
@@ -579,7 +579,7 @@
                 alert(`${msgs.venceuInimigo} ${inimigoAtual.nome}!`);
                 inimigoAtual = JSON.parse(JSON.stringify(inimigos[nivel - 1]));
                 inimigoAtualVidaMax = inimigoAtual.vida;
-                ouro += (nivel * 60); // Bônus de boss
+                ouro += (nivel * 80); // Bônus de boss
             } else {
                 hp -= inimigoAtual.ataque;
                 if (hp <= 0) { alert(`${msgs.perdeuJogo} ${inimigoAtual.nome}!`); location.reload(); return; }
