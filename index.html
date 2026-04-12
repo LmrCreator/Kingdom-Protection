@@ -134,7 +134,7 @@
         <div id="acoes" class="painel">
             <h2 id="titulo-acoes">Ações do Turno</h2>
             <button id="abrir-loja" class="loja">Rolar Loja (5 Ouro)</button>
-            <button id="recuperar-saude">Curar 50 PV (25 Ouro)</button>
+            <button id="recuperar-saude">Curar 50 PV (50 Ouro)</button>
             <button id="passar-turno" class="batalha">Iniciar Batalha (Fim de Turno)</button>
             <br><br>
             <button id="salvar-jogo" style="background-color: #555;">Salvar</button>
@@ -170,7 +170,7 @@
 
     <script>
         const CUSTO_REROLL = 5;
-        const CUSTO_CURA = 25;
+        const CUSTO_CURA = 50;
         const VALOR_CURA = 50;
         const HP_MAXIMO_LIMITE = 50000;
 
@@ -184,7 +184,7 @@
                     lblInimigoPoder: "Poder do Inimigo (Dano):", lblInimigoVida: "Vida do Inimigo:",
                     tituloTabuleiro: "Seu Exército", lblEspacos: "Espaços Usados:", lblDanoTotal: "Dano Total (com Sinergias):",
                     lblDicaVender: "Clique em uma carta no exército/edifícios para vendê-la por metade do valor.",
-                    tituloAcoes: "Ações do Turno", btnComprar: "Rolar Loja (5 Ouro)", btnCurar: "Curar 50 PV (25 Ouro)",
+                    tituloAcoes: "Ações do Turno", btnComprar: "Rolar Loja (5 Ouro)", btnCurar: "Curar 50 PV (50 Ouro)",
                     btnBatalha: "Iniciar Batalha (Fim de Turno)", btnSalvar: "Salvar", btnCarregar: "Carregar", btnRegras: "Regras",
                     tituloCartas: "Loja: Compre 1 carta (ou pule)", tituloCartasCompradas: "Edifícios Ativos", btnPularLoja: "Fechar Loja",
                     modalTitulo: "Regras do Jogo", btnVender: "Vender",
@@ -207,9 +207,9 @@
                     guerreiro: {nome: "Guerreiro", descricao: "Tropa básica. Dano: 25. Ocupa 1 espaço.", sinergiaText: ""},
                     arqueiro: {nome: "Arqueiro", descricao: "Dano: 15. Sinergia: +10 Dano para CADA outro Arqueiro.", sinergiaText: "+{val} (Sinergia)"},
                     cavaleiro: {nome: "Cavaleiro", descricao: "Tropa pesada. Dano: 50. Ocupa 1 espaço.", sinergiaText: ""},
-                    mago: {nome: "Mago", descricao: "Dano: 40. Sinergia: +25 Dano para CADA Guerreiro/Cavaleiro no campo.", sinergiaText: "+{val} (Protegido)"},
-                    castelo: {nome: "Castelo", descricao: "Ocupa 1, Dá 3 Espaços (Líquido +2). +50 Vida Max, +10 Ouro/turno.", sinergiaText: ""},
-                    fortaleza: {nome: "Fortaleza", descricao: "Ocupa 1, Dá 4 Espaços (Líquido +3). +150 Vida Max, +25 Ouro/turno.", sinergiaText: ""},
+                    mago: {nome: "Mago", descricao: "Dano: 40. Sinergia: +20 Dano para CADA Guerreiro/Cavaleiro no campo.", sinergiaText: "+{val} (Protegido)"},
+                    castelo: {nome: "Castelo", descricao: "Ocupa 1, Dá 2 Espaços (Líquido +2). +50 Vida Max, +10 Ouro/turno.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortaleza", descricao: "Ocupa 1, Dá 3 Espaços (Líquido +3). +150 Vida Max, +25 Ouro/turno.", sinergiaText: ""},
                     fazenda: {nome: "Fazenda", descricao: "Ocupa 1 espaço. +15 Ouro/turno.", sinergiaText: ""},
                     mercado: {nome: "Mercado", descricao: "Ocupa 1 espaço. +30 Ouro/turno, -20 Vida Max.", sinergiaText: ""},
                     quartel: {nome: "Quartel", descricao: "Ocupa 1, Dá 2 Espaços (Líquido +1). +30 Vida Max.", sinergiaText: ""}
@@ -224,7 +224,7 @@
                     lblInimigoPoder: "Enemy Power (Damage):", lblInimigoVida: "Enemy Health:",
                     tituloTabuleiro: "Your Army", lblEspacos: "Used Spaces:", lblDanoTotal: "Total Damage (with Synergy):",
                     lblDicaVender: "Click a card in the army/buildings to sell it for half price.",
-                    tituloAcoes: "Turn Actions", btnComprar: "Roll Shop (5 Gold)", btnCurar: "Heal 50 HP (25 Gold)",
+                    tituloAcoes: "Turn Actions", btnComprar: "Roll Shop (5 Gold)", btnCurar: "Heal 50 HP (50 Gold)",
                     btnBatalha: "Start Battle (End Turn)", btnSalvar: "Save", btnCarregar: "Load", btnRegras: "Rules",
                     tituloCartas: "Shop: Buy 1 card (or skip)", tituloCartasCompradas: "Active Buildings", btnPularLoja: "Close Shop",
                     modalTitulo: "Game Rules", btnVender: "Sell",
@@ -247,9 +247,9 @@
                     guerreiro: {nome: "Warrior", descricao: "Basic troop. Dmg: 25. Occupies 1 space.", sinergiaText: ""},
                     arqueiro: {nome: "Archer", descricao: "Dmg: 15. Synergy: +10 Dmg for EACH other Archer.", sinergiaText: "+{val} (Synergy)"},
                     cavaleiro: {nome: "Knight", descricao: "Heavy troop. Dmg: 55. Occupies 1 space.", sinergiaText: ""},
-                    mago: {nome: "Wizard", descricao: "Dmg: 40. Synergy: +25 Dmg for EACH Warrior/Knight.", sinergiaText: "+{val} (Protected)"},
-                    castelo: {nome: "Castle", descricao: "Takes 1, Gives 3 Space (Net +2). +50 Max HP, +10 Gold/turn.", sinergiaText: ""},
-                    fortaleza: {nome: "Fortress", descricao: "Takes 1, Gives 4 Space (Net +3). +150 Max HP, +25 Gold/turn.", sinergiaText: ""},
+                    mago: {nome: "Wizard", descricao: "Dmg: 40. Synergy: +20 Dmg for EACH Warrior/Knight.", sinergiaText: "+{val} (Protected)"},
+                    castelo: {nome: "Castle", descricao: "Takes 1, Gives 2 Space (Net +2). +50 Max HP, +10 Gold/turn.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortress", descricao: "Takes 1, Gives 3 Space (Net +3). +150 Max HP, +25 Gold/turn.", sinergiaText: ""},
                     fazenda: {nome: "Farm", descricao: "Occupies 1 space. +15 Gold/turn.", sinergiaText: ""},
                     mercado: {nome: "Market", descricao: "Occupies 1 space. +30 Gold/turn, -20 Max HP.", sinergiaText: ""},
                     quartel: {nome: "Barracks", descricao: "Takes 1, Gives 2 Space (Net +1). +30 Max HP.", sinergiaText: ""}
@@ -264,7 +264,7 @@
                     lblInimigoPoder: "Poder Enemigo:", lblInimigoVida: "Vida del Enemigo:",
                     tituloTabuleiro: "Tu Ejército", lblEspacos: "Espacios Usados:", lblDanoTotal: "Daño Total (con Sinergia):",
                     lblDicaVender: "Haz clic en una carta para venderla por la mitad de su precio.",
-                    tituloAcoes: "Acciones del Turno", btnComprar: "Rol Tienda (5 Oro)", btnCurar: "Curar 50 PV (25 Oro)",
+                    tituloAcoes: "Acciones del Turno", btnComprar: "Rol Tienda (5 Oro)", btnCurar: "Curar 50 PV (50 Oro)",
                     btnBatalha: "Iniciar Batalla (Fin de Turno)", btnSalvar: "Guardar", btnCarregar: "Cargar", btnRegras: "Reglas",
                     tituloCartas: "Tienda: Compra 1 carta (o salta)", tituloCartasCompradas: "Edificios Activos", btnPularLoja: "Cerrar Tienda",
                     modalTitulo: "Reglas del Juego", btnVender: "Vender",
@@ -287,9 +287,9 @@
                     guerreiro: {nome: "Guerrero", descricao: "Tropa básica. Daño: 25. Ocupa 1 espacio.", sinergiaText: ""},
                     arqueiro: {nome: "Arquero", descricao: "Daño: 15. Sinergia: +10 Daño por CADA otro Arquero.", sinergiaText: "+{val} (Sinergia)"},
                     cavaleiro: {nome: "Caballero", descricao: "Tropa pesada. Daño: 55. Ocupa 1.", sinergiaText: ""},
-                    mago: {nome: "Mago", descricao: "Daño: 40. Sinergia: +25 Daño por CADA Guerrero/Caballero.", sinergiaText: "+{val} (Protegido)"},
-                    castelo: {nome: "Castillo", descricao: "Usa 1, Da 3 Espacio. +50 Vida Max, +10 Oro/turno.", sinergiaText: ""},
-                    fortaleza: {nome: "Fortaleza", descricao: "Usa 1, Da 4 Espacio. +150 Vida Max, +25 Oro/turno.", sinergiaText: ""},
+                    mago: {nome: "Mago", descricao: "Daño: 40. Sinergia: +20 Daño por CADA Guerrero/Caballero.", sinergiaText: "+{val} (Protegido)"},
+                    castelo: {nome: "Castillo", descricao: "Usa 1, Da 2 Espacio. +50 Vida Max, +10 Oro/turno.", sinergiaText: ""},
+                    fortaleza: {nome: "Fortaleza", descricao: "Usa 1, Da 3 Espacio. +150 Vida Max, +25 Oro/turno.", sinergiaText: ""},
                     fazenda: {nome: "Granja", descricao: "Ocupa 1 espacio. +15 Oro/turno.", sinergiaText: ""},
                     mercado: {nome: "Mercado", descricao: "Ocupa 1 espacio. +30 Oro/turno, -20 Vida Max.", sinergiaText: ""},
                     quartel: {nome: "Cuartel", descricao: "Usa 1, Da 2 Espacio. +30 Vida Max.", sinergiaText: ""}
@@ -297,14 +297,13 @@
             }
         };
 
-        // BALANCEAMENTO DE CUSTOS E EFEITOS
         let cartasDisponiveis = [
             { tipo: "tropa", id: "guerreiro", ocupaEspaco: 1, custo: 30, efeitos: { danoBase: 25 } },
             { tipo: "tropa", id: "arqueiro", ocupaEspaco: 1, custo: 15, efeitos: { danoBase: 15 } },
             { tipo: "tropa", id: "cavaleiro", ocupaEspaco: 1, custo: 70, efeitos: { danoBase: 50 } },
             { tipo: "tropa", id: "mago", ocupaEspaco: 1, custo: 85, efeitos: { danoBase: 40 } },
-            { tipo: "edificio", id: "castelo", ocupaEspaco: 1, custo: 80, efeitos: { saude: 50, ouroPorAno: 10, espacoExtra: 3 } }, 
-            { tipo: "edificio", id: "fortaleza", ocupaEspaco: 1, custo: 170, efeitos: { saude: 150, ouroPorAno: 25, espacoExtra: 4 } },
+            { tipo: "edificio", id: "castelo", ocupaEspaco: 1, custo: 80, efeitos: { saude: 50, ouroPorAno: 10, espacoExtra: 2 } }, 
+            { tipo: "edificio", id: "fortaleza", ocupaEspaco: 1, custo: 170, efeitos: { saude: 150, ouroPorAno: 25, espacoExtra: 3 } },
             { tipo: "edificio", id: "fazenda", ocupaEspaco: 1, custo: 50, efeitos: { ouroPorAno: 15, saude: 0 } },
             { tipo: "edificio", id: "mercado", ocupaEspaco: 1, custo: 80, efeitos: { ouroPorAno: 30, saude: -10 } },
             { tipo: "edificio", id: "quartel", ocupaEspaco: 1, custo: 70, efeitos: { saude: 30, espacoExtra: 2 } },
@@ -330,19 +329,32 @@
 
         let nomesInimigos = ["Rei do Simples", "Rei dos Insetos", "Rei do Papel", "Rei dos Livros", "Rei da Comida", "Rei da Arquitetura", "Rei do Estudo", "Rei da Água", "Rei do Movimento", "Rei dos Animais", "Rei do Fogo", "Rei da Espada", "Rei da Ilusão", "Rei do Magma", "Imperador da Devastação"];
         let inimigos = [];
+        
+        // Multiplicadores de Dificuldade para Inimigos
         const multiplicadoresDiff = { "arqueiro": 0.5, "escudeiro": 0.75, "cavaleiro": 1.0, "comandante": 1.5, "duque": 2.0 };
+        // Novos Multiplicadores de Recursos para o Jogador
+        const multiplicadoresRecursos = { "arqueiro": 1.0, "escudeiro": 1.0, "cavaleiro": 1.0, "comandante": 1.25, "duque": 1.5 };
 
         let ouro = 200, hp = 500, hpMaximo = 500, espacosMaximosIniciais = 3, nivel = 1, ano = 1, ouroPorAnoBase = 50;
         let tabuleiro = [], cartasEscolhidas = [], cartasNaMao = [];
         let dificuldadeAtual = "cavaleiro";
+        let multRecursosAtual = 1.0;
         let inimigoAtual = null, inimigoAtualVidaMax = 0;
         let idiomaAtual = "pt-br";
 
         function inicializarInimigos(diffKey) {
             dificuldadeAtual = diffKey;
-            const mult = multiplicadoresDiff[diffKey];
+            const multInimigo = multiplicadoresDiff[diffKey];
+            multRecursosAtual = multiplicadoresRecursos[diffKey];
+
+            // Aplicando o buff de recursos na inicialização do jogo
+            ouro = Math.floor(200 * multRecursosAtual);
+            hpMaximo = Math.floor(500 * multRecursosAtual);
+            hp = hpMaximo;
+            ouroPorAnoBase = Math.floor(50 * multRecursosAtual);
+
             inimigos = baseInimigos.map((base, index) => {
-                return { nome: nomesInimigos[index], vida: Math.floor(base.vida * mult), ataque: Math.floor(base.ataque * mult) };
+                return { nome: nomesInimigos[index], vida: Math.floor(base.vida * multInimigo), ataque: Math.floor(base.ataque * multInimigo) };
             });
             inimigoAtual = JSON.parse(JSON.stringify(inimigos[0]));
             inimigoAtualVidaMax = inimigoAtual.vida;
@@ -409,7 +421,7 @@
                 let bonusSinergia = 0;
 
                 if (tropa.id === "arqueiro") { bonusSinergia = (qtdArqueiros - 1) * 10; dano += bonusSinergia; }
-                if (tropa.id === "mago") { bonusSinergia = qtdTanks * 25; dano += bonusSinergia; }
+                if (tropa.id === "mago") { bonusSinergia = qtdTanks * 20; dano += bonusSinergia; }
                 
                 total += dano;
                 return { ...tropa, danoCalculado: dano, bonusInfo: bonusSinergia };
@@ -532,10 +544,9 @@
                         tabuleiro.push(carta);
                     } else {
                         if (carta.efeitos.saude !== undefined) {
-                            // Previne que a compra de um prédio com saúde negativa mate o jogador na hora
                             if (hp + carta.efeitos.saude <= 0) {
                                 alert(msgs.mortePelaCarta);
-                                ouro += carta.custo; // devolve o dinheiro
+                                ouro += carta.custo; 
                                 return;
                             }
                             hpMaximo = Math.min(hpMaximo + carta.efeitos.saude, HP_MAXIMO_LIMITE);
@@ -579,7 +590,9 @@
                 alert(`${msgs.venceuInimigo} ${inimigoAtual.nome}!`);
                 inimigoAtual = JSON.parse(JSON.stringify(inimigos[nivel - 1]));
                 inimigoAtualVidaMax = inimigoAtual.vida;
-                ouro += (nivel * 80); // Bônus de boss
+                
+                // Aplicando o multiplicador no ouro ganho por vitória (Chefe)
+                ouro += Math.floor((nivel * 60) * multRecursosAtual); 
             } else {
                 hp -= inimigoAtual.ataque;
                 if (hp <= 0) { alert(`${msgs.perdeuJogo} ${inimigoAtual.nome}!`); location.reload(); return; }
@@ -619,7 +632,8 @@
         document.getElementById("passar-turno").addEventListener("click", passarTurno);
 
         function salvarGameState() {
-            const estado = { ouro, hp, hpMaximo, espacosMaximosIniciais, nivel, ano, inimigoAtual, inimigoAtualVidaMax, tabuleiro, cartasEscolhidas, idiomaAtual, dificuldadeAtual, inimigos };
+            // Adicionado multRecursosAtual e ouroPorAnoBase ao save para preservar a economia correta ao recarregar
+            const estado = { ouro, hp, hpMaximo, espacosMaximosIniciais, nivel, ano, inimigoAtual, inimigoAtualVidaMax, tabuleiro, cartasEscolhidas, idiomaAtual, dificuldadeAtual, inimigos, multRecursosAtual, ouroPorAnoBase };
             localStorage.setItem("jogoSalvoNKB", JSON.stringify(estado));
             alert(traducoes[idiomaAtual].msgs.jogoSalvo);
         }
@@ -631,7 +645,17 @@
                 ouro = est.ouro; hp = est.hp; hpMaximo = est.hpMaximo; espacosMaximosIniciais = est.espacosMaximosIniciais;
                 nivel = est.nivel; ano = est.ano; inimigoAtual = est.inimigoAtual;
                 inimigoAtualVidaMax = est.inimigoAtualVidaMax; tabuleiro = est.tabuleiro; cartasEscolhidas = est.cartasEscolhidas;
-                idiomaAtual = est.idiomaAtual; dificuldadeAtual = est.dificuldadeAtual || "cavaleiro"; inimigos = est.inimigos || [];
+                idiomaAtual = est.idiomaAtual; 
+                dificuldadeAtual = est.dificuldadeAtual || "cavaleiro"; 
+                
+                // Recalcula o multRecursosAtual caso seja um save antigo antes dessa atualização
+                multRecursosAtual = est.multRecursosAtual || multiplicadoresRecursos[dificuldadeAtual];
+                ouroPorAnoBase = est.ouroPorAnoBase || Math.floor(50 * multRecursosAtual);
+                
+                const multInimigo = multiplicadoresDiff[dificuldadeAtual];
+                inimigos = est.inimigos || baseInimigos.map((base, index) => {
+                    return { nome: nomesInimigos[index], vida: Math.floor(base.vida * multInimigo), ataque: Math.floor(base.ataque * multInimigo) };
+                });
                 
                 document.getElementById("idioma-select").value = idiomaAtual;
                 iniciarJogoUI();
