@@ -26,13 +26,13 @@
             cursor: pointer; margin-right: 10px; margin-bottom: 10px; transition: all 0.2s ease;
             text-transform: uppercase; font-weight: bold; box-shadow: 0 4px #771919;
         }
-        button:hover { background-color: #8B1A1A; transform: translateY(-1px); box-shadow: 0 5px #771919; }
-        button:active { transform: translateY(3px); box-shadow: 0 1px #771919; }
-        button:disabled { background-color: #555; box-shadow: 0 4px #333; cursor: not-allowed; color: #aaa; }
+        button:hover:not(:disabled) { background-color: #8B1A1A; transform: translateY(-1px); box-shadow: 0 5px #771919; }
+        button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px #771919; }
+        button:disabled { background-color: #555; box-shadow: 0 4px #333; cursor: not-allowed; color: #aaa; opacity: 0.6; }
         button.batalha { background-color: #28a745; box-shadow: 0 4px #1c7c30; }
-        button.batalha:hover { background-color: #218838; box-shadow: 0 5px #1c7c30; }
+        button.batalha:hover:not(:disabled) { background-color: #218838; box-shadow: 0 5px #1c7c30; }
         button.loja { background-color: #0056b3; box-shadow: 0 4px #003d82; }
-        button.loja:hover { background-color: #004494; box-shadow: 0 5px #003d82; }
+        button.loja:hover:not(:disabled) { background-color: #004494; box-shadow: 0 5px #003d82; }
         
         #grid-tabuleiro {
             display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; min-height: 120px;
@@ -71,14 +71,15 @@
         
         .diff-btn { width: 100%; margin-bottom: 15px; font-size: 1.1em; }
         #game-screen { display: none; }
-        #tutorial-msg { color: #17a2b8; font-weight: bold; margin-top: 10px; font-size: 1.1em; }
+        #tutorial-msg { background-color: #17a2b8; color: white; padding: 10px; border-radius: 5px; font-weight: bold; margin-top: 15px; font-size: 1.1em; text-align: center; display: none; animation: flash-green 1s infinite alternate; }
         
         /* Animações e Efeitos */
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         .flash-red { background-color: rgba(255, 0, 0, 0.5) !important; transition: background-color 0.1s; }
         .flash-green { background-color: rgba(0, 255, 0, 0.3) !important; transition: background-color 0.1s; }
         @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
-        
+        @keyframes flash-green { from { box-shadow: 0 0 5px #17a2b8; } to { box-shadow: 0 0 20px #17a2b8; } }
+
         .floating-text { position: fixed; pointer-events: none; font-size: 24px; font-weight: bold; z-index: 2000; animation: floatUp 1.2s ease-out forwards; text-shadow: 2px 2px 4px rgba(0,0,0,1); }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.2); } }
         
@@ -88,7 +89,7 @@
             border: 2px solid #FFD700; padding: 12px; border-radius: 8px;
             color: #fff; font-size: 0.95em; z-index: 3000; pointer-events: none;
             box-shadow: 0 8px 16px rgba(0,0,0,0.9); max-width: 280px; font-family: 'Arial', sans-serif;
-            transform: translate(15px, 15px); /* Offset do mouse */
+            transform: translate(15px, 15px);
         }
         .tooltip-title { color: #FFD700; font-weight: bold; font-size: 1.1em; border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 8px; text-transform: uppercase;}
         .tooltip-desc { color: #ccc; line-height: 1.4;}
@@ -125,7 +126,9 @@
         <button class="diff-btn" data-diff="cavaleiro" style="background-color: #ffc107; color: black;">Cavaleiro (Normal)</button>
         <button class="diff-btn" data-diff="comandante" style="background-color: #fd7e14;">Comandante (Difícil)</button>
         <button class="diff-btn" data-diff="duque" style="background-color: #dc3545;">Duque (Insano)</button>
-        <button id="carregar-jogo-inicio" style="margin-top:20px; width:100%;">Carregar Jogo Salvo</button>
+        <hr style="border-color: #444; margin: 20px 0;">
+        <button id="carregar-jogo-inicio" style="width:100%; margin-bottom: 10px;">Carregar Jogo Salvo</button>
+        <button id="btn-conquistas-inicio" style="width:100%; background-color: #6f42c1;">Ver Sala de Troféus</button>
     </div>
 
     <div id="game-screen">
@@ -195,6 +198,14 @@
             <h2 id="modal-titulo">Regras do Jogo</h2>
             <p id="modal-p1">Defenda seu reino usando estratégia, sinergia e economia!</p>
             <ul id="modal-list" style="text-align: left;"></ul>
+        </div>
+    </div>
+
+    <div id="conquistas-modal" class="modal">
+        <div class="modal-conteudo" style="max-height: 80vh; overflow-y: auto;">
+            <span class="fechar-modal" onclick="document.getElementById('conquistas-modal').style.display='none'" style="float:right; cursor:pointer; color:#FFD700; font-size:24px;">&times;</span>
+            <h2 id="modal-conquistas-titulo" style="color: #FFD700; border-bottom: 1px solid #555; padding-bottom: 10px;">Sala de Troféus</h2>
+            <div id="grid-conquistas" style="display: flex; flex-direction: column; gap: 10px; text-align: left; margin-top: 20px;"></div>
         </div>
     </div>
 
@@ -269,7 +280,6 @@
             setTimeout(() => { el.classList.remove(className); el.classList.remove('flash-red'); }, 400);
         }
         
-        // Funções do Tooltip Dinâmico
         const tooltipEl = document.getElementById('custom-tooltip');
         function showTooltip(e, title, desc) {
             tooltipEl.innerHTML = `<div class="tooltip-title">${title}</div><div class="tooltip-desc">${desc}</div>`;
@@ -282,7 +292,6 @@
         }
         function hideTooltip() { tooltipEl.style.display = 'none'; }
         
-        // Funções de Conquistas (Toasts)
         function showToast(message) {
             sons.achievement();
             const container = document.getElementById('toast-container');
@@ -295,23 +304,51 @@
 
         const dicionarioConquistas = {
             "primeiro_sangue": "Primeiro Sangue (Venceu o 1º nível)",
-            "rico": "Mestre da Moeda (Acumulou 3000 de Ouro)",
-            "estrategista": "Dano Massivo (Causou 5000+ de dano)",
-            "megalomaniaco": "Império (30+ Espaços de Exército)",
-            "intocavel": "Intocável (Chegou ao nv 16 sem sofrer dano)",
-            "chuva_flechas": "Chuva de Flechas (Venceu nv 16 só com Arqueiros)"
+            "15-reis": "Imperador (Venceu os 15 reis)",
+            "100-abismo": "Imperador do Abismo (Chegou ao Rei 100 do Abismo)",
+            "rico": "Mestre da Moeda (Acumulou 5000 de Ouro)",
+            "super-rico": "Rei da Moeda (Acumulou 25000 de Ouro)",
+            "estrategista": "Dano Massivo (Causou 5000+ de dano num turno)",
+            "dano++": "/Kill (Causou 50000+ de dano num turno)",
+            "imortal": "Imortal (Tem 25000+ de vida máxima)",
+            "reinado": "Reino respeitado (30+ Espaços de Exército)",
+            "megalomaniaco": "Império (100+ Espaços de Exército)",
+            "intocavel": "Intocável (Venceu os 15 Reis sem sofrer dano)",
+            "chuva_flechas": "Chuva de Flechas (Venceu os 15 Reis só com Arqueiros)",
+            "tanque_guerra": "Tanque de Guerra (Venceu os 15 Reis só com Guerreiros ou Cavaleiros)",
+            "magico": "Mágico (Venceu os 15 Reis só com Magos)",
+            "por_um_fio": "Por um Fio (Sobreviveu a um turno com exatamente 1 de Vida)",
+            "construtor": "Mestre Construtor (Possui 20 Edifícios Ativos simultaneamente)"
         };
 
-        function verificarConquistasTurno(danoTotal) {
-            if (nivel > 1 && !stats.conquistas.includes("primeiro_sangue")) desbloquearConquista("primeiro_sangue");
-            if (ouro >= 1000 && !stats.conquistas.includes("rico")) desbloquearConquista("rico");
-            if (danoTotal >= 1000 && !stats.conquistas.includes("estrategista")) desbloquearConquista("estrategista");
-            if (getEspacosMaximos() >= 10 && !stats.conquistas.includes("megalomaniaco")) desbloquearConquista("megalomaniaco");
-        }
+        // Carrega conquistas globais (persistem entre sessões mesmo sem save)
+        let globalAchievements = JSON.parse(localStorage.getItem("kp_globalAchievements")) || [];
 
         function desbloquearConquista(id) {
-            stats.conquistas.push(id);
-            showToast(dicionarioConquistas[id]);
+            // Salva globalmente
+            if (!globalAchievements.includes(id)) {
+                globalAchievements.push(id);
+                localStorage.setItem("kp_globalAchievements", JSON.stringify(globalAchievements));
+            }
+            // Salva na run atual e exibe toast se for a primeira vez na run
+            if (!stats.conquistas.includes(id)) {
+                stats.conquistas.push(id);
+                showToast(dicionarioConquistas[id]);
+            }
+        }
+
+        function verificarConquistasTurno(danoTotal) {
+            if (nivel > 1) desbloquearConquista("primeiro_sangue");
+            if (nivel > 15) desbloquearConquista("15-reis");
+            if (ouro >= 5000) desbloquearConquista("rico");
+            if (nivel > 115) desbloquearConquista("100-abismo");
+            if (ouro >= 25000) desbloquearConquista("super-rico");
+            if (danoTotal >= 5000) desbloquearConquista("estrategista");
+            if (danoTotal >= 50000) desbloquearConquista("dano++");
+            if (hpMaximo >= 25000) desbloquearConquista("imortal");
+            if (getEspacosMaximos() >= 30) desbloquearConquista("reinado");
+            if (getEspacosMaximos() >= 100) desbloquearConquista("megalomaniaco");
+            if (cartasEscolhidas.length >= 20) desbloquearConquista("construtor");
         }
 
         // --- CONSTANTES E DADOS ---
@@ -324,6 +361,8 @@
                 ui: {
                     mainTitle: "Kingdom Protection", titleDiff: "Escolha sua Dificuldade",
                     descDiff: "Sua escolha afeta a vida e o dano dos inimigos.",
+                    diffArqueiro: "Arqueiro (Tutorial)", diffEscudeiro: "Escudeiro (Fácil)", diffCavaleiro: "Cavaleiro (Normal)", diffComandante: "Comandante (Difícil)", diffDuque: "Duque (Insano)",
+                    btnConquistasLobby: "Ver Sala de Troféus", conquistasTitulo: "Sala de Troféus",
                     lblIdioma: "Idioma:", btnLoadStart: "Carregar Jogo Salvo", tituloCidade: "Seu Reino",
                     lblOuro: "Ouro:", lblVida: "Vida:", lblAno: "Turno/Ano:", lblOuroTurno: "/turno",
                     lblInimigoPoder: "Poder do Inimigo (Dano):", lblInimigoVida: "Vida do Inimigo:",
@@ -334,7 +373,10 @@
                     tituloCartas: "Loja: Compre 1 carta (ou pule)", tituloCartasCompradas: "Edifícios Ativos", btnPularLoja: "Fechar Loja",
                     modalTitulo: "Regras do Jogo", btnVender: "Vender",
                     modalList: `<li><strong>Ouro:</strong> Usado na loja e cura.</li><li><strong>Espaço:</strong> Quase tudo ocupa terreno. Compre Fortalezas!</li><li><strong>Sinergias:</strong> Arqueiros em bando, Magos atrás de Tanks.</li><li><strong>Novas Cartas:</strong> Torre dá dano passivo, Banco gera juros!</li>`,
-                    tut1: "DICA: Gaste 5 ouro para rolar a loja!", tut2: "DICA: Cuidado com o limite de espaço.", tut3: "DICA: Agrupe cartas iguais para Sinergia!",
+                    tut1: "TUTORIAL (1/4): Bem-vindo! Compre tropas para se defender do Rei inimigo. Comece clicando em 'Rolar Loja'.", 
+                    tut2: "TUTORIAL (2/4): Excelente! Agora, clique em uma carta para comprá-la e colocá-la em seu Exército.", 
+                    tut3: "TUTORIAL (3/4): Muito bem! A tropa causará dano ao final do turno. Clique em 'Iniciar Batalha'.",
+                    tut4: "TUTORIAL (4/4): Você sobreviveu! Use ouro para criar Sinergias e gerencie seus espaços. Boa sorte, Majestade!",
                     prevSobra: "Vai sobrar: ", prevRecebe: "Vai receber: ", danoBase: "Base:", sinergia: "Sinergia:", torreDano: "Torre:", global: "Buff:",
                     rewTitle: "Vitória! Escolha uma Recompensa", rewDesc: "Fortaleça seu reino permanentemente:",
                     btnRewDano: "+10% Dano Global", btnRewVida: "+50 Vida Máxima", btnRewEspaco: "+1 Espaço no Exército", evTitle: "Evento Aleatório!"
@@ -359,9 +401,11 @@
                     altar: {nome: "Altar dos Deuses", desc: "Em cada turno, há 50% de chance de abençoar o reino com +30 Vida Máxima ou +45 Ouro bônus.", sinText: ""}
                 }
             },
-            "en-us": { /* Mantido encurtado para espaço, apenas o PT-BR foi expandido para o exemplo prático */
+            "en-us": { 
                 ui: {
                     mainTitle: "Kingdom Protection", titleDiff: "Choose Difficulty", descDiff: "Affects enemy health and damage.",
+                    diffArqueiro: "Archer (Tutorial)", diffEscudeiro: "Squire (Easy)", diffCavaleiro: "Knight (Normal)", diffComandante: "Commander (Hard)", diffDuque: "Duke (Insane)",
+                    btnConquistasLobby: "Trophy Room", conquistasTitulo: "Trophy Room",
                     lblIdioma: "Language:", btnLoadStart: "Load Save", tituloCidade: "Your Kingdom",
                     lblOuro: "Gold:", lblVida: "Health:", lblAno: "Turn/Year:", lblOuroTurno: "/turn",
                     lblInimigoPoder: "Enemy Power:", lblInimigoVida: "Enemy Health:",
@@ -370,7 +414,10 @@
                     btnBatalha: "Start Battle", btnSalvar: "Save", btnCarregar: "Load", btnRegras: "Rules",
                     tituloCartas: "Shop: Buy 1 or skip", tituloCartasCompradas: "Active Buildings", btnPularLoja: "Close Shop",
                     modalTitulo: "Rules", btnVender: "Sell", modalList: `<li><strong>Gold:</strong> Used for shop.</li><li><strong>Space:</strong> Expand with Fortress.</li><li><strong>Synergies:</strong> Archers group up.</li>`,
-                    tut1: "HINT: Roll the shop!", tut2: "HINT: Watch your space limit.", tut3: "HINT: Group similar classes!",
+                    tut1: "TUTORIAL (1/4): Welcome! Buy troops to defend. Start by clicking 'Roll Shop'.", 
+                    tut2: "TUTORIAL (2/4): Great! Now click on a card to buy and place it in your Army.", 
+                    tut3: "TUTORIAL (3/4): Well done! It will deal damage at turn end. Click 'Start Battle'.",
+                    tut4: "TUTORIAL (4/4): You survived! Group troops for Synergies. Good luck, Majesty!",
                     prevSobra: "Will survive with: ", prevRecebe: "Will receive: ", danoBase: "Base:", sinergia: "Synergy:", torreDano: "Tower:", global: "Buff:",
                     rewTitle: "Victory! Choose a Reward", rewDesc: "Strengthen your kingdom:", btnRewDano: "+10% Global Damage", btnRewVida: "+50 Max HP", btnRewEspaco: "+1 Space", evTitle: "Random Event!"
                 },
@@ -393,9 +440,11 @@
                     altar: {nome: "Altar", desc: "50% chance for +30 Max HP or +45 Gold/turn.", sinText: ""}
                 }
             },
-            "es-es": { /* Mantido igual para economia */
+            "es-es": { 
                  ui: {
                     mainTitle: "Kingdom Protection", titleDiff: "Elige Dificultad", descDiff: "Afecta vida y daño enemigo.",
+                    diffArqueiro: "Arquero (Tutorial)", diffEscudeiro: "Escudero (Fácil)", diffCavaleiro: "Caballero (Normal)", diffComandante: "Comandante (Difícil)", diffDuque: "Duque (Insano)",
+                    btnConquistasLobby: "Ver Trofeos", conquistasTitulo: "Sala de Trofeos",
                     lblIdioma: "Idioma:", btnLoadStart: "Cargar Partida", tituloCidade: "Tu Reino",
                     lblOuro: "Oro:", lblVida: "Vida:", lblAno: "Turno/Año:", lblOuroTurno: "/turno",
                     lblInimigoPoder: "Poder Enemigo:", lblInimigoVida: "Vida Enemigo:",
@@ -404,7 +453,10 @@
                     btnBatalha: "Iniciar Batalla", btnSalvar: "Guardar", btnCarregar: "Cargar", btnRegras: "Reglas",
                     tituloCartas: "Tienda: Compra 1", tituloCartasCompradas: "Edificios Activos", btnPularLoja: "Cerrar",
                     modalTitulo: "Reglas", btnVender: "Vender", modalList: `<li><strong>Oro:</strong> Para la tienda.</li><li><strong>Espacio:</strong> Compra Fortalezas.</li><li><strong>Sinergia:</strong> Agrupa arqueros.</li>`,
-                    tut1: "PISTA: ¡Usa la tienda!", tut2: "PISTA: Cuidado con el límite.", tut3: "PISTA: ¡Agrupa clases!",
+                    tut1: "TUTORIAL (1/4): ¡Bienvenido! Compra tropas. Clic en 'Rol Tienda'.", 
+                    tut2: "TUTORIAL (2/4): ¡Excelente! Clic en una carta para comprarla.", 
+                    tut3: "TUTORIAL (3/4): Hará daño al final del turno. Clic 'Iniciar Batalla'.",
+                    tut4: "TUTORIAL (4/4): ¡Sobreviviste! Agrupa clases. ¡Suerte, Majestad!",
                     prevSobra: "Sobrará: ", prevRecebe: "Recibirá: ", danoBase: "Base:", sinergia: "Sinergia:", torreDano: "Torre:", global: "Buff:",
                     rewTitle: "¡Victoria! Elige Recompensa", rewDesc: "Fortalece tu reino:", btnRewDano: "+10% Daño Global", btnRewVida: "+50 Vida Máx", btnRewEspaco: "+1 Espacio", evTitle: "¡Evento Aleatorio!"
                 },
@@ -463,9 +515,10 @@
         let inimigoAtual = null, inimigoAtualVidaMax = 0;
         let idiomaAtual = "pt-br";
         let custoRerollAtual = CUSTO_REROLL; 
+        let stepTutorial = 0;
         
         // Stats e Conquistas
-        let stats = { maxDano: 0, intocavel: true, puroArco: true, conquistas: [] };
+        let stats = { maxDano: 0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: [] };
 
         function inicializarInimigos(diffKey) {
             dificuldadeAtual = diffKey;
@@ -485,6 +538,17 @@
         function traduzirElementosEstaticos() {
             const ui = traducoes[idiomaAtual].ui;
             document.getElementById("title-diff").innerText = ui.titleDiff; document.getElementById("desc-diff").innerText = ui.descDiff;
+            
+            // Tradução dos botões de dificuldade
+            document.querySelector('[data-diff="arqueiro"]').innerText = ui.diffArqueiro;
+            document.querySelector('[data-diff="escudeiro"]').innerText = ui.diffEscudeiro;
+            document.querySelector('[data-diff="cavaleiro"]').innerText = ui.diffCavaleiro;
+            document.querySelector('[data-diff="comandante"]').innerText = ui.diffComandante;
+            document.querySelector('[data-diff="duque"]').innerText = ui.diffDuque;
+            
+            document.getElementById("btn-conquistas-inicio").innerText = ui.btnConquistasLobby;
+            document.getElementById("modal-conquistas-titulo").innerText = ui.conquistasTitulo;
+            
             document.getElementById("carregar-jogo-inicio").innerText = ui.btnLoadStart; document.getElementById("titulo-cidade").innerText = ui.tituloCidade;
             document.getElementById("lbl-ouro").innerText = ui.lblOuro; document.getElementById("lbl-vida").innerText = ui.lblVida;
             document.getElementById("lbl-inimigo-poder").innerText = ui.lblInimigoPoder; document.getElementById("lbl-inimigo-vida").innerText = ui.lblInimigoVida;
@@ -501,6 +565,36 @@
             document.getElementById("btn-rew-espaco").innerText = ui.btnRewEspaco; document.getElementById("evento-title").innerText = ui.evTitle;
             document.getElementById("lbl-ano").innerText = ui.lblAno;
             document.getElementById("recuperar-saude").innerText = ui.btnCurar.replace('{c}', custoCuraAtual);
+        }
+
+        // Funções do Tutorial
+        function atualizarTutorial() {
+            if (dificuldadeAtual !== "arqueiro") return;
+            const ui = traducoes[idiomaAtual].ui;
+            const msgEl = document.getElementById("tutorial-msg");
+            const btnTurno = document.getElementById("passar-turno");
+            const btnLoja = document.getElementById("abrir-loja");
+            const btnPular = document.getElementById("pular-loja");
+            
+            msgEl.style.display = "block";
+            
+            if (stepTutorial === 1) {
+                msgEl.innerText = ui.tut1;
+                btnTurno.disabled = true;
+            } else if (stepTutorial === 2) {
+                msgEl.innerText = ui.tut2;
+                btnTurno.disabled = true;
+                if(btnPular) btnPular.style.display = "none"; // Força comprar
+            } else if (stepTutorial === 3) {
+                msgEl.innerText = ui.tut3;
+                btnLoja.disabled = true;
+                btnTurno.disabled = false;
+                if(btnPular) btnPular.style.display = "block";
+            } else if (stepTutorial === 4) {
+                msgEl.innerText = ui.tut4;
+                btnLoja.disabled = false;
+                btnTurno.disabled = false;
+            }
         }
 
         function getEspacosUsados() { return tabuleiro.reduce((a,c)=>a+(c.ocupaEspaco||0),0) + cartasEscolhidas.reduce((a,c)=>a+(c.ocupaEspaco||0),0); }
@@ -574,9 +668,8 @@
             
             document.getElementById("lbl-stats").textContent = `Maior Dano: ${stats.maxDano} | Turnos Sobrevividos: ${ano}`;
             
-            // Renderiza conquistas textuais se não houver conquistas, limpa a div
             let conquistasTxt = stats.conquistas.length > 0 
-                ? "🏆 Conquistas: " + stats.conquistas.map(id => dicionarioConquistas[id].split("(")[0].trim()).join(" | ") 
+                ? "🏆 Conquistas nesta run: " + stats.conquistas.map(id => dicionarioConquistas[id].split("(")[0].trim()).join(" | ") 
                 : "";
             document.getElementById("lbl-achievements").textContent = conquistasTxt;
         }
@@ -590,7 +683,6 @@
 
             calc.tabSinergizado.forEach((tropa, i) => {
                 const cT = tCartas[tropa.id]; const div = document.createElement("div"); div.className = "carta-tropa";
-                // Removido 'title' nativo e adicionado tooltip funcional
                 div.onmouseenter = (e) => showTooltip(e, cT.nome, cT.desc);
                 div.onmousemove = moveTooltip;
                 div.onmouseleave = hideTooltip;
@@ -638,6 +730,8 @@
             ouro -= custoRerollAtual; 
             custoRerollAtual = CUSTO_REROLL; 
             
+            if(stepTutorial === 1) { stepTutorial = 2; atualizarTutorial(); }
+
             cartasNaMao = [];
             while (cartasNaMao.length < 3) {
                 const c = cartasDisponiveis[Math.floor(Math.random() * cartasDisponiveis.length)];
@@ -659,10 +753,10 @@
                     ouro -= c.custo; sons.coin();
                     if (c.tipo === "tropa") tabuleiro.push(c);
                     else {
-                        // BUG CORRIGIDO AQUI: A variável indefinida HP_MAXIMO_LIMITE foi removida.
                         if (c.efeitos.saude !== undefined) { hpMaximo += c.efeitos.saude; hp = Math.min(hp+c.efeitos.saude, hpMaximo); }
                         cartasEscolhidas.push(c);
                     }
+                    if(stepTutorial === 2) { stepTutorial = 3; atualizarTutorial(); }
                     fecharLoja(); atualizarInterface();
                 };
                 lista.appendChild(li);
@@ -672,7 +766,7 @@
 
         function fecharLoja() {
             document.getElementById("cartas").style.display = "none";
-            document.getElementById("abrir-loja").disabled = false; document.getElementById("passar-turno").disabled = false;
+            document.getElementById("abrir-loja").disabled = false; document.getElementById("passar-turno").disabled = (stepTutorial === 1 || stepTutorial === 2);
         }
 
         function mostrarCartasEscolhidas() {
@@ -680,7 +774,6 @@
             cartasEscolhidas.forEach((c, i) => {
                 const cT = traducoes[idiomaAtual].carta[c.id]; const li = document.createElement("li");
                 
-                // Adicionando Tooltip funcional na lista também
                 li.onmouseenter = (e) => showTooltip(e, cT.nome, cT.desc);
                 li.onmousemove = moveTooltip;
                 li.onmouseleave = hideTooltip;
@@ -709,7 +802,12 @@
             let calc = calcularDanoTotal(); floatText('inimigo-status', `-${calc.total}`, '#ff4444');
             inimigoAtual.vida -= calc.total;
             
+            if(stepTutorial === 3) { stepTutorial = 4; atualizarTutorial(); }
+
+            // Checagens para Conquistas Exclusivas
             if(tabuleiro.some(t => t.id !== "arqueiro")) stats.puroArco = false;
+            if(tabuleiro.some(t => t.id !== "guerreiro" && t.id !== "cavaleiro")) stats.puroTank = false;
+            if(tabuleiro.some(t => t.id !== "mago")) stats.puroMago = false;
 
             if (inimigoAtual.vida <= 0) {
                 sons.win();
@@ -718,8 +816,10 @@
                 ouro += recompensaOuro; floatText('cidade', `+${recompensaOuro} Ouro!`, '#FFD700');
                 
                 if (nivel === 16) {
-                    if (stats.intocavel && !stats.conquistas.includes("intocavel")) desbloquearConquista("intocavel");
-                    if (stats.puroArco && tabuleiro.length > 0 && !stats.conquistas.includes("chuva_flechas")) desbloquearConquista("chuva_flechas");
+                    if (stats.intocavel) desbloquearConquista("intocavel");
+                    if (stats.puroArco && tabuleiro.length > 0) desbloquearConquista("chuva_flechas");
+                    if (stats.puroTank && tabuleiro.length > 0) desbloquearConquista("tanque_guerra");
+                    if (stats.puroMago && tabuleiro.length > 0) desbloquearConquista("magico");
                 }
 
                 document.getElementById('reward-modal').style.display = 'block';
@@ -735,6 +835,9 @@
                 hp -= inimigoAtual.ataque; 
                 stats.intocavel = false; 
                 flashElement('cidade', 'shake'); floatText('cidade', `-${inimigoAtual.ataque}`, '#ff4444');
+                
+                if (hp === 1) desbloquearConquista("por_um_fio");
+
                 if (hp <= 0) { sons.loss(); setTimeout(() => { alert(`${traducoes[idiomaAtual].msgs.perdeuJogo} ${inimigoAtual.nome}!`); location.reload(); }, 500); return; }
             }
 
@@ -750,7 +853,15 @@
         document.getElementById("btn-rew-espaco").onclick = () => { espacosMaximosIniciais += 1; fecharReward(); };
         function fecharReward() { document.getElementById('reward-modal').style.display = 'none'; atualizarInterface(); sons.heal(); }
 
-        function iniciarJogoUI() { document.getElementById("start-screen").style.display = "none"; document.getElementById("game-screen").style.display = "block"; atualizarInterface(); initAudio(); }
+        function iniciarJogoUI() { 
+            document.getElementById("start-screen").style.display = "none"; 
+            document.getElementById("game-screen").style.display = "block"; 
+            
+            if(dificuldadeAtual === "arqueiro") { stepTutorial = 1; atualizarTutorial(); }
+            else { stepTutorial = 0; document.getElementById("tutorial-msg").style.display = "none"; }
+
+            atualizarInterface(); initAudio(); 
+        }
 
         document.querySelectorAll(".diff-btn").forEach(btn => btn.addEventListener("click", (e) => { inicializarInimigos(e.target.dataset.diff); iniciarJogoUI(); }));
         document.getElementById("abrir-loja").addEventListener("click", abrirLoja);
@@ -778,7 +889,7 @@
             const s = localStorage.getItem("jogoSalvoNKB");
             if (s) {
                 const e = JSON.parse(s);
-                ouro=e.ouro; hp=e.hp; hpMaximo=e.hpMaximo; espacosMaximosIniciais=e.espacosMaximosIniciais; nivel=e.nivel; ano=e.ano; inimigoAtual=e.inimigoAtual; inimigoAtualVidaMax=e.inimigoAtualVidaMax; tabuleiro=e.tabuleiro; cartasEscolhidas=e.cartasEscolhidas; idiomaAtual=e.idiomaAtual; dificuldadeAtual=e.dificuldadeAtual||"cavaleiro"; multRecursosAtual=e.multRecursosAtual||1.0; ouroPorAnoBase=e.ouroPorAnoBase||50; custoCuraAtual=e.custoCuraAtual||50; multDanoGlobal=e.multDanoGlobal||1.0; stats=e.stats||{maxDano:0, intocavel: true, puroArco: true, conquistas: []}; inimigos=e.inimigos||[];
+                ouro=e.ouro; hp=e.hp; hpMaximo=e.hpMaximo; espacosMaximosIniciais=e.espacosMaximosIniciais; nivel=e.nivel; ano=e.ano; inimigoAtual=e.inimigoAtual; inimigoAtualVidaMax=e.inimigoAtualVidaMax; tabuleiro=e.tabuleiro; cartasEscolhidas=e.cartasEscolhidas; idiomaAtual=e.idiomaAtual; dificuldadeAtual=e.dificuldadeAtual||"cavaleiro"; multRecursosAtual=e.multRecursosAtual||1.0; ouroPorAnoBase=e.ouroPorAnoBase||50; custoCuraAtual=e.custoCuraAtual||50; multDanoGlobal=e.multDanoGlobal||1.0; stats=e.stats||{maxDano:0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: []}; inimigos=e.inimigos||[];
                 document.getElementById("idioma-select").value = idiomaAtual; iniciarJogoUI(); showToast(traducoes[idiomaAtual].msgs.jogoCarregado);
             } else alert(traducoes[idiomaAtual].msgs.semJogoSalvo);
         }
@@ -788,6 +899,24 @@
         document.getElementById("idioma-select").addEventListener("change", (e) => { idiomaAtual = e.target.value; traduzirElementosEstaticos(); if(document.getElementById("game-screen").style.display==="block") atualizarInterface(); });
         document.getElementById("mostrar-regras").addEventListener("click", () => document.getElementById("regras-modal").style.display = "block");
         
+        // Modal de Conquistas no Lobby
+        document.getElementById("btn-conquistas-inicio").addEventListener("click", () => {
+            const grid = document.getElementById("grid-conquistas");
+            grid.innerHTML = "";
+            for (const [id, desc] of Object.entries(dicionarioConquistas)) {
+                const unlocked = globalAchievements.includes(id);
+                const div = document.createElement("div");
+                div.style.padding = "10px";
+                div.style.border = "1px solid #555";
+                div.style.borderRadius = "5px";
+                div.style.backgroundColor = unlocked ? "rgba(40, 167, 69, 0.2)" : "rgba(30, 30, 30, 0.8)";
+                div.style.color = unlocked ? "#fff" : "#777";
+                div.innerHTML = `<span style="font-size: 1.5em; margin-right: 10px;">${unlocked ? '🏆' : '🔒'}</span> <strong>${desc}</strong>`;
+                grid.appendChild(div);
+            }
+            document.getElementById("conquistas-modal").style.display = "block";
+        });
+
         traduzirElementosEstaticos();
     </script>
 </body>
