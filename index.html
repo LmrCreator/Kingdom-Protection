@@ -54,8 +54,8 @@
         .carta-tropa small { color: #ff9999; font-weight: bold; font-size: 1.1em; display: block;}
         .carta-tropa .sinergia { color: #5bc0de; font-size: 0.85em; font-weight: normal; }
         
-        .progress-bar-container { background-color: #444; border: 1px solid #FFD700; border-radius: 5px; overflow: hidden; height: 25px; margin-top: 5px; margin-bottom: 10px; }
-        .progress-bar { height: 100%; background-color: #28a745; text-align: right; padding-right: 5px; color: white; line-height: 25px; font-weight: bold; transition: width 0.3s ease; }
+        .progress-bar-container { background-color: #444; border: 1px solid #FFD700; border-radius: 5px; overflow: hidden; height: 25px; margin-top: 5px; margin-bottom: 10px; cursor: pointer; }
+        .progress-bar { height: 100%; background-color: #28a745; text-align: right; padding-right: 5px; color: white; line-height: 25px; font-weight: bold; transition: width 0.3s ease; pointer-events: none; }
         #inimigo-progress-bar { background-color: #dc3545; }
         
         #lista-cartas { display: flex; gap: 15px; list-style: none; padding: 0; flex-wrap: wrap; }
@@ -137,7 +137,7 @@
                 <h2 id="titulo-cidade">Seu Reino</h2>
                 <p><strong id="lbl-ouro">Ouro:</strong> <span id="ouro" style="color: #FFD700; font-size: 1.2em;">200</span> <small id="lbl-ouro-turno" style="color:#aaa;">(+25/turno)</small></p>
                 <p><span id="lbl-vida">Vida:</span> <span id="hp">500</span> / <span id="hp-max">500</span></p>
-                <div class="progress-bar-container"><div id="hp-progress-bar" class="progress-bar" style="width: 100%;"></div></div>
+                <div id="barra-vida-reino" class="progress-bar-container"><div id="hp-progress-bar" class="progress-bar" style="width: 100%;"></div></div>
                 <div id="previsao-reino" class="previsao"></div>
                 <p><span id="lbl-ano">Turno/Ano:</span> <span id="ano" style="font-weight: bold; color: #aaa;">1</span> | Nível: <span id="nivel-disp">1</span></p>
                 <div id="tutorial-msg"></div>
@@ -302,23 +302,34 @@
             setTimeout(() => toast.remove(), 4000);
         }
 
+        // --- DICIONÁRIO DE CONQUISTAS COM CATEGORIAS ---
         const dicionarioConquistas = {
-            "primeiro_sangue": "Primeiro Sangue (Venceu o 1º nível)",
-            "15-reis": "Imperador (Venceu os 15 reis)",
-            "100-abismo": "Imperador do Abismo (Chegou ao Rei 100 do Abismo)",
-            "rico": "Mestre da Moeda (Acumulou 5000 de Ouro)",
-            "super-rico": "Rei da Moeda (Acumulou 25000 de Ouro)",
-            "estrategista": "Dano Massivo (Causou 5000+ de dano num turno)",
-            "dano++": "/Kill (Causou 50000+ de dano num turno)",
-            "imortal": "Imortal (Tem 25000+ de vida máxima)",
-            "reinado": "Reino respeitado (30+ Espaços de Exército)",
-            "megalomaniaco": "Império (100+ Espaços de Exército)",
-            "intocavel": "Intocável (Venceu os 15 Reis sem sofrer dano)",
-            "chuva_flechas": "Chuva de Flechas (Venceu os 15 Reis só com Arqueiros)",
-            "tanque_guerra": "Tanque de Guerra (Venceu os 15 Reis só com Guerreiros ou Cavaleiros)",
-            "magico": "Mágico (Venceu os 15 Reis só com Magos)",
-            "por_um_fio": "Por um Fio (Sobreviveu a um turno com exatamente 1 de Vida)",
-            "construtor": "Mestre Construtor (Possui 20 Edifícios Ativos simultaneamente)"
+            // Inicial
+            "primeiro_sangue": { desc: "Primeiro Sangue (Venceu o 1º nível)", cat: "Inicial" },
+            "rico": { desc: "Mestre da Moeda (Acumulou 5000 de Ouro)", cat: "Inicial" },
+            "estrategista": { desc: "Dano Massivo (Causou 5000+ de dano num turno)", cat: "Inicial" },
+            "construtor": { desc: "Mestre Construtor (Possui 20 Edifícios Ativos)", cat: "Inicial" },
+            // Normal
+            "15-reis": { desc: "Imperador (Venceu os 15 reis)", cat: "Normal" },
+            "reinado": { desc: "Reino Respeitado (30+ Espaços de Exército)", cat: "Normal" },
+            "chuva_flechas": { desc: "Chuva de Flechas (Venceu os 15 Reis só com Arqueiros)", cat: "Normal" },
+            "tanque_guerra": { desc: "Tanque de Guerra (Venceu os 15 Reis só com Guerreiros/Cavaleiros)", cat: "Normal" },
+            "magico": { desc: "Mágico (Venceu os 15 Reis só com Magos)", cat: "Normal" },
+            "consumista": { desc: "Consumista (Rolou a loja 50 vezes na mesma partida)", cat: "Normal" },
+            // Difícil
+            "super-rico": { desc: "Rei da Moeda (Acumulou 25000 de Ouro)", cat: "Difícil" },
+            "imortal": { desc: "Imortal (Tem 25000+ de vida máxima)", cat: "Difícil" },
+            "imperador_construcoes": { desc: "Imperador das Construções (Possui 50+ Edifícios Ativos)", cat: "Difícil" },
+            "potencia_economica": { desc: "Potência Econômica (Ganhe 1000+ de Ouro por turno)", cat: "Difícil" },
+            "por_um_fio": { desc: "Por um Fio (Sobreviveu a um turno com exatamente 1 de Vida)", cat: "Difícil" },
+            "perfect": { desc: "Perfect (Derrote 3 chefes com dano exato sobrando 0 HP)", cat: "Difícil" },
+            // Insana
+            "100-abismo": { desc: "Imperador do Abismo (Chegou ao Rei 100 do Abismo)", cat: "Insana" },
+            "dano++": { desc: "/Kill (Causou 50000+ de dano num turno)", cat: "Insana" },
+            "megalomaniaco": { desc: "Império (100+ Espaços de Exército)", cat: "Insana" },
+            "intocavel": { desc: "Intocável (Venceu os 15 Reis sem sofrer dano)", cat: "Insana" },
+            "alta_aposta": { desc: "Alta Aposta (Vença os 15 Reis com Vida Máxima < 250)", cat: "Insana" },
+            "sem_exercito": { desc: "O que é Exército? (Vença os 15 Reis usando só Torres para dano)", cat: "Insana" }
         };
 
         // Carrega conquistas globais (persistem entre sessões mesmo sem save)
@@ -333,7 +344,7 @@
             // Salva na run atual e exibe toast se for a primeira vez na run
             if (!stats.conquistas.includes(id)) {
                 stats.conquistas.push(id);
-                showToast(dicionarioConquistas[id]);
+                showToast(dicionarioConquistas[id].desc);
             }
         }
 
@@ -349,12 +360,17 @@
             if (getEspacosMaximos() >= 30) desbloquearConquista("reinado");
             if (getEspacosMaximos() >= 100) desbloquearConquista("megalomaniaco");
             if (cartasEscolhidas.length >= 20) desbloquearConquista("construtor");
+            if (cartasEscolhidas.length >= 50) desbloquearConquista("imperador_construcoes");
+            
+            // Verifica Potência Econômica com o Ouro Base Projetado + Juros Projetados
+            let ouroProjetado = getOuroTurno() + simularEfeitosEspeciaisTurno().jurosTotal;
+            if (ouroProjetado >= 1000) desbloquearConquista("potencia_economica");
         }
 
         // --- CONSTANTES E DADOS ---
         const CUSTO_REROLL = 5;
         let custoCuraAtual = 50;
-        const VALOR_CURA = 25;
+        const VALOR_CURA = 50;
 
         const traducoes = {
             "pt-br": {
@@ -517,8 +533,11 @@
         let custoRerollAtual = CUSTO_REROLL; 
         let stepTutorial = 0;
         
-        // Stats e Conquistas
-        let stats = { maxDano: 0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: [] };
+        // Stats e Conquistas (atualizado com os contadores de novas conquistas)
+        let stats = { 
+            maxDano: 0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, 
+            conquistas: [], perfects: 0, rerolls: 0, usouTropa: false 
+        };
 
         function inicializarInimigos(diffKey) {
             dificuldadeAtual = diffKey;
@@ -669,7 +688,7 @@
             document.getElementById("lbl-stats").textContent = `Maior Dano: ${stats.maxDano} | Turnos Sobrevividos: ${ano}`;
             
             let conquistasTxt = stats.conquistas.length > 0 
-                ? "🏆 Conquistas nesta run: " + stats.conquistas.map(id => dicionarioConquistas[id].split("(")[0].trim()).join(" | ") 
+                ? "🏆 Conquistas nesta run: " + stats.conquistas.map(id => dicionarioConquistas[id].desc.split("(")[0].trim()).join(" | ") 
                 : "";
             document.getElementById("lbl-achievements").textContent = conquistasTxt;
         }
@@ -730,6 +749,9 @@
             ouro -= custoRerollAtual; 
             custoRerollAtual = CUSTO_REROLL; 
             
+            stats.rerolls = (stats.rerolls || 0) + 1;
+            if (stats.rerolls >= 50) desbloquearConquista("consumista");
+
             if(stepTutorial === 1) { stepTutorial = 2; atualizarTutorial(); }
 
             cartasNaMao = [];
@@ -798,13 +820,22 @@
         }
 
         function passarTurno() {
+            if (tabuleiro.length > 0) stats.usouTropa = true; // Se tem tropa, suja a conquista O que é Exército?
+            
             sons.impact(); flashElement('inimigo-status', 'shake');
             let calc = calcularDanoTotal(); floatText('inimigo-status', `-${calc.total}`, '#ff4444');
+            
+            // Verifica a conquista Perfect: O dano do turno deve ser EXATAMENTE a vida atual do rei.
+            if (inimigoAtual.vida - calc.total === 0) {
+                stats.perfects++;
+                if (stats.perfects >= 3) desbloquearConquista("perfect");
+            }
+            
             inimigoAtual.vida -= calc.total;
             
             if(stepTutorial === 3) { stepTutorial = 4; atualizarTutorial(); }
 
-            // Checagens para Conquistas Exclusivas
+            // Checagens para Conquistas Exclusivas de Deck
             if(tabuleiro.some(t => t.id !== "arqueiro")) stats.puroArco = false;
             if(tabuleiro.some(t => t.id !== "guerreiro" && t.id !== "cavaleiro")) stats.puroTank = false;
             if(tabuleiro.some(t => t.id !== "mago")) stats.puroMago = false;
@@ -820,6 +851,8 @@
                     if (stats.puroArco && tabuleiro.length > 0) desbloquearConquista("chuva_flechas");
                     if (stats.puroTank && tabuleiro.length > 0) desbloquearConquista("tanque_guerra");
                     if (stats.puroMago && tabuleiro.length > 0) desbloquearConquista("magico");
+                    if (hpMaximo < 250) desbloquearConquista("alta_aposta");
+                    if (!stats.usouTropa) desbloquearConquista("sem_exercito");
                 }
 
                 document.getElementById('reward-modal').style.display = 'block';
@@ -889,7 +922,9 @@
             const s = localStorage.getItem("jogoSalvoNKB");
             if (s) {
                 const e = JSON.parse(s);
-                ouro=e.ouro; hp=e.hp; hpMaximo=e.hpMaximo; espacosMaximosIniciais=e.espacosMaximosIniciais; nivel=e.nivel; ano=e.ano; inimigoAtual=e.inimigoAtual; inimigoAtualVidaMax=e.inimigoAtualVidaMax; tabuleiro=e.tabuleiro; cartasEscolhidas=e.cartasEscolhidas; idiomaAtual=e.idiomaAtual; dificuldadeAtual=e.dificuldadeAtual||"cavaleiro"; multRecursosAtual=e.multRecursosAtual||1.0; ouroPorAnoBase=e.ouroPorAnoBase||50; custoCuraAtual=e.custoCuraAtual||50; multDanoGlobal=e.multDanoGlobal||1.0; stats=e.stats||{maxDano:0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: []}; inimigos=e.inimigos||[];
+                ouro=e.ouro; hp=e.hp; hpMaximo=e.hpMaximo; espacosMaximosIniciais=e.espacosMaximosIniciais; nivel=e.nivel; ano=e.ano; inimigoAtual=e.inimigoAtual; inimigoAtualVidaMax=e.inimigoAtualVidaMax; tabuleiro=e.tabuleiro; cartasEscolhidas=e.cartasEscolhidas; idiomaAtual=e.idiomaAtual; dificuldadeAtual=e.dificuldadeAtual||"cavaleiro"; multRecursosAtual=e.multRecursosAtual||1.0; ouroPorAnoBase=e.ouroPorAnoBase||50; custoCuraAtual=e.custoCuraAtual||50; multDanoGlobal=e.multDanoGlobal||1.0; 
+                stats=e.stats||{maxDano:0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: [], perfects: 0, rerolls: 0, usouTropa: false}; 
+                inimigos=e.inimigos||[];
                 document.getElementById("idioma-select").value = idiomaAtual; iniciarJogoUI(); showToast(traducoes[idiomaAtual].msgs.jogoCarregado);
             } else alert(traducoes[idiomaAtual].msgs.semJogoSalvo);
         }
@@ -899,22 +934,48 @@
         document.getElementById("idioma-select").addEventListener("change", (e) => { idiomaAtual = e.target.value; traduzirElementosEstaticos(); if(document.getElementById("game-screen").style.display==="block") atualizarInterface(); });
         document.getElementById("mostrar-regras").addEventListener("click", () => document.getElementById("regras-modal").style.display = "block");
         
-        // Modal de Conquistas no Lobby
+        // Modal de Conquistas no Lobby com Categorias
         document.getElementById("btn-conquistas-inicio").addEventListener("click", () => {
             const grid = document.getElementById("grid-conquistas");
             grid.innerHTML = "";
-            for (const [id, desc] of Object.entries(dicionarioConquistas)) {
-                const unlocked = globalAchievements.includes(id);
-                const div = document.createElement("div");
-                div.style.padding = "10px";
-                div.style.border = "1px solid #555";
-                div.style.borderRadius = "5px";
-                div.style.backgroundColor = unlocked ? "rgba(40, 167, 69, 0.2)" : "rgba(30, 30, 30, 0.8)";
-                div.style.color = unlocked ? "#fff" : "#777";
-                div.innerHTML = `<span style="font-size: 1.5em; margin-right: 10px;">${unlocked ? '🏆' : '🔒'}</span> <strong>${desc}</strong>`;
-                grid.appendChild(div);
-            }
+            
+            const categorias = ["Inicial", "Normal", "Difícil", "Insana"];
+            const coresCat = { "Inicial": "#28a745", "Normal": "#007bff", "Difícil": "#fd7e14", "Insana": "#dc3545" };
+
+            categorias.forEach(cat => {
+                const title = document.createElement("h3");
+                title.style.color = coresCat[cat];
+                title.style.borderBottom = `1px solid ${coresCat[cat]}`;
+                title.style.marginTop = "20px";
+                title.style.paddingBottom = "5px";
+                title.style.marginBottom = "10px";
+                title.textContent = `Categoria: ${cat}`;
+                grid.appendChild(title);
+
+                for (const [id, info] of Object.entries(dicionarioConquistas)) {
+                    if (info.cat !== cat) continue;
+                    const unlocked = globalAchievements.includes(id);
+                    const div = document.createElement("div");
+                    div.style.padding = "10px";
+                    div.style.border = "1px solid #555";
+                    div.style.borderRadius = "5px";
+                    div.style.marginBottom = "8px";
+                    div.style.backgroundColor = unlocked ? "rgba(40, 167, 69, 0.2)" : "rgba(30, 30, 30, 0.8)";
+                    div.style.color = unlocked ? "#fff" : "#777";
+                    div.innerHTML = `<span style="font-size: 1.5em; margin-right: 10px;">${unlocked ? '🏆' : '🔒'}</span> <strong>${info.desc}</strong>`;
+                    grid.appendChild(div);
+                }
+            });
+            
             document.getElementById("conquistas-modal").style.display = "block";
+        });
+
+        // --- EASTER EGG DE HP ---
+        document.getElementById("barra-vida-reino").addEventListener("click", () => {
+            hpMaximo += 1;
+            hp += 1;
+            atualizarInterface();
+            floatText('cidade', '+1 HP Máx (Segredo)', '#28a745');
         });
 
         traduzirElementosEstaticos();
