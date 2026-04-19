@@ -94,9 +94,10 @@
         .tooltip-title { color: #FFD700; font-weight: bold; font-size: 1.1em; border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 8px; text-transform: uppercase;}
         .tooltip-desc { color: #ccc; line-height: 1.4;}
         
-        /* Notificação de Conquistas (Toast) */
+        /* Notificação de Conquistas e Avisos (Toast) */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 4000; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: linear-gradient(145deg, #FFD700, #DAA520); color: #000; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); font-weight: bold; animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards; border: 2px solid #fff; }
+        .toast { background: linear-gradient(145deg, #FFD700, #DAA520); color: #000; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); font-weight: bold; animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in forwards; border: 2px solid #fff; }
+        .toast-error { background: linear-gradient(145deg, #dc3545, #a71d2a) !important; color: white !important; border-color: #ff9999 !important; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(20px); } }
 
@@ -209,6 +210,14 @@
         </div>
     </div>
 
+    <div id="slots-modal" class="modal">
+        <div class="modal-conteudo">
+            <span class="fechar-modal" onclick="document.getElementById('slots-modal').style.display='none'" style="float:right; cursor:pointer; color:#FFD700; font-size:24px;">&times;</span>
+            <h2 id="slots-title">Salvar Jogo</h2>
+            <div id="slots-container" style="display:flex; flex-direction:column; gap:10px; margin-top:20px;"></div>
+        </div>
+    </div>
+
     <div id="reward-modal" class="modal">
         <div class="modal-conteudo">
             <h2 id="reward-title" style="color: #28a745;">Vitória! Escolha uma Recompensa</h2>
@@ -252,14 +261,15 @@
             heal: () => playTone(400, 'sine', 0.4, 0.1),
             win: () => { [300, 400, 500, 600].forEach((f,i) => setTimeout(()=>playTone(f, 'square', 0.2, 0.1), i*100)); },
             loss: () => { [200, 150, 100, 50].forEach((f,i) => setTimeout(()=>playTone(f, 'sawtooth', 0.4, 0.2), i*300)); },
-            achievement: () => { [500, 700, 900].forEach((f,i) => setTimeout(()=>playTone(f, 'sine', 0.3, 0.1), i*150)); }
+            achievement: () => { [500, 700, 900].forEach((f,i) => setTimeout(()=>playTone(f, 'sine', 0.3, 0.1), i*150)); },
+            secret: () => { [400, 500, 600, 800, 1200].forEach((f,i) => setTimeout(()=>playTone(f, 'sine', 0.4, 0.1), i*150)); }
         };
 
         document.addEventListener('click', (e) => {
             if(e.target.tagName === 'BUTTON' && !e.target.disabled) { initAudio(); sons.click(); }
         });
 
-        // --- SISTEMA DE FEEDBACK VISUAL E TOOLTIP ---
+        // --- SISTEMA DE FEEDBACK VISUAL E TOASTS ---
         function floatText(elId, text, color) {
             const el = document.getElementById(elId);
             if(!el) return;
@@ -286,44 +296,61 @@
             tooltipEl.style.display = 'block';
             moveTooltip(e);
         }
-        function moveTooltip(e) {
-            tooltipEl.style.left = e.pageX + 'px';
-            tooltipEl.style.top = e.pageY + 'px';
-        }
+        function moveTooltip(e) { tooltipEl.style.left = e.pageX + 'px'; tooltipEl.style.top = e.pageY + 'px'; }
         function hideTooltip() { tooltipEl.style.display = 'none'; }
         
-        function showToast(message) {
+        function showToast(message, duration = 4000) {
             sons.achievement();
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'toast';
+            toast.style.animationDuration = `0.5s, 0.5s`;
+            toast.style.animationDelay = `0s, ${duration/1000 - 0.5}s`;
             toast.innerHTML = `🏆 ${message}`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
+            setTimeout(() => toast.remove(), duration);
         }
 
-        // --- DICIONÁRIO DE CONQUISTAS COM CATEGORIAS ---
+        function showAlert(message, isGameOver = false) {
+            if(isGameOver) sons.loss();
+            else playTone(250, 'sawtooth', 0.2, 0.1);
+
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-error';
+            toast.style.animationDuration = `0.5s, 0.5s`;
+            let duration = isGameOver ? 4000 : 3000;
+            toast.style.animationDelay = `0s, ${duration/1000 - 0.5}s`;
+            toast.innerHTML = `⚠️ ${message}`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+                if(isGameOver) location.reload();
+            }, duration);
+        }
+
+        // --- DICIONÁRIO DE CONQUISTAS ---
         const dicionarioConquistas = {
-            // Inicial
             "primeiro_sangue": { desc: "Primeiro Sangue (Venceu o 1º nível)", cat: "Inicial" },
             "rico": { desc: "Mestre da Moeda (Acumulou 5000 de Ouro)", cat: "Inicial" },
             "estrategista": { desc: "Dano Massivo (Causou 5000+ de dano num turno)", cat: "Inicial" },
             "construtor": { desc: "Mestre Construtor (Possui 20 Edifícios Ativos)", cat: "Inicial" },
-            // Normal
+            
             "15-reis": { desc: "Imperador (Venceu os 15 reis)", cat: "Normal" },
             "reinado": { desc: "Reino Respeitado (30+ Espaços de Exército)", cat: "Normal" },
             "chuva_flechas": { desc: "Chuva de Flechas (Venceu os 15 Reis só com Arqueiros)", cat: "Normal" },
             "tanque_guerra": { desc: "Tanque de Guerra (Venceu os 15 Reis só com Guerreiros/Cavaleiros)", cat: "Normal" },
             "magico": { desc: "Mágico (Venceu os 15 Reis só com Magos)", cat: "Normal" },
             "consumista": { desc: "Consumista (Rolou a loja 50 vezes na mesma partida)", cat: "Normal" },
-            // Difícil
+            
             "super-rico": { desc: "Rei da Moeda (Acumulou 25000 de Ouro)", cat: "Difícil" },
             "imortal": { desc: "Imortal (Tem 25000+ de vida máxima)", cat: "Difícil" },
             "imperador_construcoes": { desc: "Imperador das Construções (Possui 50+ Edifícios Ativos)", cat: "Difícil" },
             "potencia_economica": { desc: "Potência Econômica (Ganhe 1000+ de Ouro por turno)", cat: "Difícil" },
             "por_um_fio": { desc: "Por um Fio (Sobreviveu a um turno com exatamente 1 de Vida)", cat: "Difícil" },
             "perfect": { desc: "Perfect (Derrote 3 chefes com dano exato sobrando 0 HP)", cat: "Difícil" },
-            // Insana
+            
             "100-abismo": { desc: "Imperador do Abismo (Chegou ao Rei 100 do Abismo)", cat: "Insana" },
             "dano++": { desc: "/Kill (Causou 50000+ de dano num turno)", cat: "Insana" },
             "megalomaniaco": { desc: "Império (100+ Espaços de Exército)", cat: "Insana" },
@@ -332,20 +359,59 @@
             "sem_exercito": { desc: "O que é Exército? (Vença os 15 Reis usando só Torres para dano)", cat: "Insana" }
         };
 
-        // Carrega conquistas globais (persistem entre sessões mesmo sem save)
         let globalAchievements = JSON.parse(localStorage.getItem("kp_globalAchievements")) || [];
 
         function desbloquearConquista(id) {
-            // Salva globalmente
             if (!globalAchievements.includes(id)) {
                 globalAchievements.push(id);
                 localStorage.setItem("kp_globalAchievements", JSON.stringify(globalAchievements));
             }
-            // Salva na run atual e exibe toast se for a primeira vez na run
             if (!stats.conquistas.includes(id)) {
                 stats.conquistas.push(id);
                 showToast(dicionarioConquistas[id].desc);
             }
+            verificarConquistasSecretas();
+        }
+
+        // --- SISTEMA DE CONQUISTAS SECRETAS E BUFFS ---
+        function verificarConquistasSecretas() {
+            const msgsSecretas = {
+                "sec_init": "✨ SEGREDO: Todas as conquistas Iniciais! (+100 HP Base)",
+                "sec_norm": "✨ SEGREDO: Todas as conquistas Normais! (+200 Ouro Base)",
+                "sec_diff": "✨ SEGREDO: Todas as conquistas Difíceis! (+75 Ouro/t e +20% Dano)",
+                "sec_ins":  "✨ SEGREDO: Todas as conquistas Insanas! (+30% Dano, +250 HP, +2 Espaço)",
+                "sec_all":  "🌟 DEUS DO REINO: TODAS AS CONQUISTAS! (Sinergia 2x, +150 HP, +30% Dano, +125 Ouro/t)"
+            };
+
+            const cats = {
+                "Inicial": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Inicial"),
+                "Normal": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Normal"),
+                "Difícil": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Difícil"),
+                "Insana": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Insana")
+            };
+
+            const hasAll = (arr) => arr.every(id => globalAchievements.includes(id));
+
+            if(hasAll(cats["Inicial"]) && !globalAchievements.includes("sec_init")) unlockSecret("sec_init", msgsSecretas["sec_init"]);
+            if(hasAll(cats["Normal"]) && !globalAchievements.includes("sec_norm")) unlockSecret("sec_norm", msgsSecretas["sec_norm"]);
+            if(hasAll(cats["Difícil"]) && !globalAchievements.includes("sec_diff")) unlockSecret("sec_diff", msgsSecretas["sec_diff"]);
+            if(hasAll(cats["Insana"]) && !globalAchievements.includes("sec_ins")) unlockSecret("sec_ins", msgsSecretas["sec_ins"]);
+            if(hasAll(cats["Inicial"]) && hasAll(cats["Normal"]) && hasAll(cats["Difícil"]) && hasAll(cats["Insana"]) && !globalAchievements.includes("sec_all")) 
+                unlockSecret("sec_all", msgsSecretas["sec_all"]);
+        }
+
+        function unlockSecret(id, msg) {
+            globalAchievements.push(id);
+            localStorage.setItem("kp_globalAchievements", JSON.stringify(globalAchievements));
+            sons.secret();
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = 'linear-gradient(145deg, #FFD700, #ff4444)';
+            toast.style.color = '#fff';
+            toast.innerHTML = `🏆 ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 7000);
         }
 
         function verificarConquistasTurno(danoTotal) {
@@ -362,7 +428,6 @@
             if (cartasEscolhidas.length >= 20) desbloquearConquista("construtor");
             if (cartasEscolhidas.length >= 50) desbloquearConquista("imperador_construcoes");
             
-            // Verifica Potência Econômica com o Ouro Base Projetado + Juros Projetados
             let ouroProjetado = getOuroTurno() + simularEfeitosEspeciaisTurno().jurosTotal;
             if (ouroProjetado >= 1000) desbloquearConquista("potencia_economica");
         }
@@ -395,7 +460,8 @@
                     tut4: "TUTORIAL (4/4): Você sobreviveu! Use ouro para criar Sinergias e gerencie seus espaços. Boa sorte, Majestade!",
                     prevSobra: "Vai sobrar: ", prevRecebe: "Vai receber: ", danoBase: "Base:", sinergia: "Sinergia:", torreDano: "Torre:", global: "Buff:",
                     rewTitle: "Vitória! Escolha uma Recompensa", rewDesc: "Fortaleça seu reino permanentemente:",
-                    btnRewDano: "+10% Dano Global", btnRewVida: "+50 Vida Máxima", btnRewEspaco: "+1 Espaço no Exército", evTitle: "Evento Aleatório!"
+                    btnRewDano: "+10% Dano Global", btnRewVida: "+50 Vida Máxima", btnRewEspaco: "+1 Espaço no Exército", evTitle: "Evento Aleatório!",
+                    slotVazio: "Vazio", btnSalvarModal: "Salvar Jogo", btnCarregarModal: "Carregar Jogo", slotTurno: "Turno", defaultSaveName: "Save de"
                 },
                 msgs: {
                     naoOuro: "Ouro insuficiente!", perdeuJogo: "Seu reino caiu para o", jogoSalvo: "Jogo salvo!", semJogoSalvo: "Nenhum save encontrado.",
@@ -435,7 +501,8 @@
                     tut3: "TUTORIAL (3/4): Well done! It will deal damage at turn end. Click 'Start Battle'.",
                     tut4: "TUTORIAL (4/4): You survived! Group troops for Synergies. Good luck, Majesty!",
                     prevSobra: "Will survive with: ", prevRecebe: "Will receive: ", danoBase: "Base:", sinergia: "Synergy:", torreDano: "Tower:", global: "Buff:",
-                    rewTitle: "Victory! Choose a Reward", rewDesc: "Strengthen your kingdom:", btnRewDano: "+10% Global Damage", btnRewVida: "+50 Max HP", btnRewEspaco: "+1 Space", evTitle: "Random Event!"
+                    rewTitle: "Victory! Choose a Reward", rewDesc: "Strengthen your kingdom:", btnRewDano: "+10% Global Damage", btnRewVida: "+50 Max HP", btnRewEspaco: "+1 Space", evTitle: "Random Event!",
+                    slotVazio: "Empty", btnSalvarModal: "Save Game", btnCarregarModal: "Load Game", slotTurno: "Turn", defaultSaveName: "Save"
                 },
                 msgs: {
                     naoOuro: "Not enough gold!", perdeuJogo: "Kingdom fell to", jogoSalvo: "Saved!", semJogoSalvo: "No save found.", jogoCarregado: "Loaded!", espacoCheio: "Board full!", mortePelaCarta: "Would kill the king!",
@@ -474,7 +541,8 @@
                     tut3: "TUTORIAL (3/4): Hará daño al final del turno. Clic 'Iniciar Batalla'.",
                     tut4: "TUTORIAL (4/4): ¡Sobreviviste! Agrupa clases. ¡Suerte, Majestad!",
                     prevSobra: "Sobrará: ", prevRecebe: "Recibirá: ", danoBase: "Base:", sinergia: "Sinergia:", torreDano: "Torre:", global: "Buff:",
-                    rewTitle: "¡Victoria! Elige Recompensa", rewDesc: "Fortalece tu reino:", btnRewDano: "+10% Daño Global", btnRewVida: "+50 Vida Máx", btnRewEspaco: "+1 Espacio", evTitle: "¡Evento Aleatorio!"
+                    rewTitle: "¡Victoria! Elige Recompensa", rewDesc: "Fortalece tu reino:", btnRewDano: "+10% Daño Global", btnRewVida: "+50 Vida Máx", btnRewEspaco: "+1 Espacio", evTitle: "¡Evento Aleatorio!",
+                    slotVazio: "Vacío", btnSalvarModal: "Guardar Juego", btnCarregarModal: "Cargar Juego", slotTurno: "Turno", defaultSaveName: "Guardado"
                 },
                 msgs: {
                     naoOuro: "¡Oro insuficiente!", perdeuJogo: "Tu reino cayó ante", jogoSalvo: "¡Guardado!", semJogoSalvo: "No hay save.", jogoCarregado: "¡Cargado!", espacoCheio: "¡Sin espacio!", mortePelaCarta: "¡Te mataría!",
@@ -532,12 +600,16 @@
         let idiomaAtual = "pt-br";
         let custoRerollAtual = CUSTO_REROLL; 
         let stepTutorial = 0;
+        let easterEggUsado = false; // Controle de uso do easter egg da barra de vida
         
-        // Stats e Conquistas (atualizado com os contadores de novas conquistas)
         let stats = { 
             maxDano: 0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, 
             conquistas: [], perfects: 0, rerolls: 0, usouTropa: false 
         };
+
+        // Slots de Save
+        let saveSlots = JSON.parse(localStorage.getItem("kp_slots")) || [null, null, null];
+        let slotMode = "save"; // 'save' or 'load'
 
         function inicializarInimigos(diffKey) {
             dificuldadeAtual = diffKey;
@@ -548,6 +620,10 @@
             hpMaximo = Math.floor(500 * multRecursosAtual);
             hp = hpMaximo;
             ouroPorAnoBase = Math.floor(50 * multRecursosAtual);
+            multDanoGlobal = 1.0;
+            espacosMaximosIniciais = 3;
+            custoCuraAtual = 50;
+            easterEggUsado = false;
 
             inimigos = baseInimigos.map((base, idx) => ({ nome: nomesInimigos[idx], vida: Math.floor(base.vida * multInimigo), ataque: Math.floor(base.ataque * multInimigo) }));
             inimigoAtual = JSON.parse(JSON.stringify(inimigos[0]));
@@ -558,7 +634,6 @@
             const ui = traducoes[idiomaAtual].ui;
             document.getElementById("title-diff").innerText = ui.titleDiff; document.getElementById("desc-diff").innerText = ui.descDiff;
             
-            // Tradução dos botões de dificuldade
             document.querySelector('[data-diff="arqueiro"]').innerText = ui.diffArqueiro;
             document.querySelector('[data-diff="escudeiro"]').innerText = ui.diffEscudeiro;
             document.querySelector('[data-diff="cavaleiro"]').innerText = ui.diffCavaleiro;
@@ -586,7 +661,6 @@
             document.getElementById("recuperar-saude").innerText = ui.btnCurar.replace('{c}', custoCuraAtual);
         }
 
-        // Funções do Tutorial
         function atualizarTutorial() {
             if (dificuldadeAtual !== "arqueiro") return;
             const ui = traducoes[idiomaAtual].ui;
@@ -603,7 +677,7 @@
             } else if (stepTutorial === 2) {
                 msgEl.innerText = ui.tut2;
                 btnTurno.disabled = true;
-                if(btnPular) btnPular.style.display = "none"; // Força comprar
+                if(btnPular) btnPular.style.display = "none";
             } else if (stepTutorial === 3) {
                 msgEl.innerText = ui.tut3;
                 btnLoja.disabled = true;
@@ -651,10 +725,13 @@
             let qArq = tabuleiro.filter(t=>t.id==="arqueiro").length;
             let qTank = tabuleiro.filter(t=>t.id==="guerreiro"||t.id==="cavaleiro").length;
             
+            // Buff Secreto Total
+            let sinergiaMult = globalAchievements.includes("sec_all") ? 2 : 1;
+
             let tabSinergizado = tabuleiro.map(tropa => {
                 let d = tropa.efeitos.danoBase, sin = 0;
-                if(tropa.id==="arqueiro") sin = (qArq-1)*10;
-                if(tropa.id==="mago") sin = qTank*20;
+                if(tropa.id==="arqueiro") sin = ((qArq-1)*10) * sinergiaMult;
+                if(tropa.id==="mago") sin = (qTank*20) * sinergiaMult;
                 d += sin; totalDanoBase += tropa.efeitos.danoBase; totalSinergia += sin;
                 return { ...tropa, danoCalculado: Math.floor(d * multDanoGlobal), bonusInfo: sin };
             });
@@ -745,7 +822,7 @@
 
         function abrirLoja() {
             const msgs = traducoes[idiomaAtual].msgs;
-            if (ouro < custoRerollAtual) { alert(msgs.naoOuro); return; }
+            if (ouro < custoRerollAtual) { showAlert(msgs.naoOuro); return; }
             ouro -= custoRerollAtual; 
             custoRerollAtual = CUSTO_REROLL; 
             
@@ -768,9 +845,9 @@
                 const li = document.createElement("li"); const cT = traducoes[idiomaAtual].carta[c.id];
                 li.innerHTML = `<strong style="font-size:1.2em; color:#FFD700;">${cT.nome}</strong><br><div class="custo-carta">💰 ${c.custo} Ouro</div><br>${cT.desc}`;
                 li.onclick = () => {
-                    if (getEspacosUsados() + (c.ocupaEspaco||0) > getEspacosMaximos()) { alert(msgs.espacoCheio); return; }
-                    if (ouro < c.custo) { alert(msgs.naoOuro); return; }
-                    if (c.efeitos && c.efeitos.saude !== undefined && hp + c.efeitos.saude <= 0) { alert(msgs.mortePelaCarta); return; }
+                    if (getEspacosUsados() + (c.ocupaEspaco||0) > getEspacosMaximos()) { showAlert(msgs.espacoCheio); return; }
+                    if (ouro < c.custo) { showAlert(msgs.naoOuro); return; }
+                    if (c.efeitos && c.efeitos.saude !== undefined && hp + c.efeitos.saude <= 0) { showAlert(msgs.mortePelaCarta); return; }
                     
                     ouro -= c.custo; sons.coin();
                     if (c.tipo === "tropa") tabuleiro.push(c);
@@ -820,22 +897,19 @@
         }
 
         function passarTurno() {
-            if (tabuleiro.length > 0) stats.usouTropa = true; // Se tem tropa, suja a conquista O que é Exército?
+            if (tabuleiro.length > 0) stats.usouTropa = true;
             
             sons.impact(); flashElement('inimigo-status', 'shake');
             let calc = calcularDanoTotal(); floatText('inimigo-status', `-${calc.total}`, '#ff4444');
             
-            // Verifica a conquista Perfect: O dano do turno deve ser EXATAMENTE a vida atual do rei.
             if (inimigoAtual.vida - calc.total === 0) {
                 stats.perfects++;
                 if (stats.perfects >= 3) desbloquearConquista("perfect");
             }
             
             inimigoAtual.vida -= calc.total;
-            
             if(stepTutorial === 3) { stepTutorial = 4; atualizarTutorial(); }
 
-            // Checagens para Conquistas Exclusivas de Deck
             if(tabuleiro.some(t => t.id !== "arqueiro")) stats.puroArco = false;
             if(tabuleiro.some(t => t.id !== "guerreiro" && t.id !== "cavaleiro")) stats.puroTank = false;
             if(tabuleiro.some(t => t.id !== "mago")) stats.puroMago = false;
@@ -871,7 +945,10 @@
                 
                 if (hp === 1) desbloquearConquista("por_um_fio");
 
-                if (hp <= 0) { sons.loss(); setTimeout(() => { alert(`${traducoes[idiomaAtual].msgs.perdeuJogo} ${inimigoAtual.nome}!`); location.reload(); }, 500); return; }
+                if (hp <= 0) { 
+                    showAlert(`${traducoes[idiomaAtual].msgs.perdeuJogo} ${inimigoAtual.nome}!`, true); 
+                    return; 
+                }
             }
 
             ano++;
@@ -886,10 +963,21 @@
         document.getElementById("btn-rew-espaco").onclick = () => { espacosMaximosIniciais += 1; fecharReward(); };
         function fecharReward() { document.getElementById('reward-modal').style.display = 'none'; atualizarInterface(); sons.heal(); }
 
-        function iniciarJogoUI() { 
+        // --- INICIAR E BUFFS SECRETOS ---
+        function iniciarJogoUI(isLoad = false) { 
             document.getElementById("start-screen").style.display = "none"; 
             document.getElementById("game-screen").style.display = "block"; 
             
+            if (!isLoad) {
+                // Aplica os Buffs Secretos caso o jogador inicie um Novo Jogo
+                if(globalAchievements.includes("sec_init")) hpMaximo += 100;
+                if(globalAchievements.includes("sec_norm")) ouro += 200;
+                if(globalAchievements.includes("sec_diff")) { ouroPorAnoBase += 75; multDanoGlobal += 0.20; }
+                if(globalAchievements.includes("sec_ins")) { multDanoGlobal += 0.30; hpMaximo += 250; espacosMaximosIniciais += 2; }
+                if(globalAchievements.includes("sec_all")) { hpMaximo += 150; multDanoGlobal += 0.30; ouroPorAnoBase += 125; }
+                hp = hpMaximo;
+            }
+
             if(dificuldadeAtual === "arqueiro") { stepTutorial = 1; atualizarTutorial(); }
             else { stepTutorial = 0; document.getElementById("tutorial-msg").style.display = "none"; }
 
@@ -908,29 +996,78 @@
                 custoCuraAtual += 5; 
                 sons.heal(); flashElement('cidade', 'flash-green'); floatText('cidade', `+${VALOR_CURA} HP`, '#28a745');
                 atualizarInterface();
-            } else alert(msgs.naoOuro);
+            } else showAlert(msgs.naoOuro);
         });
 
         document.getElementById("passar-turno").addEventListener("click", passarTurno);
         
-        document.getElementById("salvar-jogo").addEventListener("click", () => {
-            localStorage.setItem("jogoSalvoNKB", JSON.stringify({ ouro, hp, hpMaximo, espacosMaximosIniciais, nivel, ano, inimigoAtual, inimigoAtualVidaMax, tabuleiro, cartasEscolhidas, idiomaAtual, dificuldadeAtual, inimigos, multRecursosAtual, ouroPorAnoBase, custoCuraAtual, multDanoGlobal, stats }));
-            showToast(traducoes[idiomaAtual].msgs.jogoSalvo);
-        });
-        
-        function carregarJogo() {
-            const s = localStorage.getItem("jogoSalvoNKB");
-            if (s) {
-                const e = JSON.parse(s);
-                ouro=e.ouro; hp=e.hp; hpMaximo=e.hpMaximo; espacosMaximosIniciais=e.espacosMaximosIniciais; nivel=e.nivel; ano=e.ano; inimigoAtual=e.inimigoAtual; inimigoAtualVidaMax=e.inimigoAtualVidaMax; tabuleiro=e.tabuleiro; cartasEscolhidas=e.cartasEscolhidas; idiomaAtual=e.idiomaAtual; dificuldadeAtual=e.dificuldadeAtual||"cavaleiro"; multRecursosAtual=e.multRecursosAtual||1.0; ouroPorAnoBase=e.ouroPorAnoBase||50; custoCuraAtual=e.custoCuraAtual||50; multDanoGlobal=e.multDanoGlobal||1.0; 
-                stats=e.stats||{maxDano:0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: [], perfects: 0, rerolls: 0, usouTropa: false}; 
-                inimigos=e.inimigos||[];
-                document.getElementById("idioma-select").value = idiomaAtual; iniciarJogoUI(); showToast(traducoes[idiomaAtual].msgs.jogoCarregado);
-            } else alert(traducoes[idiomaAtual].msgs.semJogoSalvo);
+        // --- SISTEMA DE SAVE MULTI-SLOT ---
+        function abrirModalSlots(mode) {
+            slotMode = mode;
+            const ui = traducoes[idiomaAtual].ui;
+            document.getElementById('slots-title').innerText = mode === 'save' ? ui.btnSalvarModal : ui.btnCarregarModal;
+            const container = document.getElementById('slots-container');
+            container.innerHTML = "";
+
+            for(let i=0; i<3; i++) {
+                let slot = saveSlots[i];
+                let btn = document.createElement('button');
+                btn.style.width = "100%";
+                btn.style.textAlign = "left";
+                btn.style.fontSize = "1.1em";
+                
+                if(slot) {
+                    btn.innerHTML = `<strong>Slot ${i+1}:</strong> ${slot.name} - ${ui.slotTurno} ${slot.data.ano} (${slot.data.dificuldadeAtual})`;
+                    btn.style.backgroundColor = mode === 'save' ? "#fd7e14" : "#28a745"; 
+                } else {
+                    btn.innerHTML = `<strong>Slot ${i+1}:</strong> ${ui.slotVazio}`;
+                    if(mode === 'save') btn.style.backgroundColor = "#0056b3";
+                    else { btn.style.backgroundColor = "#555"; btn.disabled = true; }
+                }
+
+                btn.onclick = () => {
+                    if(mode === 'save') {
+                        let defName = slot ? slot.name : `${ui.defaultSaveName} ${new Date().toLocaleDateString()}`;
+                        let saveName = prompt("Nome do Save:", defName);
+                        if(saveName !== null && saveName.trim() !== "") {
+                            efetuarSave(i, saveName);
+                            document.getElementById('slots-modal').style.display='none';
+                        }
+                    } else {
+                        efetuarLoad(i);
+                        document.getElementById('slots-modal').style.display='none';
+                    }
+                };
+                container.appendChild(btn);
+            }
+            document.getElementById('slots-modal').style.display = 'block';
         }
+
+        function efetuarSave(idx, name) {
+            let data = { ouro, hp, hpMaximo, espacosMaximosIniciais, nivel, ano, inimigoAtual, inimigoAtualVidaMax, tabuleiro, cartasEscolhidas, idiomaAtual, dificuldadeAtual, inimigos, multRecursosAtual, ouroPorAnoBase, custoCuraAtual, multDanoGlobal, stats, easterEggUsado };
+            saveSlots[idx] = { name: name, data: data };
+            localStorage.setItem("kp_slots", JSON.stringify(saveSlots));
+            showToast(traducoes[idiomaAtual].msgs.jogoSalvo);
+        }
+
+        function efetuarLoad(idx) {
+            let slot = saveSlots[idx];
+            if(!slot) return;
+            let e = slot.data;
+            ouro=e.ouro; hp=e.hp; hpMaximo=e.hpMaximo; espacosMaximosIniciais=e.espacosMaximosIniciais; nivel=e.nivel; ano=e.ano; inimigoAtual=e.inimigoAtual; inimigoAtualVidaMax=e.inimigoAtualVidaMax; tabuleiro=e.tabuleiro; cartasEscolhidas=e.cartasEscolhidas; idiomaAtual=e.idiomaAtual; dificuldadeAtual=e.dificuldadeAtual||"cavaleiro"; multRecursosAtual=e.multRecursosAtual||1.0; ouroPorAnoBase=e.ouroPorAnoBase||50; custoCuraAtual=e.custoCuraAtual||50; multDanoGlobal=e.multDanoGlobal||1.0; 
+            stats=e.stats||{maxDano:0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: [], perfects: 0, rerolls: 0, usouTropa: false}; 
+            inimigos=e.inimigos||[];
+            easterEggUsado = e.easterEggUsado || false;
+            
+            document.getElementById("idioma-select").value = idiomaAtual; 
+            iniciarJogoUI(true); // O 'true' garante que os buffs não sejam somados duplamente.
+            showToast(traducoes[idiomaAtual].msgs.jogoCarregado);
+        }
+
+        document.getElementById("salvar-jogo").addEventListener("click", () => abrirModalSlots('save'));
+        document.getElementById("carregar-jogo").addEventListener("click", () => abrirModalSlots('load'));
+        document.getElementById("carregar-jogo-inicio").addEventListener("click", () => abrirModalSlots('load'));
         
-        document.getElementById("carregar-jogo").addEventListener("click", carregarJogo);
-        document.getElementById("carregar-jogo-inicio").addEventListener("click", carregarJogo);
         document.getElementById("idioma-select").addEventListener("change", (e) => { idiomaAtual = e.target.value; traduzirElementosEstaticos(); if(document.getElementById("game-screen").style.display==="block") atualizarInterface(); });
         document.getElementById("mostrar-regras").addEventListener("click", () => document.getElementById("regras-modal").style.display = "block");
         
@@ -972,6 +1109,8 @@
 
         // --- EASTER EGG DE HP ---
         document.getElementById("barra-vida-reino").addEventListener("click", () => {
+            if (easterEggUsado) return;
+            easterEggUsado = true;
             hpMaximo += 1;
             hp += 1;
             atualizarInterface();
