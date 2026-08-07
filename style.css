@@ -1,0 +1,801 @@
+/* ==========================================================================
+   1. FONTES E VARIÁVEIS GERAIS
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+    /* Paleta de Cores Medievais Sombrias */
+    --bg-void: #0a0a0c;
+    --wood-dark: #1e1814;
+    --wood-light: #3a2e24;
+    --parchment: #e6d5b8;
+    --parchment-dark: #c5b497;
+    
+    /* Metais e Raridades */
+    --gold-bright: #ffd700;
+    --gold-antique: #c5a059;
+    --iron: #7f8c8d;
+    --emerald: #2ecc71;
+    --sapphire: #3498db;
+    --amethyst: #9b59b6;
+    --ruby: #e74c3c;
+    
+    /* Estados */
+    --blood-red: #8a0303;
+    --poison-green: #27ae60;
+    --mana-blue: #2980b9;
+
+    /* Sombras e Brilhos */
+    --shadow-inset: inset 0 0 20px rgba(0,0,0,0.8);
+    --shadow-drop: 0 10px 30px rgba(0,0,0,0.9);
+    --glow-gold: 0 0 15px rgba(197, 160, 89, 0.5);
+    
+    /* Tipografia */
+    --font-title: 'Cinzel', serif;
+    --font-body: 'Lora', serif;
+}
+
+/* ==========================================================================
+   2. RESET E ESTRUTURA BASE (O "Mesa" do Jogo)
+   ========================================================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-void);
+    /* Fundo imitando uma mesa de taverna escura sob a luz de velas */
+    background-image: 
+        radial-gradient(circle at 50% 30%, rgba(45, 35, 25, 0.8) 0%, rgba(10, 10, 12, 1) 70%),
+        url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+    color: var(--parchment);
+    min-height: 100vh;
+    padding: 30px;
+    overflow-x: hidden;
+}
+
+/* Scrollbar temática */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-void); border-left: 1px solid var(--wood-light); }
+::-webkit-scrollbar-thumb { background: var(--wood-light); border-radius: 5px; border: 1px solid var(--gold-antique); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-antique); }
+
+/* ==========================================================================
+   3. TIPOGRAFIA TEMÁTICA
+   ========================================================================== */
+h1, h2, h3, h4 {
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+h1 {
+    text-align: center;
+    color: var(--gold-bright);
+    font-size: 3rem;
+    text-shadow: 2px 2px 4px #000, 0 0 20px rgba(255, 215, 0, 0.3);
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+/* Ornamento abaixo do H1 */
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+}
+
+h2 {
+    color: var(--gold-antique);
+    font-size: 1.8rem;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   4. PAINÉIS DA INTERFACE (HUD, Loja, Inventário)
+   ========================================================================== */
+.painel {
+    background: linear-gradient(135deg, rgba(30, 24, 20, 0.95), rgba(15, 12, 10, 0.95));
+    border: 2px solid var(--wood-light);
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow-drop), inset 0 0 40px rgba(0,0,0,0.6);
+    position: relative;
+}
+
+/* Cantoneiras decorativas para os painéis */
+.painel::before, .painel::after {
+    content: ''; position: absolute; width: 15px; height: 15px; border: 2px solid var(--gold-antique);
+}
+.painel::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.painel::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+/* ==========================================================================
+   5. BARRAS DE VIDA (Estilo Frasco de Sangue / Joia)
+   ========================================================================== */
+.progress-bar-container {
+    background: #000;
+    border: 3px solid var(--wood-light);
+    border-radius: 4px;
+    height: 35px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.8), inset 0 5px 10px rgba(0,0,0,0.9);
+}
+
+.progress-bar {
+    height: 100%;
+    transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    background-size: 30px 30px;
+    background-image: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%, transparent);
+}
+
+#inimigo-progress-bar {
+    background-color: var(--blood-red);
+    box-shadow: inset 0 0 15px rgba(255,0,0,0.5);
+    animation: pulsar-sangue 2s infinite linear;
+}
+
+@keyframes pulsar-sangue {
+    0% { background-position: 0 0; }
+    100% { background-position: 30px 0; }
+}
+
+.hp-text-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    z-index: 2;
+}
+
+/* ==========================================================================
+   6. BOTÕES (Estilo Ferro Forjado e Madeira)
+   ========================================================================== */
+button {
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--parchment);
+    padding: 15px 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.1s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 0 #000, 0 8px 15px rgba(0,0,0,0.6);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(6px);
+    box-shadow: 0 0px 0 #000, 0 2px 5px rgba(0,0,0,0.6);
+}
+
+button:disabled {
+    filter: grayscale(100%) opacity(0.5);
+    cursor: not-allowed;
+    box-shadow: 0 2px 0 #000;
+    transform: translateY(4px);
+}
+
+.btn-principal {
+    background: linear-gradient(to bottom, #4a0e0e, #2a0505);
+    border: 2px solid var(--blood-red);
+    text-shadow: 1px 1px 2px #000;
+}
+.btn-principal:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #5c1111, #3a0808);
+    border-color: #ff3333;
+}
+
+.btn-secundario {
+    background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
+    border: 2px solid var(--gold-antique);
+}
+.btn-secundario:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #4a3a2e, #2a2018);
+    border-color: var(--gold-bright);
+}
+
+/* Substitua '.btn-comprar' pela classe real do botão da carta */
+.btn-comprar {
+    background-color: #1a1a1a; /* Deixa o fundo do botão escuro */
+    border: 1px solid #444;    /* Opcional: Adiciona uma borda sutil para destacar */
+    border-radius: 5px;        /* Mantém as bordas arredondadas que você já tem */
+    
+    /* A cor abaixo garante que o texto fique naquela cor meio creme/dourada */
+    color: #e8d3a7; 
+}
+
+/* Opcional: Um efeito ao passar o mouse por cima (Hover) */
+.btn-comprar:hover {
+    background-color: #2a2a2a;
+    border-color: #666;
+    cursor: pointer;
+}
+/* ==========================================================================
+   7. GRID E LAYOUT DAS CARTAS
+   ========================================================================== */
+#grid-tabuleiro, #lista-cartas {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 260px;
+}
+
+#grid-tabuleiro {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px dashed rgba(197, 160, 89, 0.3);
+    border-radius: 12px;
+}
+
+/* ==========================================================================
+   8. DESIGN DAS CARTAS (Sensação Tátil e 3D)
+   ========================================================================== */
+.carta-tropa {
+    width: 160px;
+    height: 240px;
+    background: url('https://www.transparenttextures.com/patterns/dark-leather.png'), linear-gradient(135deg, #2b2520, #14110e);
+    border-radius: 12px;
+    padding: 10px;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    
+    /* Configuração 3D */
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9);
+}
+
+/* Borda interna da carta */
+.carta-tropa::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 6px; right: 6px; bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+/* Efeito Hover estilo Balatro (Levanta e rotaciona levemente) */
+.carta-tropa:hover {
+    transform: translateY(-15px) scale(1.08) rotateX(5deg) rotateY(2deg);
+    z-index: 100;
+    box-shadow: -5px 20px 30px rgba(0,0,0,0.9), 0 0 20px rgba(255,255,255,0.1);
+}
+
+/* Estrutura Interna da Carta */
+.carta-nome {
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-align: center;
+    color: var(--parchment);
+    text-shadow: 2px 2px 4px #000;
+    margin-bottom: 8px;
+    background: rgba(0,0,0,0.6);
+    padding: 5px 0;
+    border-radius: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.carta-stats {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.carta-stats span {
+    display: flex;
+    justify-content: space-between;
+}
+
+.carta-stats span.dano { color: #ff6b6b; font-weight: bold; }
+.carta-stats span.hp { color: #51cf66; font-weight: bold; }
+
+.sinergia {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--gold-antique);
+    text-align: center;
+    margin-top: 10px;
+    padding: 5px;
+    border-top: 1px solid rgba(197, 160, 89, 0.3);
+}
+
+/* Slots Vazios no Tabuleiro */
+.slot-vazio {
+    width: 160px;
+    height: 240px;
+    border: 2px dashed rgba(197, 160, 89, 0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(197, 160, 89, 0.5);
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    background: rgba(0,0,0,0.2);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* ==========================================================================
+   9. SISTEMA VISUAL DE RARIDADES (Bordas e Brilhos Especiais)
+   ========================================================================== */
+.carta-tropa.raridade-comum { border: 3px solid var(--iron); }
+
+.carta-tropa.raridade-incomum { 
+    border: 3px solid var(--emerald);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(46, 204, 113, 0.2);
+}
+
+.carta-tropa.raridade-raro { 
+    border: 3px solid var(--sapphire);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 20px rgba(52, 152, 219, 0.3);
+}
+
+.carta-tropa.raridade-epico { 
+    border: 3px solid var(--amethyst);
+    animation: pulsar-epico 3s infinite alternate;
+}
+@keyframes pulsar-epico {
+    0% { box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 10px rgba(155, 89, 182, 0.4); }
+    100% { box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 25px rgba(155, 89, 182, 0.8); }
+}
+
+.carta-tropa.raridade-lendario { 
+    border: 3px solid var(--gold-bright);
+    background-image: linear-gradient(135deg, rgba(255, 215, 0, 0.1), transparent), url('https://www.transparenttextures.com/patterns/dark-leather.png');
+    animation: brilho-lendario 2s infinite alternate;
+}
+@keyframes brilho-lendario {
+    0% { box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 15px rgba(255, 215, 0, 0.5); border-color: #d4af37; }
+    100% { box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 35px rgba(255, 215, 0, 1); border-color: #fff8dc; }
+}
+
+.carta-tropa.raridade-mitico { 
+    border: 3px solid var(--ruby);
+    background-image: radial-gradient(circle at center, rgba(231, 76, 60, 0.2) 0%, transparent 70%), url('https://www.transparenttextures.com/patterns/dark-leather.png');
+    animation: furia-mitica 1s infinite alternate;
+}
+@keyframes furia-mitica {
+    0% { box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 20px rgba(231, 76, 60, 0.6); }
+    100% { box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 45px rgba(231, 76, 60, 1); transform: scale(1.02); }
+}
+
+/* Badge de Raridade dentro da loja */
+.tag-raridade-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-family: var(--font-title);
+    font-size: 0.7rem;
+    background: #000;
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid currentColor;
+    z-index: 5;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.8);
+}
+
+/* ==========================================================================
+   10. EFEITOS DE COMBATE (Flutuantes e Visuais)
+   ========================================================================== */
+.floating-text {
+    position: fixed;
+    pointer-events: none;
+    font-family: var(--font-title);
+    font-size: 2rem;
+    font-weight: 900;
+    z-index: 9999;
+    color: #fff;
+    text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 0 0 15px rgba(255,0,0,0.8);
+    animation: flutuarDano 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes flutuarDano {
+    0% { opacity: 0; transform: translateY(0) scale(0.5); }
+    20% { opacity: 1; transform: translateY(-30px) scale(1.3); }
+    100% { opacity: 0; transform: translateY(-80px) scale(1); }
+}
+
+/* Tremor de tela ao levar muito dano */
+.shake-screen { animation: tremor 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes tremor {
+    10%, 90% { transform: translate3d(-3px, 0, 0); }
+    20%, 80% { transform: translate3d(5px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+    40%, 60% { transform: translate3d(8px, 0, 0); }
+}
+
+/* Flash vermelho na tela inteira */
+.flash-dano {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(255, 0, 0, 0.3); pointer-events: none; z-index: 8000;
+    animation: flashOut 0.3s forwards;
+}
+@keyframes flashOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* ==========================================================================
+   11. CLIMA DINÂMICO
+   ========================================================================== */
+#clima-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: 1px solid var(--gold-antique);
+    font-family: var(--font-title);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.clima-overlay-chuva {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50;
+    background: repeating-linear-gradient(170deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.02) 2%, rgba(255,255,255,0) 4%);
+    animation: chover 0.5s linear infinite;
+}
+@keyframes chover { from { background-position: 0 0; } to { background-position: 20px 100vh; } }
+
+/* ==========================================================================
+   12. MODAIS E TOASTS (Notificações)
+   ========================================================================== */
+.modal {
+    display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px);
+    justify-content: center; align-items: center;
+}
+
+.modal-conteudo {
+    background: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), linear-gradient(135deg, #2b2520, #14110e);
+    padding: 40px;
+    border: 3px solid var(--gold-bright);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 550px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,1), inset 0 0 30px rgba(255, 215, 0, 0.1);
+    animation: modalAparecer 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes modalAparecer {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+#toast-container {
+    position: fixed; bottom: 30px; right: 30px; z-index: 6000;
+    display: flex; flex-direction: column; gap: 15px;
+}
+
+.toast {
+    background: rgba(20, 15, 10, 0.95);
+    padding: 18px 25px;
+    border-radius: 6px;
+    border-left: 6px solid var(--gold-bright);
+    color: var(--parchment);
+    font-family: var(--font-body);
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    animation: toastEntrar 0.4s ease-out forwards, toastSair 0.4s ease-in forwards 3s;
+}
+@keyframes toastEntrar { from { transform: translateX(120%); } to { transform: translateX(0); } }
+@keyframes toastSair { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+
+/* ==========================================================================
+   13. RESPONSIVIDADE BASE
+   ========================================================================== */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    .carta-tropa, .slot-vazio { width: 140px; height: 210px; }
+    button { padding: 12px 20px; font-size: 0.9rem; }
+    #toast-container { bottom: 10px; right: 10px; left: 10px; }
+}
+/* ==========================================================================
+   14. ATUALIZAÇÕES E ADIÇÕES: MODOS, EASTER EGGS E MECÂNICAS SECRETAS
+   ========================================================================== */
+
+/* --- Modos de Jogo: Hardcore & Sandbox --- */
+.badge-modo {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-family: var(--font-title);
+    font-weight: 900;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    text-transform: uppercase;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.9);
+    z-index: 1000;
+    animation: pulse-badge 2s infinite alternate;
+}
+
+.badge-hardcore { 
+    background: #8a0303; 
+    border: 2px solid #ff3333; 
+    color: #fff; 
+    text-shadow: 1px 1px 2px #000;
+}
+
+.badge-sandbox { 
+    background: #2980b9; 
+    border: 2px solid #3498db; 
+    color: #fff; 
+    text-shadow: 1px 1px 2px #000;
+}
+
+@keyframes pulse-badge {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); box-shadow: 0 5px 25px rgba(255, 255, 255, 0.2); }
+}
+
+/* --- Easter Egg: O Rei Esquecido (5 min AFK) --- */
+#rei-esquecido-modal .modal-conteudo {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 60px rgba(255, 215, 0, 0.3);
+    background-image: radial-gradient(circle at center, rgba(197, 160, 89, 0.1) 0%, transparent 80%), url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+}
+
+.rei-glow {
+    font-size: 5rem;
+    display: inline-block;
+    animation: flutuar-rei 3s ease-in-out infinite;
+    text-shadow: 0 0 30px var(--gold-bright);
+    margin-bottom: 15px;
+}
+
+@keyframes flutuar-rei {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px) scale(1.05); }
+}
+
+/* --- Easter Egg: Fantasma do Desenvolvedor (0,01% Chance) --- */
+#fantasma-dev-modal .modal-conteudo {
+    border-color: #9b59b6;
+    box-shadow: 0 0 50px rgba(155, 89, 182, 0.4);
+    background: rgba(10, 10, 15, 0.98);
+}
+
+.fantasma-glow {
+    font-size: 4rem;
+    display: inline-block;
+    animation: glitch-fantasma 2.5s infinite linear alternate-reverse;
+    text-shadow: 0 0 20px #9b59b6;
+    opacity: 0.85;
+}
+
+@keyframes glitch-fantasma {
+    0% { transform: skewX(0deg) translate(0); filter: hue-rotate(0deg); }
+    10% { transform: skewX(-5deg) translate(-2px, 2px); filter: hue-rotate(45deg); opacity: 0.5; }
+    20% { transform: skewX(5deg) translate(2px, -2px); filter: hue-rotate(-45deg); opacity: 1; }
+    30%, 100% { transform: skewX(0deg) translate(0); }
+}
+
+.carta-tropa.ghost-card {
+    border: 2px dashed #9b59b6;
+    background-image: linear-gradient(135deg, rgba(155, 89, 182, 0.15), transparent), url('https://www.transparenttextures.com/patterns/dark-leather.png');
+    box-shadow: inset 0 0 25px rgba(155, 89, 182, 0.4);
+}
+
+/* --- Mecânica Secreta: Sacrifício de Alma (Double Click Mítico) --- */
+.sacrificio-fx {
+    pointer-events: none;
+    animation: queimar-alma 0.7s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards !important;
+}
+
+@keyframes queimar-alma {
+    0% { filter: brightness(1); transform: scale(1); }
+    40% { filter: brightness(3) sepia(1) hue-rotate(-50deg) saturate(5); transform: scale(1.15) rotate(5deg); box-shadow: 0 0 50px rgba(255, 0, 0, 1); }
+    100% { filter: brightness(0); transform: scale(0); opacity: 0; }
+}
+
+/* --- Easter Egg: Eclipse Absoluto (Turno 66 + 666 Ouro ou Konami Code) --- */
+body.eclipse-absoluto {
+    filter: invert(0.85) hue-rotate(180deg) contrast(1.3) saturate(1.2);
+    transition: filter 3s ease-in-out;
+}
+
+.eclipse-text-overlay {
+    color: #8a0303;
+    text-shadow: 0 0 10px #ff3333, 0 0 30px #8a0303;
+    font-family: var(--font-title);
+    font-size: 4rem;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    pointer-events: none;
+    animation: pulse-eclipse 3s infinite;
+}
+
+@keyframes pulse-eclipse {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); }
+    50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* --- Easter Egg: Dragão Dourado (DRAGON Pós-Nível 25) --- */
+.boss-dragao-hud #inimigo-progress-bar {
+    background-color: var(--gold-bright) !important;
+    box-shadow: inset 0 0 20px #ff9900 !important;
+    animation: pulsar-dragao-hp 0.8s infinite alternate !important;
+}
+
+@keyframes pulsar-dragao-hp {
+    from { box-shadow: inset 0 0 10px #ff9900; }
+    to { box-shadow: inset 0 0 40px #ffff00; filter: brightness(1.2); }
+}
+
+/* --- Easter Egg: Console de Desenvolvedor (Ctrl + Shift + Y + 7) --- */
+#dev-console-modal .modal-conteudo {
+    background: #050505;
+    border: 2px solid #2ecc71;
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.2);
+    font-family: 'Courier New', Courier, monospace;
+    text-align: left;
+}
+
+#dev-console-modal h2 { 
+    color: #2ecc71; 
+    border-bottom: 1px solid #2ecc71; 
+    font-family: 'Courier New', monospace; 
+    text-shadow: none;
+}
+
+.dev-input {
+    background: #000;
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+    padding: 12px;
+    width: 100%;
+    margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
+    outline: none;
+}
+
+.dev-btn { 
+    background: #0a1f12; 
+    border: 1px solid #2ecc71; 
+    color: #2ecc71; 
+    cursor: pointer; 
+    padding: 12px; 
+    width: 100%; 
+    margin-bottom: 10px;
+    font-family: 'Courier New', monospace;
+    transition: 0.2s;
+    text-transform: none;
+    box-shadow: none;
+}
+
+.dev-btn:hover { background: #2ecc71; color: #000; box-shadow: 0 0 15px #2ecc71; }
+
+/* --- Mecânica Secreta: Formação Lendária "Reino Perdido" (x10 Dano) --- */
+.sinergia-reino-perdido {
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-title);
+    color: var(--gold-bright);
+    font-size: 3rem;
+    text-transform: uppercase;
+    z-index: 8000;
+    pointer-events: none;
+    animation: reino-perdido-aparecer 1s forwards, reino-perdido-brilhar 2s infinite 1s;
+}
+
+@keyframes reino-perdido-aparecer {
+    from { opacity: 0; transform: translate(-50%, -40px) scale(0.7); }
+    to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes reino-perdido-brilhar {
+    0%, 100% { text-shadow: 0 0 20px var(--gold-bright), 0 0 40px #ff9900; }
+    50% { text-shadow: 0 0 40px #fff, 0 0 80px var(--gold-bright); color: #fff; }
+}
+
+/* --- Easter Egg: Dado da Sorte (20 Clicks no Título) --- */
+#dado-sorte-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    font-size: 6rem;
+    z-index: 9500;
+    pointer-events: none;
+    display: none;
+}
+
+.rolar-dado-anim {
+    display: block !important;
+    animation: rolar 1.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes rolar {
+    0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.2); opacity: 0; }
+    50% { transform: translate(-50%, -50%) rotate(1080deg) scale(1.8); opacity: 1; text-shadow: 0 0 40px var(--gold-bright); }
+    100% { transform: translate(-50%, -50%) rotate(1440deg) scale(1.2); opacity: 0; }
+}
+
+/* --- Easter Egg: Tesouro Oculto Fx (10 Clicks no Ouro) --- */
+.tesouro-pop {
+    animation: coin-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: var(--gold-bright) !important;
+    text-shadow: 0 0 20px #ff9900, 0 0 40px #ffd700 !important;
+}
+
+@keyframes coin-pop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.8) rotate(10deg); }
+}
+
+
+/* ==========================================================================
+   15. ESTÉTICA REFINADA PARA CARTAS ÉPICAS+ (As 10 Novas Cartas)
+   ========================================================================== */
+
+/* Ajustes finos no interior da carta para caber os novos status e custos altos */
+.carta-stats { font-size: 1rem; font-weight: 700; }
+.carta-stats span { margin-bottom: 4px; }
+.carta-stats span.dano { color: #ff5252; }
+.carta-stats span.hp { color: #4cd137; }
+
+/* Brilho elemental específico para Míticos/Lendários (Fênix, Dragão) */
+.carta-tropa[data-element="Fogo"].raridade-mitico,
+.carta-tropa[data-element="Fogo"].raridade-lendario {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 0 30px rgba(231, 76, 60, 0.4);
+}
+.carta-tropa[data-element="Fogo"].raridade-mitico:hover {
+    box-shadow: -5px 20px 35px rgba(0,0,0,1), 0 0 40px rgba(255, 80, 0, 0.8);
+}
+
+/* Elemento Sagrado (Paladino da Luz) */
+.carta-tropa[data-element="Sagrado"] {
+    border-color: #fff8dc;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 20px rgba(255, 248, 220, 0.3);
+}
+
+/* Elemento Trovão (Senhor do Trovão) */
+.carta-tropa[data-element="Trovão"] {
+    border-color: #f1c40f;
+    animation: relampago-flicker 3.5s infinite;
+}
+
+@keyframes relampago-flicker {
+    0%, 95%, 98% { box-shadow: inset 0 0 15px rgba(241, 196, 15, 0.1); }
+    96%, 99% { box-shadow: inset 0 0 40px rgba(241, 196, 15, 0.9); border-color: #fff; }
+    100% { box-shadow: inset 0 0 15px rgba(241, 196, 15, 0.1); }
+}
