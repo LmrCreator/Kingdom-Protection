@@ -3,1121 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Jogo Roguelike inspirado em Nine Kings onde você precisa defender seu reino e vencer infinitos inimigos.">
-    <title>Kingdom Protection - New Edition</title>
+    <meta name="description" content="Kingdom Protection - Auto-Battler Roguelike com mecânicas de clima, raridades e loja estilo Balatro.">
+    <title>Kingdom Protection - Remastered</title>
+    
+    <!-- Ícone da Aba -->
     <link rel="icon" href="https://png.pngtree.com/png-clipart/20220706/ourmid/pngtree-king-golden-crown-with-red-diamonds-vector-logo-png-image_5687935.png" type="image/png">
-    <style>
-        body {
-            font-family: 'Georgia', serif; margin: 0; padding: 20px;
-            background-color: #222; 
-            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://via.placeholder.com/1500x800.png?text=Fundo+de+Guerra'); 
-            background-size: cover; background-attachment: fixed; color: #ddd;
-        }
-        h1 { text-align: center; color: #FFD700; text-shadow: 2px 2px 4px #000; border-bottom: 2px solid #FFD700; padding-bottom: 10px; margin-bottom: 5px; }
-        h3 { text-align: center; color: #5bc0de; margin-top: 0; margin-bottom: 30px;}
-        h2 { color: #FFD700; border-bottom: 1px solid #555; padding-bottom: 5px; margin-top: 0px; }
-        .painel {
-            background-color: rgba(30, 30, 30, 0.95); padding: 20px; margin-bottom: 20px;
-            border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.05); border: 2px solid #555;
-            transition: all 0.2s;
-        }
-        button {
-            background-color: #A52A2A; color: white; padding: 12px 20px; border: none; border-radius: 6px;
-            cursor: pointer; margin-right: 10px; margin-bottom: 10px; transition: all 0.2s ease;
-            text-transform: uppercase; font-weight: bold; box-shadow: 0 4px #771919;
-        }
-        button:hover:not(:disabled) { background-color: #8B1A1A; transform: translateY(-1px); box-shadow: 0 5px #771919; }
-        button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px #771919; }
-        button:disabled { background-color: #555; box-shadow: 0 4px #333; cursor: not-allowed; color: #aaa; opacity: 0.6; }
-        button.batalha { background-color: #28a745; box-shadow: 0 4px #1c7c30; }
-        button.batalha:hover:not(:disabled) { background-color: #218838; box-shadow: 0 5px #1c7c30; }
-        button.loja { background-color: #0056b3; box-shadow: 0 4px #003d82; }
-        button.loja:hover:not(:disabled) { background-color: #004494; box-shadow: 0 5px #003d82; }
-        
-        #grid-tabuleiro {
-            display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; min-height: 120px;
-            background-color: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px dashed #777;
-        }
-        .carta-tropa {
-            background: linear-gradient(145deg, #444, #222); border: 2px solid #FFD700; border-radius: 8px;
-            padding: 15px; width: 120px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.7);
-            cursor: pointer; position: relative;
-        }
-        .carta-tropa:hover { border-color: #ff4444; } 
-        .carta-tropa::after {
-            content: "Vender (50%)"; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
-            background: #ff4444; color: white; padding: 2px 5px; font-size: 0.8em; border-radius: 3px;
-            opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; z-index: 10;
-        }
-        .carta-tropa:hover::after { opacity: 1; }
-        .carta-tropa span { display: block; font-size: 1.1em; font-weight: bold; color: #fff; margin-bottom: 8px; }
-        .carta-tropa small { color: #ff9999; font-weight: bold; font-size: 1.1em; display: block;}
-        .carta-tropa .sinergia { color: #5bc0de; font-size: 0.85em; font-weight: normal; }
-        
-        .progress-bar-container { background-color: #444; border: 1px solid #FFD700; border-radius: 5px; overflow: hidden; height: 25px; margin-top: 5px; margin-bottom: 10px; cursor: pointer; }
-        .progress-bar { height: 100%; background-color: #28a745; text-align: right; padding-right: 5px; color: white; line-height: 25px; font-weight: bold; transition: width 0.3s ease; pointer-events: none; }
-        #inimigo-progress-bar { background-color: #dc3545; }
-        
-        #lista-cartas { display: flex; gap: 15px; list-style: none; padding: 0; flex-wrap: wrap; }
-        #lista-cartas li { background: linear-gradient(145deg, #333, #111); border: 2px solid #555; padding: 20px; border-radius: 8px; cursor: pointer; flex: 1; min-width: 200px; text-align: center; transition: all 0.3s ease; }
-        #lista-cartas li:hover { border: 2px solid #FFD700; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(255,215,0,0.2); }
-        .custo-carta { display: inline-block; background: #FFD700; color: #000; padding: 3px 8px; border-radius: 12px; font-weight: bold; margin-bottom: 10px; }
-        
-        #lista-cartas-escolhidas li { background-color: rgba(60, 60, 60, 0.9); border-bottom: 1px solid #444; padding: 10px; margin-bottom: 5px; border-radius: 5px; list-style: none; display: flex; justify-content: space-between; cursor: help;}
-        .btn-vender-edificio { background-color: #dc3545; padding: 5px 10px; font-size: 0.8em; margin: 0; box-shadow: none;}
-        
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); }
-        .modal-conteudo { background-color: rgba(30, 30, 30, 0.95); margin: 10% auto; padding: 30px; border: 3px solid #FFD700; width: 80%; max-width: 600px; border-radius: 12px; color: #ddd; text-align: center;}
-        
-        .diff-btn { width: 100%; margin-bottom: 15px; font-size: 1.1em; }
-        #game-screen { display: none; }
-        #tutorial-msg { background-color: #17a2b8; color: white; padding: 10px; border-radius: 5px; font-weight: bold; margin-top: 15px; font-size: 1.1em; text-align: center; display: none; animation: flash-green 1s infinite alternate; }
-        
-        /* Animações e Efeitos */
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        .flash-red { background-color: rgba(255, 0, 0, 0.5) !important; transition: background-color 0.1s; }
-        .flash-green { background-color: rgba(0, 255, 0, 0.3) !important; transition: background-color 0.1s; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
-        @keyframes flash-green { from { box-shadow: 0 0 5px #17a2b8; } to { box-shadow: 0 0 20px #17a2b8; } }
-
-        .floating-text { position: fixed; pointer-events: none; font-size: 24px; font-weight: bold; z-index: 2000; animation: floatUp 1.2s ease-out forwards; text-shadow: 2px 2px 4px rgba(0,0,0,1); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-80px) scale(1.2); } }
-        
-        /* Novo Tooltip Dinâmico */
-        #custom-tooltip {
-            position: absolute; display: none; background: rgba(15, 15, 15, 0.98);
-            border: 2px solid #FFD700; padding: 12px; border-radius: 8px;
-            color: #fff; font-size: 0.95em; z-index: 3000; pointer-events: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.9); max-width: 280px; font-family: 'Arial', sans-serif;
-            transform: translate(15px, 15px);
-        }
-        .tooltip-title { color: #FFD700; font-weight: bold; font-size: 1.1em; border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 8px; text-transform: uppercase;}
-        .tooltip-desc { color: #ccc; line-height: 1.4;}
-        
-        /* Notificação de Conquistas e Avisos (Toast) */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 4000; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: linear-gradient(145deg, #FFD700, #DAA520); color: #000; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.8); font-weight: bold; animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in forwards; border: 2px solid #fff; }
-        .toast-error { background: linear-gradient(145deg, #dc3545, #a71d2a) !important; color: white !important; border-color: #ff9999 !important; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(20px); } }
-
-        .previsao { font-size: 0.85em; margin-top: 5px; font-style: italic; color: #ffeb3b; }
-        .stats-box { font-size: 0.9em; color: #aaa; text-align: center; margin-top: 20px; border-top: 1px dashed #555; padding-top: 10px;}
-        .achievements-box { margin-top: 10px; color: #FFD700; font-weight: bold; }
-    </style>
+    
+    <!-- Folha de Estilos -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="custom-tooltip"></div>
+
+    <!-- ========================================== -->
+    <!-- SISTEMA DE NOTIFICAÇÕES (TOAST)            -->
+    <!-- ========================================== -->
     <div id="toast-container"></div>
 
-    <h1 id="main-title">Kingdom Protection</h1>
-    <h3 id="main-subtitle">New Edition</h3>
+    <!-- ========================================== -->
+    <!-- TELA DE LOBBY / INÍCIO                     -->
+    <!-- ========================================== -->
+    <div id="header-lobby">
+        <h1 id="main-title">Kingdom Protection</h1>
+        <h3 id="main-subtitle">Balatro Auto-Battler Edition</h3>
+    </div>
 
-    <div id="start-screen" class="painel" style="max-width: 600px; margin: 0 auto;">
-        <label for="idioma-select" id="lbl-idioma" style="color:#FFD700;">Idioma / Language:</label>
-        <select id="idioma-select" style="margin-bottom: 20px; padding: 5px;">
-            <option value="pt-br">Português (Brasil)</option>
-            <option value="en-us">English (USA)</option>
-            <option value="es-es">Español</option>
-        </select>
+    <div id="start-screen" class="painel">
+            
         <h2 id="title-diff">Escolha sua Dificuldade</h2>
         <p id="desc-diff">Sua escolha afeta a vida e o dano dos inimigos.</p>
-        <button class="diff-btn" data-diff="arqueiro" style="background-color: #17a2b8;">Arqueiro (Tutorial)</button>
-        <button class="diff-btn" data-diff="escudeiro" style="background-color: #28a745;">Escudeiro (Fácil)</button>
-        <button class="diff-btn" data-diff="cavaleiro" style="background-color: #ffc107; color: black;">Cavaleiro (Normal)</button>
-        <button class="diff-btn" data-diff="comandante" style="background-color: #fd7e14;">Comandante (Difícil)</button>
-        <button class="diff-btn" data-diff="duque" style="background-color: #dc3545;">Duque (Insano)</button>
-        <hr style="border-color: #444; margin: 20px 0;">
-        <button id="carregar-jogo-inicio" style="width:100%; margin-bottom: 10px;">Carregar Jogo Salvo</button>
-        <button id="btn-conquistas-inicio" style="width:100%; background-color: #6f42c1;">Ver Sala de Troféus</button>
-    </div>
-
-    <div id="game-screen">
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-            <div id="cidade" class="painel" style="flex: 1; min-width: 300px;">
-                <h2 id="titulo-cidade">Seu Reino</h2>
-                <p><strong id="lbl-ouro">Ouro:</strong> <span id="ouro" style="color: #FFD700; font-size: 1.2em;">200</span> <small id="lbl-ouro-turno" style="color:#aaa;">(+25/turno)</small></p>
-                <p><span id="lbl-vida">Vida:</span> <span id="hp">500</span> / <span id="hp-max">500</span></p>
-                <div id="barra-vida-reino" class="progress-bar-container"><div id="hp-progress-bar" class="progress-bar" style="width: 100%;"></div></div>
-                <div id="previsao-reino" class="previsao"></div>
-                <p><span id="lbl-ano">Turno/Ano:</span> <span id="ano" style="font-weight: bold; color: #aaa;">1</span> | Nível: <span id="nivel-disp">1</span></p>
-                <div id="tutorial-msg"></div>
-            </div>
-
-            <div id="inimigo-status" class="painel" style="flex: 1; min-width: 300px;">
-                <h2 id="inimigo-nome">Rei Inimigo 1</h2>
-                <p><span id="lbl-inimigo-poder">Poder do Inimigo (Dano):</span> <span id="inimigo-ataque" style="color: #ff9999; font-weight: bold;"></span></p>
-                <p><span id="lbl-inimigo-vida">Vida do Inimigo:</span> <span id="inimigo-vida"></span></p>
-                <div class="progress-bar-container"><div id="inimigo-progress-bar" class="progress-bar" style="width: 100%;"></div></div>
-                <div id="previsao-inimigo" class="previsao"></div>
-            </div>
-        </div>
-
-        <div id="tabuleiro" class="painel">
-            <h2 id="titulo-tabuleiro">Seu Exército</h2>
-            <p style="margin:0; color:#ccc;"><span id="lbl-espacos">Espaços Usados:</span> <span id="espacos-usados">0</span> / <span id="espacos-max">3</span></p>
-            <p style="margin:0; color:#888; font-size: 0.8em;" id="lbl-dica-vender">Passe o mouse nas cartas para dicas. Clique para vender.</p>
-            <div id="grid-tabuleiro"></div>
-            <p style="margin-top: 15px; font-size: 1.2em;">
-                <span id="lbl-dano-total" style="color:#aaa;">Dano Total:</span> 
-                <strong id="dano-total" style="color: #FFD700;">0</strong> 
-                <small id="dano-breakdown" style="color:#5bc0de; font-size: 0.8em;"></small>
-            </p>
-        </div>
-
-        <div id="acoes" class="painel">
-            <h2 id="titulo-acoes">Ações do Turno</h2>
-            <button id="abrir-loja" class="loja">Rolar Loja (5 Ouro)</button>
-            <button id="recuperar-saude">Curar 50 PV</button>
-            <button id="passar-turno" class="batalha">Iniciar Batalha (Fim de Turno)</button>
-            <br><br>
-            <button id="salvar-jogo" style="background-color: #555;">Salvar</button>
-            <button id="carregar-jogo" style="background-color: #555;">Carregar</button>
-            <button id="mostrar-regras" style="background-color: #555;">Regras</button>
-        </div>
-
-        <div id="cartas" class="painel" style="display: none; border-color: #0056b3;">
-            <h2 id="titulo-cartas">Loja: Compre 1 carta (ou pule)</h2>
-            <ul id="lista-cartas"></ul>
-            <button id="pular-loja" style="background-color: #555; width: 100%; margin-top: 10px;">Fechar Loja</button>
-        </div>
-
-        <div id="cartas-escolhidas" class="painel">
-            <h2 id="titulo-cartas-compradas">Edifícios Ativos (Efeitos Passivos)</h2>
-            <ul id="lista-cartas-escolhidas" style="padding-left: 0;"></ul>
-        </div>
         
-        <div class="stats-box">
-            <span id="lbl-stats">Maior Dano: 0 | Turnos Sobrevividos: 0</span>
-            <div id="lbl-achievements" class="achievements-box"></div>
+        <!-- Botões de Dificuldade -->
+        <button class="diff-btn btn-principal" data-diff="escudeiro">Escudeiro (Fácil)</button>
+        <button class="diff-btn btn-principal" data-diff="cavaleiro">Cavaleiro (Normal)</button>
+        <button class="diff-btn btn-principal" data-diff="comandante">Comandante (Difícil)</button>
+    
+        <hr>
+
+        <!-- Novos Modos de Jogo -->
+        <h3 style="color: var(--gold-antique); margin-bottom: 15px; font-size: 1.2rem;">Outros Modos de Jogo:</h3>
+        <div style="margin-bottom: 20px;">
+            <button id="btn-modo-sandbox" class="btn-secundario">Sandbox</button>
+            <button id="btn-modo-hardcore" class="btn-secundario" style="border-color: var(--blood-red); color: #ff6b6b;">Hardcore</button>
+        </div>
+
+        <hr>
+        
+        <!-- Controles de Save e Conquistas -->
+        <div>
+            <button id="carregar-jogo-inicio" class="btn-secundario">Carregar Jogo Salvo</button>
+            <button id="btn-conquistas-inicio" class="btn-secundario">Ver Sala de Troféus 🏆</button>
         </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- TELA PRINCIPAL DO JOGO                     -->
+    <!-- ========================================== -->
+    <div id="game-screen">
+        
+        <!-- Status e Informações do Jogador -->
+        <header class="header-game">
+            <div class="hud-container">
+                <div class="hud-item painel">
+                    <span class="hud-label">🪙 Ouro:</span>
+                    <strong id="ouro-display" class="hud-value">15</strong>
+                </div>
+                <div class="hud-item painel">
+                    <span class="hud-label">⚔️ Onda:</span>
+                    <strong id="onda-display" class="hud-value">1</strong>
+                </div>
+                <div class="hud-item painel">
+                    <span class="hud-label">🌍 Clima Atual:</span>
+                    <div id="clima-display" class="clima-sol">
+                        <span>☀️</span> Sol Radiante
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Container do Layout de Batalha -->
+        <main class="main-container">
+
+            <!-- CAMPO DO INIMIGO -->
+            <section id="inimigo-section" class="painel">
+                <div class="inimigo-header">
+                    <h2>Horda Inimiga</h2>
+                    <div id="inimigo-hp-text" class="hp-text-overlay">Aguardando início...</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="inimigo-progress-bar" class="progress-bar"></div>
+                </div>
+            </section>
+
+            <!-- CAMPO DO JOGADOR (TABULEIRO) -->
+            <section id="tabuleiro-section" class="painel">
+                <div class="section-title">
+                    <h2>Seu Exército (Tabuleiro)</h2>
+                    <small class="dica-texto">Ocupado: 0 / 6 (Clique para vender)</small>
+                </div>
+                <!-- Grid onde as cartas das tropas ficarão -->
+                <div id="grid-tabuleiro" class="grid-tabuleiro">
+                    <!-- Gerado pelo JS -->
+                </div>
+            </section>
+
+            <!-- MERCADO / LOJA ESTILO BALATRO -->
+            <section id="loja-section" class="painel">
+                <div class="loja-header">
+                    <h2>Mercado de Tropas</h2>
+                    <button id="btn-reroll" class="btn-secundario">
+                        🔄 Rolar Loja (🪙 2)
+                    </button>
+                </div>
+                <!-- Cartas disponíveis para compra -->
+                <div id="lista-cartas" class="cartas-container">
+                    <!-- Gerado pelo JS -->
+                </div>
+            </section>
+
+            <!-- AÇÕES E CONTROLES -->
+            <section id="acoes-section" class="painel-acoes">
+                <button id="btn-batalha" class="btn-principal pulse-animation">
+                    ⚔️ Iniciar Batalha
+                </button>
+                <div>
+                    <button id="salvar-jogo" class="btn-secundario">💾 Salvar Progresso</button>
+                    <button id="mostrar-regras" class="btn-secundario">📖 Ver Regras</button>
+                </div>
+            </section>
+            
+        </main>
+    </div> <!-- Fim da Game Screen -->
+
+    <!-- ========================================== -->
+    <!-- MODAIS E CAIXAS DE DIÁLOGO                 -->
+    <!-- ========================================== -->
+    
+    <!-- Modal de Regras -->
     <div id="regras-modal" class="modal">
         <div class="modal-conteudo">
-            <span class="fechar-modal" onclick="document.getElementById('regras-modal').style.display='none'" style="float:right; cursor:pointer; color:#FFD700; font-size:24px;">&times;</span>
+            <span class="fechar-modal" onclick="document.getElementById('regras-modal').style.display='none'">&times;</span>
             <h2 id="modal-titulo">Regras do Jogo</h2>
             <p id="modal-p1">Defenda seu reino usando estratégia, sinergia e economia!</p>
-            <ul id="modal-list" style="text-align: left;"></ul>
+            <ul id="modal-list">
+                <li><strong>Monte seu Exército:</strong> Compre tropas na loja e posicione-as no tabuleiro.</li>
+                <li><strong>Economia (Reroll):</strong> Use seu ouro para rodar a loja em busca de tropas melhores.</li>
+                <li><strong>Raridades:</strong> Tropas Lendárias e Míticas custam mais, mas são esmagadoras.</li>
+                <li><strong>Clima Dinâmico:</strong> Fique de olho no clima! Ele muda a cada rodada e afeta a batalha.</li>
+            </ul>
         </div>
     </div>
 
-    <div id="conquistas-modal" class="modal">
-        <div class="modal-conteudo" style="max-height: 80vh; overflow-y: auto;">
-            <span class="fechar-modal" onclick="document.getElementById('conquistas-modal').style.display='none'" style="float:right; cursor:pointer; color:#FFD700; font-size:24px;">&times;</span>
-            <h2 id="modal-conquistas-titulo" style="color: #FFD700; border-bottom: 1px solid #555; padding-bottom: 10px;">Sala de Troféus</h2>
-            <div id="grid-conquistas" style="display: flex; flex-direction: column; gap: 10px; text-align: left; margin-top: 20px;"></div>
-        </div>
-    </div>
+     <!-- ========================================== -->
+    <!-- MODAIS ADICIONAIS (EASTER EGGS E DEV)      -->
+    <!-- ========================================== -->
 
-    <div id="slots-modal" class="modal">
+    <!-- Modal do Console Dev Atualizado -->
+    <div id="dev-console-modal" class="modal">
         <div class="modal-conteudo">
-            <span class="fechar-modal" onclick="document.getElementById('slots-modal').style.display='none'" style="float:right; cursor:pointer; color:#FFD700; font-size:24px;">&times;</span>
-            <h2 id="slots-title">Salvar Jogo</h2>
-            <div id="slots-container" style="display:flex; flex-direction:column; gap:10px; margin-top:20px;"></div>
+            <span class="fechar-modal-btn" onclick="document.getElementById('dev-console-modal').style.display='none'">&times;</span>
+            <h2>🛠️ Console de Desenvolvedor</h2>
+            <p>Comandos de teste e depuração:</p>
+            
+            <!-- Invocar Tropa -->
+            <div style="margin: 10px 0;">
+                <input type="text" id="dev-input-carta" placeholder="ID (c1, rei, espada...)" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                <button id="dev-btn-invocar" class="btn-secundario">Invocar Tropa</button>
+            </div>
+            
+            <!-- Mudar Onda -->
+            <div style="margin: 10px 0;">
+                <input type="number" id="dev-input-onda" placeholder="Número da Onda" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                <button id="dev-btn-onda" class="btn-secundario">Mudar Onda</button>
+            </div>
+
+            <!-- Modificar Ouro (Definir valor exato) -->
+            <div style="margin: 10px 0;">
+                <input type="number" id="dev-input-ouro" placeholder="Quantidade de Ouro" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                <button id="dev-btn-ouro" class="btn-secundario">Definir Ouro</button>
+            </div>
+
+            <!-- Adicionar Espaços no Tabuleiro -->
+            <div style="margin: 10px 0;">
+                <input type="number" id="dev-input-slots" placeholder="Qtd. Slots Extras" value="3" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                <button id="dev-btn-slots" class="btn-secundario">Adicionar Slots</button>
+            </div>
+
+            <!-- Mudar Clima -->
+            <div style="margin: 10px 0;">
+                <select id="dev-select-clima" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                    <option value="sol">Sol Radiante ☀️</option>
+                    <option value="chuva">Chuva Forte 🌧️</option>
+                    <option value="neve">Nevasca ❄️</option>
+                    <option value="tempestade">Tempestade ⛈️</option>
+                    <option value="eclipse">Eclipse 🌘</option>
+                </select>
+                <button id="dev-btn-clima" class="btn-secundario">Mudar Clima</button>
+            </div>
         </div>
     </div>
 
+<!-- Modal do Console Secreto do Jogador -->
+    <div id="player-secret-modal" class="modal">
+        <div class="modal-conteudo" style="border-color: var(--sapphire); box-shadow: 0 0 30px rgba(52, 152, 219, 0.4);">
+            <span class="fechar-modal-btn" onclick="document.getElementById('player-secret-modal').style.display='none'">&times;</span>
+            <h2 style="color: var(--sapphire);">Console Secreto</h2>
+            <p style="margin-bottom: 15px;">Use seus poderes com sabedoria. Eles são limitados!</p>
+            
+            <!-- Invocar Cartas (Máx 3 - Raras) -->
+            <div style="margin: 10px 0;">
+                <select id="player-select-carta" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                    <option value="espada">Espadachim (Raro)</option>
+                    <option value="arco">Arqueiro (Raro)</option>
+                    <option value="mago">Mago Aprendiz (Raro)</option>
+                    <option value="escudo">Guarda Real (Raro)</option>
+                </select>
+                <button id="player-btn-invocar" class="btn-secundario">Invocar (<span id="count-cartas">0/3</span>)</button>
+            </div>
+
+            <!-- Adicionar Slots (Máx 6) -->
+            <div style="margin: 10px 0;">
+                <input type="number" id="player-input-slots" placeholder="Qtd. Slots (Máx 6)" min="1" max="6" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                <button id="player-btn-slots" class="btn-secundario">Adicionar Slots (<span id="count-slots">0/6</span>)</button>
+            </div>
+
+            <!-- Mudar Clima (Máx 1) -->
+            <div style="margin: 10px 0;">
+                <select id="player-select-clima" style="padding: 6px; width: 50%; background: #222; color: #fff; border: 1px solid #444;">
+                    <option value="sol">Sol Radiante ☀️</option>
+                    <option value="chuva">Chuva Forte 🌧️</option>
+                    <option value="neve">Nevasca ❄️</option>
+                    <option value="tempestade">Tempestade ⛈️</option>
+                    <option value="eclipse">Eclipse 🌘</option>
+                </select>
+                <button id="player-btn-clima" class="btn-secundario">Mudar Clima (<span id="count-clima">0/1</span>)</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal do Rei Esquecido (Easter Egg AFK) -->
+    <div id="rei-esquecido-modal" class="modal">
+        <div class="modal-conteudo">
+            <h2>👑 O Rei Esquecido</h2>
+            <p>Você ficou ausente por muito tempo. O monarca ancestral oferece uma dádiva:</p>
+            <div id="carta-rei-container" style="margin: 15px 0;"></div>
+            <button id="btn-aceitar-rei" class="btn-principal">Aceitar Dádiva</button>
+        </div>
+    </div>
+
+    <!-- Modal do Fantasma do Desenvolvedor -->
+    <div id="fantasma-dev-modal" class="modal">
+        <div class="modal-conteudo">
+            <h2>👻 Aparição do Desenvolvedor</h2>
+            <p>Você encontrou uma fenda dimensional rara! O espírito criador te concede uma benção eterna.</p>
+            <button id="btn-recompensa-fantasma" class="btn-principal">Receber Carta Fantasma Única</button>
+        </div>
+    </div>
+
+    <!-- Modal da Sala de Troféus (Compatibilidade com o JS) -->
+    <div id="trofeus-modal" class="modal">
+        <div class="modal-conteudo">
+            <span class="fechar-modal-btn" onclick="document.getElementById('trofeus-modal').style.display='none'">&times;</span>
+            <h2>🏆 Sala de Troféus e Estatísticas</h2>
+            <div id="grid-conquistas" style="margin-top: 15px;">
+                <!-- Preenchido dinamicamente pelo script -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recompensa de Batalha (Após Chefe ou Ondas) -->
     <div id="reward-modal" class="modal">
         <div class="modal-conteudo">
-            <h2 id="reward-title" style="color: #28a745;">Vitória! Escolha uma Recompensa</h2>
-            <p id="reward-desc">O chefe caiu. Fortaleça seu reino permanentemente:</p>
-            <button id="btn-rew-dano" style="width:100%; font-size:1.1em; background:#A52A2A;">+10% Dano Global</button>
-            <button id="btn-rew-vida" style="width:100%; font-size:1.1em; background:#28a745;">+50 Vida Máxima</button>
-            <button id="btn-rew-espaco" style="width:100%; font-size:1.1em; background:#0056b3;">+1 Espaço no Exército</button>
+            <h2 id="reward-title">Vitória Épica!</h2>
+            <p id="reward-desc">O chefe caiu. Escolha uma benção para fortalecer seu reino:</p>
+            <button id="btn-rew-dano">⚔️ +10% Dano Global</button>
+            <button id="btn-rew-vida">🪙 +15 Ouro Bônus</button>
+            <button id="btn-rew-espaco">🛡️ +1 Espaço no Tabuleiro</button>
         </div>
     </div>
 
+    <!-- Modal de Eventos Aleatórios -->
     <div id="evento-modal" class="modal">
         <div class="modal-conteudo">
-            <h2 id="evento-title" style="color: #ffc107;">Evento Aleatório!</h2>
-            <p id="evento-desc" style="font-size: 1.2em;"></p>
-            <button onclick="document.getElementById('evento-modal').style.display='none'" style="width:100%; font-size:1.1em;">Continuar</button>
+            <h2 id="evento-title">Evento Aleatório!</h2>
+            <p id="evento-desc"></p>
+            <button onclick="document.getElementById('evento-modal').style.display='none'">Continuar a Jornada</button>
         </div>
     </div>
 
-    <script>
-        // --- MOTOR DE ÁUDIO SIMPLES (Web Audio API) ---
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-
-        function initAudio() { if(!audioCtx) audioCtx = new AudioContext(); }
-        
-        function playTone(freq, type, duration, vol=0.1) {
-            if(!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
-        }
-        
-        const sons = {
-            click: () => playTone(600, 'sine', 0.1, 0.05),
-            coin: () => { playTone(1200, 'square', 0.1, 0.05); setTimeout(()=>playTone(1600, 'square', 0.15, 0.05), 100); },
-            impact: () => playTone(100, 'sawtooth', 0.3, 0.2),
-            heal: () => playTone(400, 'sine', 0.4, 0.1),
-            win: () => { [300, 400, 500, 600].forEach((f,i) => setTimeout(()=>playTone(f, 'square', 0.2, 0.1), i*100)); },
-            loss: () => { [200, 150, 100, 50].forEach((f,i) => setTimeout(()=>playTone(f, 'sawtooth', 0.4, 0.2), i*300)); },
-            achievement: () => { [500, 700, 900].forEach((f,i) => setTimeout(()=>playTone(f, 'sine', 0.3, 0.1), i*150)); },
-            secret: () => { [400, 500, 600, 800, 1200].forEach((f,i) => setTimeout(()=>playTone(f, 'sine', 0.4, 0.1), i*150)); }
-        };
-
-        document.addEventListener('click', (e) => {
-            if(e.target.tagName === 'BUTTON' && !e.target.disabled) { initAudio(); sons.click(); }
-        });
-
-        // --- SISTEMA DE FEEDBACK VISUAL E TOASTS ---
-        function floatText(elId, text, color) {
-            const el = document.getElementById(elId);
-            if(!el) return;
-            const rect = el.getBoundingClientRect();
-            const f = document.createElement('div');
-            f.textContent = text; f.style.color = color; f.className = 'floating-text';
-            f.style.left = (rect.left + rect.width/2 - 20) + 'px';
-            f.style.top = rect.top + 'px';
-            document.body.appendChild(f);
-            setTimeout(() => f.remove(), 1200);
-        }
-
-        function flashElement(elId, className) {
-            const el = document.getElementById(elId);
-            if(!el) return;
-            el.classList.add(className);
-            if(className === 'shake') el.classList.add('flash-red');
-            setTimeout(() => { el.classList.remove(className); el.classList.remove('flash-red'); }, 400);
-        }
-        
-        const tooltipEl = document.getElementById('custom-tooltip');
-        function showTooltip(e, title, desc) {
-            tooltipEl.innerHTML = `<div class="tooltip-title">${title}</div><div class="tooltip-desc">${desc}</div>`;
-            tooltipEl.style.display = 'block';
-            moveTooltip(e);
-        }
-        function moveTooltip(e) { tooltipEl.style.left = e.pageX + 'px'; tooltipEl.style.top = e.pageY + 'px'; }
-        function hideTooltip() { tooltipEl.style.display = 'none'; }
-        
-        function showToast(message, duration = 4000) {
-            sons.achievement();
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.style.animationDuration = `0.5s, 0.5s`;
-            toast.style.animationDelay = `0s, ${duration/1000 - 0.5}s`;
-            toast.innerHTML = `🏆 ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), duration);
-        }
-
-        function showAlert(message, isGameOver = false) {
-            if(isGameOver) sons.loss();
-            else playTone(250, 'sawtooth', 0.2, 0.1);
-
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast toast-error';
-            toast.style.animationDuration = `0.5s, 0.5s`;
-            let duration = isGameOver ? 4000 : 3000;
-            toast.style.animationDelay = `0s, ${duration/1000 - 0.5}s`;
-            toast.innerHTML = `⚠️ ${message}`;
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-                if(isGameOver) location.reload();
-            }, duration);
-        }
-
-        // --- DICIONÁRIO DE CONQUISTAS ---
-        const dicionarioConquistas = {
-            "primeiro_sangue": { desc: "Primeiro Sangue (Venceu o 1º nível)", cat: "Inicial" },
-            "rico": { desc: "Mestre da Moeda (Acumulou 5000 de Ouro)", cat: "Inicial" },
-            "estrategista": { desc: "Dano Massivo (Causou 5000+ de dano num turno)", cat: "Inicial" },
-            "construtor": { desc: "Mestre Construtor (Possui 20 Edifícios Ativos)", cat: "Inicial" },
-            
-            "15-reis": { desc: "Imperador (Venceu os 15 reis)", cat: "Normal" },
-            "reinado": { desc: "Reino Respeitado (30+ Espaços de Exército)", cat: "Normal" },
-            "chuva_flechas": { desc: "Chuva de Flechas (Venceu os 15 Reis só com Arqueiros)", cat: "Normal" },
-            "tanque_guerra": { desc: "Tanque de Guerra (Venceu os 15 Reis só com Guerreiros/Cavaleiros)", cat: "Normal" },
-            "magico": { desc: "Mágico (Venceu os 15 Reis só com Magos)", cat: "Normal" },
-            "consumista": { desc: "Consumista (Rolou a loja 50 vezes na mesma partida)", cat: "Normal" },
-            
-            "super-rico": { desc: "Rei da Moeda (Acumulou 25000 de Ouro)", cat: "Difícil" },
-            "imortal": { desc: "Imortal (Tem 25000+ de vida máxima)", cat: "Difícil" },
-            "imperador_construcoes": { desc: "Imperador das Construções (Possui 50+ Edifícios Ativos)", cat: "Difícil" },
-            "potencia_economica": { desc: "Potência Econômica (Ganhe 1000+ de Ouro por turno)", cat: "Difícil" },
-            "por_um_fio": { desc: "Por um Fio (Sobreviveu a um turno com exatamente 1 de Vida)", cat: "Difícil" },
-            "perfect": { desc: "Perfect (Derrote 3 chefes com dano exato sobrando 0 HP)", cat: "Difícil" },
-            
-            "100-abismo": { desc: "Imperador do Abismo (Chegou ao Rei 100 do Abismo)", cat: "Insana" },
-            "dano++": { desc: "/Kill (Causou 50000+ de dano num turno)", cat: "Insana" },
-            "megalomaniaco": { desc: "Império (100+ Espaços de Exército)", cat: "Insana" },
-            "intocavel": { desc: "Intocável (Venceu os 15 Reis sem sofrer dano)", cat: "Insana" },
-            "alta_aposta": { desc: "Alta Aposta (Vença os 15 Reis com Vida Máxima < 250)", cat: "Insana" },
-            "sem_exercito": { desc: "O que é Exército? (Vença os 15 Reis usando só Torres para dano)", cat: "Insana" }
-        };
-
-        let globalAchievements = JSON.parse(localStorage.getItem("kp_globalAchievements")) || [];
-
-        function desbloquearConquista(id) {
-            if (!globalAchievements.includes(id)) {
-                globalAchievements.push(id);
-                localStorage.setItem("kp_globalAchievements", JSON.stringify(globalAchievements));
-            }
-            if (!stats.conquistas.includes(id)) {
-                stats.conquistas.push(id);
-                showToast(dicionarioConquistas[id].desc);
-            }
-            verificarConquistasSecretas();
-        }
-
-        // --- SISTEMA DE CONQUISTAS SECRETAS E BUFFS ---
-        function verificarConquistasSecretas() {
-            const msgsSecretas = {
-                "sec_init": "✨ SEGREDO: Todas as conquistas Iniciais! (+100 HP Base)",
-                "sec_norm": "✨ SEGREDO: Todas as conquistas Normais! (+200 Ouro Base)",
-                "sec_diff": "✨ SEGREDO: Todas as conquistas Difíceis! (+75 Ouro/t e +20% Dano)",
-                "sec_ins":  "✨ SEGREDO: Todas as conquistas Insanas! (+30% Dano, +250 HP, +2 Espaço)",
-                "sec_all":  "🌟 DEUS DO REINO: TODAS AS CONQUISTAS! (Sinergia 2x, +150 HP, +30% Dano, +125 Ouro/t)"
-            };
-
-            const cats = {
-                "Inicial": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Inicial"),
-                "Normal": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Normal"),
-                "Difícil": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Difícil"),
-                "Insana": Object.keys(dicionarioConquistas).filter(k => dicionarioConquistas[k].cat === "Insana")
-            };
-
-            const hasAll = (arr) => arr.every(id => globalAchievements.includes(id));
-
-            if(hasAll(cats["Inicial"]) && !globalAchievements.includes("sec_init")) unlockSecret("sec_init", msgsSecretas["sec_init"]);
-            if(hasAll(cats["Normal"]) && !globalAchievements.includes("sec_norm")) unlockSecret("sec_norm", msgsSecretas["sec_norm"]);
-            if(hasAll(cats["Difícil"]) && !globalAchievements.includes("sec_diff")) unlockSecret("sec_diff", msgsSecretas["sec_diff"]);
-            if(hasAll(cats["Insana"]) && !globalAchievements.includes("sec_ins")) unlockSecret("sec_ins", msgsSecretas["sec_ins"]);
-            if(hasAll(cats["Inicial"]) && hasAll(cats["Normal"]) && hasAll(cats["Difícil"]) && hasAll(cats["Insana"]) && !globalAchievements.includes("sec_all")) 
-                unlockSecret("sec_all", msgsSecretas["sec_all"]);
-        }
-
-        function unlockSecret(id, msg) {
-            globalAchievements.push(id);
-            localStorage.setItem("kp_globalAchievements", JSON.stringify(globalAchievements));
-            sons.secret();
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.style.background = 'linear-gradient(145deg, #FFD700, #ff4444)';
-            toast.style.color = '#fff';
-            toast.innerHTML = `🏆 ${msg}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 7000);
-        }
-
-        function verificarConquistasTurno(danoTotal) {
-            if (nivel > 1) desbloquearConquista("primeiro_sangue");
-            if (nivel > 15) desbloquearConquista("15-reis");
-            if (ouro >= 5000) desbloquearConquista("rico");
-            if (nivel > 115) desbloquearConquista("100-abismo");
-            if (ouro >= 25000) desbloquearConquista("super-rico");
-            if (danoTotal >= 5000) desbloquearConquista("estrategista");
-            if (danoTotal >= 50000) desbloquearConquista("dano++");
-            if (hpMaximo >= 25000) desbloquearConquista("imortal");
-            if (getEspacosMaximos() >= 30) desbloquearConquista("reinado");
-            if (getEspacosMaximos() >= 100) desbloquearConquista("megalomaniaco");
-            if (cartasEscolhidas.length >= 20) desbloquearConquista("construtor");
-            if (cartasEscolhidas.length >= 50) desbloquearConquista("imperador_construcoes");
-            
-            let ouroProjetado = getOuroTurno() + simularEfeitosEspeciaisTurno().jurosTotal;
-            if (ouroProjetado >= 1000) desbloquearConquista("potencia_economica");
-        }
-
-        // --- CONSTANTES E DADOS ---
-        const CUSTO_REROLL = 5;
-        let custoCuraAtual = 50;
-        const VALOR_CURA = 50;
-
-        const traducoes = {
-            "pt-br": {
-                ui: {
-                    mainTitle: "Kingdom Protection", titleDiff: "Escolha sua Dificuldade",
-                    descDiff: "Sua escolha afeta a vida e o dano dos inimigos.",
-                    diffArqueiro: "Arqueiro (Tutorial)", diffEscudeiro: "Escudeiro (Fácil)", diffCavaleiro: "Cavaleiro (Normal)", diffComandante: "Comandante (Difícil)", diffDuque: "Duque (Insano)",
-                    btnConquistasLobby: "Ver Sala de Troféus", conquistasTitulo: "Sala de Troféus",
-                    lblIdioma: "Idioma:", btnLoadStart: "Carregar Jogo Salvo", tituloCidade: "Seu Reino",
-                    lblOuro: "Ouro:", lblVida: "Vida:", lblAno: "Turno/Ano:", lblOuroTurno: "/turno",
-                    lblInimigoPoder: "Poder do Inimigo (Dano):", lblInimigoVida: "Vida do Inimigo:",
-                    tituloTabuleiro: "Seu Exército", lblEspacos: "Espaços Usados:", lblDanoTotal: "Dano Total:",
-                    lblDicaVender: "Passe o mouse p/ dicas. Clique p/ vender.",
-                    tituloAcoes: "Ações do Turno", btnComprar: "Rolar Loja ({c} Ouro)", btnCurar: "Curar 50 PV ({c} Ouro)",
-                    btnBatalha: "Iniciar Batalha (Fim de Turno)", btnSalvar: "Salvar", btnCarregar: "Carregar", btnRegras: "Regras",
-                    tituloCartas: "Loja: Compre 1 carta (ou pule)", tituloCartasCompradas: "Edifícios Ativos", btnPularLoja: "Fechar Loja",
-                    modalTitulo: "Regras do Jogo", btnVender: "Vender",
-                    modalList: `<li><strong>Ouro:</strong> Usado na loja e cura.</li><li><strong>Espaço:</strong> Quase tudo ocupa terreno. Compre Fortalezas!</li><li><strong>Sinergias:</strong> Arqueiros em bando, Magos atrás de Tanks.</li><li><strong>Novas Cartas:</strong> Torre dá dano passivo, Banco gera juros!</li>`,
-                    tut1: "TUTORIAL (1/4): Bem-vindo! Compre tropas para se defender do Rei inimigo. Comece clicando em 'Rolar Loja'.", 
-                    tut2: "TUTORIAL (2/4): Excelente! Agora, clique em uma carta para comprá-la e colocá-la em seu Exército.", 
-                    tut3: "TUTORIAL (3/4): Muito bem! A tropa causará dano ao final do turno. Clique em 'Iniciar Batalha'.",
-                    tut4: "TUTORIAL (4/4): Você sobreviveu! Use ouro para criar Sinergias e gerencie seus espaços. Boa sorte, Majestade!",
-                    prevSobra: "Vai sobrar: ", prevRecebe: "Vai receber: ", danoBase: "Base:", sinergia: "Sinergia:", torreDano: "Torre:", global: "Buff:",
-                    rewTitle: "Vitória! Escolha uma Recompensa", rewDesc: "Fortaleça seu reino permanentemente:",
-                    btnRewDano: "+10% Dano Global", btnRewVida: "+50 Vida Máxima", btnRewEspaco: "+1 Espaço no Exército", evTitle: "Evento Aleatório!",
-                    slotVazio: "Vazio", btnSalvarModal: "Salvar Jogo", btnCarregarModal: "Carregar Jogo", slotTurno: "Turno", defaultSaveName: "Save de"
-                },
-                msgs: {
-                    naoOuro: "Ouro insuficiente!", perdeuJogo: "Seu reino caiu para o", jogoSalvo: "Jogo salvo!", semJogoSalvo: "Nenhum save encontrado.",
-                    jogoCarregado: "Jogo carregado!", espacoCheio: "Espaço cheio no exército! Venda unidades ou compre Fortalezas.", mortePelaCarta: "Esta carta mataria o rei!",
-                    evBoaColheita: "Boa colheita! +120 Ouro.", evPraga: "Praga nas fazendas! -50 Vida.", evMercador: "Mercador generoso! Próxima rolagem da loja grátis (Custo 0)."
-                },
-                carta: {
-                    guerreiro: {nome: "Guerreiro", desc: "Causa 25 de Dano direto ao inimigo. Ocupa 1 espaço no seu exército.", sinText: ""},
-                    arqueiro: {nome: "Arqueiro", desc: "Causa 15 de Dano. Sinergia: Ganha +10 de Dano para CADA outro Arqueiro no tabuleiro.", sinText: "+{val} (Sinergia de Grupo)"},
-                    cavaleiro: {nome: "Cavaleiro", desc: "Causa 50 de Dano devastador. Ocupa 1 espaço e atua como Tank para proteger magos.", sinText: ""},
-                    mago: {nome: "Mago", desc: "Causa 40 de Dano base. Sinergia: Ganha +20 de Dano por CADA Tank (Guerreiro ou Cavaleiro) no tabuleiro.", sinText: "+{val} (Bônus de Proteção)"},
-                    castelo: {nome: "Castelo", desc: "Aumenta o limite máximo de tropas em 2 (ganho líquido de +1). Fortalece as muralhas concedendo +50 de Vida Máxima e gera +10 Ouro por turno.", sinText: ""},
-                    fortaleza: {nome: "Fortaleza", desc: "A maior estrutura defensiva. Aumenta o limite máximo de tropas em 3 (ganho líquido de +2). Concede +150 de Vida Máxima e gera +25 Ouro por turno.", sinText: ""},
-                    fazenda: {nome: "Fazenda", desc: "Não altera a vida, mas garante +15 de Ouro a cada turno.", sinText: ""},
-                    mercado: {nome: "Mercado", desc: "Gera altíssimo lucro (+30 Ouro por turno), mas atrai invasores, reduzindo sua Vida Máxima em 40.", sinText: ""},
-                    quartel: {nome: "Quartel", desc: "Aumenta o limite de tropas em 2 (ganho líquido de +1) e fornece um bônus defensivo de +50 Vida Máxima.", sinText: ""},
-                    banco: {nome: "Banco", desc: "Rende juros compostos: gera +5% de todo o seu Ouro atual a cada fim de turno.", sinText: ""},
-                    torre: {nome: "Torre de Artilharia", desc: "Causa 50 de Dano passivo e garantido todos os turnos ao inimigo, independente da sinergia do exército. Ocupa 1 espaço.", sinText: ""},
-                    altar: {nome: "Altar dos Deuses", desc: "Em cada turno, há 50% de chance de abençoar o reino com +30 Vida Máxima ou +45 Ouro bônus.", sinText: ""}
-                }
-            },
-            "en-us": { 
-                ui: {
-                    mainTitle: "Kingdom Protection", titleDiff: "Choose Difficulty", descDiff: "Affects enemy health and damage.",
-                    diffArqueiro: "Archer (Tutorial)", diffEscudeiro: "Squire (Easy)", diffCavaleiro: "Knight (Normal)", diffComandante: "Commander (Hard)", diffDuque: "Duke (Insane)",
-                    btnConquistasLobby: "Trophy Room", conquistasTitulo: "Trophy Room",
-                    lblIdioma: "Language:", btnLoadStart: "Load Save", tituloCidade: "Your Kingdom",
-                    lblOuro: "Gold:", lblVida: "Health:", lblAno: "Turn/Year:", lblOuroTurno: "/turn",
-                    lblInimigoPoder: "Enemy Power:", lblInimigoVida: "Enemy Health:",
-                    tituloTabuleiro: "Your Army", lblEspacos: "Spaces Used:", lblDanoTotal: "Total Damage:",
-                    lblDicaVender: "Hover for tips. Click to sell.", tituloAcoes: "Actions", btnComprar: "Roll Shop ({c} Gold)", btnCurar: "Heal 50 HP ({c} Gold)",
-                    btnBatalha: "Start Battle", btnSalvar: "Save", btnCarregar: "Load", btnRegras: "Rules",
-                    tituloCartas: "Shop: Buy 1 or skip", tituloCartasCompradas: "Active Buildings", btnPularLoja: "Close Shop",
-                    modalTitulo: "Rules", btnVender: "Sell", modalList: `<li><strong>Gold:</strong> Used for shop.</li><li><strong>Space:</strong> Expand with Fortress.</li><li><strong>Synergies:</strong> Archers group up.</li>`,
-                    tut1: "TUTORIAL (1/4): Welcome! Buy troops to defend. Start by clicking 'Roll Shop'.", 
-                    tut2: "TUTORIAL (2/4): Great! Now click on a card to buy and place it in your Army.", 
-                    tut3: "TUTORIAL (3/4): Well done! It will deal damage at turn end. Click 'Start Battle'.",
-                    tut4: "TUTORIAL (4/4): You survived! Group troops for Synergies. Good luck, Majesty!",
-                    prevSobra: "Will survive with: ", prevRecebe: "Will receive: ", danoBase: "Base:", sinergia: "Synergy:", torreDano: "Tower:", global: "Buff:",
-                    rewTitle: "Victory! Choose a Reward", rewDesc: "Strengthen your kingdom:", btnRewDano: "+10% Global Damage", btnRewVida: "+50 Max HP", btnRewEspaco: "+1 Space", evTitle: "Random Event!",
-                    slotVazio: "Empty", btnSalvarModal: "Save Game", btnCarregarModal: "Load Game", slotTurno: "Turn", defaultSaveName: "Save"
-                },
-                msgs: {
-                    naoOuro: "Not enough gold!", perdeuJogo: "Kingdom fell to", jogoSalvo: "Saved!", semJogoSalvo: "No save found.", jogoCarregado: "Loaded!", espacoCheio: "Board full!", mortePelaCarta: "Would kill the king!",
-                    evBoaColheita: "Good harvest! +120 Gold.", evPraga: "Plague! -50 HP.", evMercador: "Generous merchant! Next shop roll is free."
-                },
-                carta: {
-                    guerreiro: {nome: "Warrior", desc: "Basic melee. Dmg: 25. Takes 1.", sinText: ""},
-                    arqueiro: {nome: "Archer", desc: "Ranged unit. Dmg: 15. Synergy: +10 per other Archer.", sinText: "+{val} (Syn)"},
-                    cavaleiro: {nome: "Knight", desc: "Elite heavy troop. Dmg: 50. Takes 1.", sinText: ""},
-                    mago: {nome: "Wizard", desc: "Spellcaster. Dmg: 40. Synergy: +20 per Tank.", sinText: "+{val} (Prot)"},
-                    castelo: {nome: "Castle", desc: "+2 Space (Net +1). +50 Max HP, +10 Gold/t.", sinText: ""},
-                    fortaleza: {nome: "Fortress", desc: "+3 Space (Net +2). +150 Max HP, +25 Gold/t.", sinText: ""},
-                    fazenda: {nome: "Farm", desc: "+15 Gold/turn.", sinText: ""},
-                    mercado: {nome: "Market", desc: "+30 Gold/turn, -30 Max HP.", sinText: ""},
-                    quartel: {nome: "Barracks", desc: "+2 Space (Net +1). +50 Max HP.", sinText: ""},
-                    banco: {nome: "Bank", desc: "Generates +5% of current Gold per turn.", sinText: ""},
-                    torre: {nome: "Tower", desc: "50 passive damage per turn. Takes 1.", sinText: ""},
-                    altar: {nome: "Altar", desc: "50% chance for +30 Max HP or +45 Gold/turn.", sinText: ""}
-                }
-            },
-            "es-es": { 
-                 ui: {
-                    mainTitle: "Kingdom Protection", titleDiff: "Elige Dificultad", descDiff: "Afecta vida y daño enemigo.",
-                    diffArqueiro: "Arquero (Tutorial)", diffEscudeiro: "Escudero (Fácil)", diffCavaleiro: "Caballero (Normal)", diffComandante: "Comandante (Difícil)", diffDuque: "Duque (Insano)",
-                    btnConquistasLobby: "Ver Trofeos", conquistasTitulo: "Sala de Trofeos",
-                    lblIdioma: "Idioma:", btnLoadStart: "Cargar Partida", tituloCidade: "Tu Reino",
-                    lblOuro: "Oro:", lblVida: "Vida:", lblAno: "Turno/Año:", lblOuroTurno: "/turno",
-                    lblInimigoPoder: "Poder Enemigo:", lblInimigoVida: "Vida Enemigo:",
-                    tituloTabuleiro: "Tu Ejército", lblEspacos: "Espacios Usados:", lblDanoTotal: "Daño Total:",
-                    lblDicaVender: "Pasa el ratón para info. Clic para vender.", tituloAcoes: "Acciones", btnComprar: "Rol Tienda ({c} Oro)", btnCurar: "Curar 50 PV ({c} Oro)",
-                    btnBatalha: "Iniciar Batalla", btnSalvar: "Guardar", btnCarregar: "Cargar", btnRegras: "Reglas",
-                    tituloCartas: "Tienda: Compra 1", tituloCartasCompradas: "Edificios Activos", btnPularLoja: "Cerrar",
-                    modalTitulo: "Reglas", btnVender: "Vender", modalList: `<li><strong>Oro:</strong> Para la tienda.</li><li><strong>Espacio:</strong> Compra Fortalezas.</li><li><strong>Sinergia:</strong> Agrupa arqueros.</li>`,
-                    tut1: "TUTORIAL (1/4): ¡Bienvenido! Compra tropas. Clic en 'Rol Tienda'.", 
-                    tut2: "TUTORIAL (2/4): ¡Excelente! Clic en una carta para comprarla.", 
-                    tut3: "TUTORIAL (3/4): Hará daño al final del turno. Clic 'Iniciar Batalla'.",
-                    tut4: "TUTORIAL (4/4): ¡Sobreviviste! Agrupa clases. ¡Suerte, Majestad!",
-                    prevSobra: "Sobrará: ", prevRecebe: "Recibirá: ", danoBase: "Base:", sinergia: "Sinergia:", torreDano: "Torre:", global: "Buff:",
-                    rewTitle: "¡Victoria! Elige Recompensa", rewDesc: "Fortalece tu reino:", btnRewDano: "+10% Daño Global", btnRewVida: "+50 Vida Máx", btnRewEspaco: "+1 Espacio", evTitle: "¡Evento Aleatorio!",
-                    slotVazio: "Vacío", btnSalvarModal: "Guardar Juego", btnCarregarModal: "Cargar Juego", slotTurno: "Turno", defaultSaveName: "Guardado"
-                },
-                msgs: {
-                    naoOuro: "¡Oro insuficiente!", perdeuJogo: "Tu reino cayó ante", jogoSalvo: "¡Guardado!", semJogoSalvo: "No hay save.", jogoCarregado: "¡Cargado!", espacoCheio: "¡Sin espacio!", mortePelaCarta: "¡Te mataría!",
-                    evBoaColheita: "¡Buena cosecha! +120 Oro.", evPraga: "¡Plaga! -50 Vida.", evMercador: "¡Mercader generoso! Próximo rol de tienda gratis."
-                },
-                carta: {
-                    guerreiro: {nome: "Guerrero", desc: "Daño: 25. Ocupa 1.", sinText: ""},
-                    arqueiro: {nome: "Arquero", desc: "Daño: 15. Sinergia: +10 por Arquero.", sinText: "+{val} (Sin)"},
-                    cavaleiro: {nome: "Caballero", desc: "Daño: 50. Ocupa 1.", sinText: ""},
-                    mago: {nome: "Mago", desc: "Daño: 40. Sinergia: +20 por Tank.", sinText: "+{val} (Prot)"},
-                    castelo: {nome: "Castillo", desc: "+2 Espacio (Liq +1). +50 Max HP.", sinText: ""},
-                    fortaleza: {nome: "Fortaleza", desc: "+3 Espacio (Liq +2). +150 Max HP.", sinText: ""},
-                    fazenda: {nome: "Granja", desc: "+15 Oro/turno.", sinText: ""},
-                    mercado: {nome: "Mercado", desc: "+30 Oro/turno, -30 Vida Max.", sinText: ""},
-                    quartel: {nome: "Cuartel", desc: "+2 Espacio (Liq +1). +40 Max HP.", sinText: ""},
-                    banco: {nome: "Banco", desc: "Genera +5% de Oro actual por turno.", sinText: ""},
-                    torre: {nome: "Torre", desc: "50 daño pasivo/turno. Ocupa 1.", sinText: ""},
-                    altar: {nome: "Altar", desc: "50% chance +30 Vida Max o +45 Oro.", sinText: ""}
-                }
-            }
-        };
-
-        let cartasDisponiveis = [
-            { tipo: "tropa", id: "guerreiro", ocupaEspaco: 1, custo: 30, efeitos: { danoBase: 25 } },
-            { tipo: "tropa", id: "arqueiro", ocupaEspaco: 1, custo: 15, efeitos: { danoBase: 15 } },
-            { tipo: "tropa", id: "cavaleiro", ocupaEspaco: 1, custo: 70, efeitos: { danoBase: 50 } },
-            { tipo: "tropa", id: "mago", ocupaEspaco: 1, custo: 80, efeitos: { danoBase: 40 } },
-            { tipo: "edificio", id: "castelo", ocupaEspaco: 1, custo: 80, efeitos: { saude: 50, ouroPorAno: 10, espacoExtra: 2 } }, 
-            { tipo: "edificio", id: "fortaleza", ocupaEspaco: 1, custo: 170, efeitos: { saude: 150, ouroPorAno: 25, espacoExtra: 3 } },
-            { tipo: "edificio", id: "fazenda", ocupaEspaco: 1, custo: 50, efeitos: { ouroPorAno: 15, saude: 0 } },
-            { tipo: "edificio", id: "mercado", ocupaEspaco: 1, custo: 80, efeitos: { ouroPorAno: 30, saude: -30 } },
-            { tipo: "edificio", id: "quartel", ocupaEspaco: 1, custo: 70, efeitos: { saude: 40, espacoExtra: 2 } },
-            { tipo: "edificio", id: "banco", ocupaEspaco: 1, custo: 100, efeitos: { jurosOuro: 0.05 } },
-            { tipo: "edificio", id: "torre", ocupaEspaco: 1, custo: 90, efeitos: { danoPassivo: 50 } },
-            { tipo: "edificio", id: "altar", ocupaEspaco: 1, custo: 120, efeitos: { altarEffect: true } },
-        ];
-
-        let baseInimigos = [
-            { vida: 100, ataque: 40 }, { vida: 200, ataque: 80 }, { vida: 400, ataque: 150 }, { vida: 650, ataque: 220 },
-            { vida: 1000, ataque: 350 }, { vida: 1500, ataque: 500 }, { vida: 2000, ataque: 650 }, { vida: 2600, ataque: 900 },
-            { vida: 3400, ataque: 1100 }, { vida: 4600, ataque: 1300 }, { vida: 6200, ataque: 1600 }, { vida: 8300, ataque: 2000 },
-            { vida: 10500, ataque: 2500 }, { vida: 13000, ataque: 3200 }, { vida: 18000, ataque: 4500 }
-        ];
-        let nomesInimigos = ["Rei do Simples", "Rei dos Insetos", "Rei do Papel", "Rei dos Livros", "Rei da Comida", "Rei da Arquitetura", "Rei do Estudo", "Rei da Água", "Rei do Movimento", "Rei dos Animais", "Rei do Fogo", "Rei da Espada", "Rei da Ilusão", "Rei do Magma", "Imperador da Devastação"];
-        
-        let inimigos = [];
-        const multiplicadoresDiff = { "arqueiro": 0.5, "escudeiro": 0.75, "cavaleiro": 1.0, "comandante": 1.5, "duque": 2.0 };
-        const multiplicadoresRecursos = { "arqueiro": 1.0, "escudeiro": 1.0, "cavaleiro": 1.0, "comandante": 1.25, "duque": 1.5 };
-
-        // Estados do Jogo
-        let ouro = 200, hp = 500, hpMaximo = 500, espacosMaximosIniciais = 3, nivel = 1, ano = 1, ouroPorAnoBase = 50;
-        let tabuleiro = [], cartasEscolhidas = [], cartasNaMao = [];
-        let dificuldadeAtual = "cavaleiro", multRecursosAtual = 1.0, multDanoGlobal = 1.0;
-        let inimigoAtual = null, inimigoAtualVidaMax = 0;
-        let idiomaAtual = "pt-br";
-        let custoRerollAtual = CUSTO_REROLL; 
-        let stepTutorial = 0;
-        let easterEggUsado = false; // Controle de uso do easter egg da barra de vida
-        
-        let stats = { 
-            maxDano: 0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, 
-            conquistas: [], perfects: 0, rerolls: 0, usouTropa: false 
-        };
-
-        // Slots de Save
-        let saveSlots = JSON.parse(localStorage.getItem("kp_slots")) || [null, null, null];
-        let slotMode = "save"; // 'save' or 'load'
-
-        function inicializarInimigos(diffKey) {
-            dificuldadeAtual = diffKey;
-            const multInimigo = multiplicadoresDiff[diffKey];
-            multRecursosAtual = multiplicadoresRecursos[diffKey];
-
-            ouro = Math.floor(200 * multRecursosAtual);
-            hpMaximo = Math.floor(500 * multRecursosAtual);
-            hp = hpMaximo;
-            ouroPorAnoBase = Math.floor(50 * multRecursosAtual);
-            multDanoGlobal = 1.0;
-            espacosMaximosIniciais = 3;
-            custoCuraAtual = 50;
-            easterEggUsado = false;
-
-            inimigos = baseInimigos.map((base, idx) => ({ nome: nomesInimigos[idx], vida: Math.floor(base.vida * multInimigo), ataque: Math.floor(base.ataque * multInimigo) }));
-            inimigoAtual = JSON.parse(JSON.stringify(inimigos[0]));
-            inimigoAtualVidaMax = inimigoAtual.vida;
-        }
-
-        function traduzirElementosEstaticos() {
-            const ui = traducoes[idiomaAtual].ui;
-            document.getElementById("title-diff").innerText = ui.titleDiff; document.getElementById("desc-diff").innerText = ui.descDiff;
-            
-            document.querySelector('[data-diff="arqueiro"]').innerText = ui.diffArqueiro;
-            document.querySelector('[data-diff="escudeiro"]').innerText = ui.diffEscudeiro;
-            document.querySelector('[data-diff="cavaleiro"]').innerText = ui.diffCavaleiro;
-            document.querySelector('[data-diff="comandante"]').innerText = ui.diffComandante;
-            document.querySelector('[data-diff="duque"]').innerText = ui.diffDuque;
-            
-            document.getElementById("btn-conquistas-inicio").innerText = ui.btnConquistasLobby;
-            document.getElementById("modal-conquistas-titulo").innerText = ui.conquistasTitulo;
-            
-            document.getElementById("carregar-jogo-inicio").innerText = ui.btnLoadStart; document.getElementById("titulo-cidade").innerText = ui.tituloCidade;
-            document.getElementById("lbl-ouro").innerText = ui.lblOuro; document.getElementById("lbl-vida").innerText = ui.lblVida;
-            document.getElementById("lbl-inimigo-poder").innerText = ui.lblInimigoPoder; document.getElementById("lbl-inimigo-vida").innerText = ui.lblInimigoVida;
-            document.getElementById("titulo-tabuleiro").innerText = ui.tituloTabuleiro; document.getElementById("lbl-espacos").innerText = ui.lblEspacos;
-            document.getElementById("lbl-dica-vender").innerText = ui.lblDicaVender; document.getElementById("titulo-acoes").innerText = ui.tituloAcoes;
-            document.getElementById("abrir-loja").innerText = ui.btnComprar.replace('{c}', custoRerollAtual); 
-            document.getElementById("passar-turno").innerText = ui.btnBatalha;
-            document.getElementById("salvar-jogo").innerText = ui.btnSalvar; document.getElementById("carregar-jogo").innerText = ui.btnCarregar;
-            document.getElementById("mostrar-regras").innerText = ui.btnRegras; document.getElementById("titulo-cartas").innerText = ui.tituloCartas;
-            document.getElementById("pular-loja").innerText = ui.btnPularLoja; document.getElementById("titulo-cartas-compradas").innerText = ui.tituloCartasCompradas;
-            document.getElementById("modal-titulo").innerText = ui.modalTitulo; document.getElementById("modal-list").innerHTML = ui.modalList;
-            document.getElementById("reward-title").innerText = ui.rewTitle; document.getElementById("reward-desc").innerText = ui.rewDesc;
-            document.getElementById("btn-rew-dano").innerText = ui.btnRewDano; document.getElementById("btn-rew-vida").innerText = ui.btnRewVida;
-            document.getElementById("btn-rew-espaco").innerText = ui.btnRewEspaco; document.getElementById("evento-title").innerText = ui.evTitle;
-            document.getElementById("lbl-ano").innerText = ui.lblAno;
-            document.getElementById("recuperar-saude").innerText = ui.btnCurar.replace('{c}', custoCuraAtual);
-        }
-
-        function atualizarTutorial() {
-            if (dificuldadeAtual !== "arqueiro") return;
-            const ui = traducoes[idiomaAtual].ui;
-            const msgEl = document.getElementById("tutorial-msg");
-            const btnTurno = document.getElementById("passar-turno");
-            const btnLoja = document.getElementById("abrir-loja");
-            const btnPular = document.getElementById("pular-loja");
-            
-            msgEl.style.display = "block";
-            
-            if (stepTutorial === 1) {
-                msgEl.innerText = ui.tut1;
-                btnTurno.disabled = true;
-            } else if (stepTutorial === 2) {
-                msgEl.innerText = ui.tut2;
-                btnTurno.disabled = true;
-                if(btnPular) btnPular.style.display = "none";
-            } else if (stepTutorial === 3) {
-                msgEl.innerText = ui.tut3;
-                btnLoja.disabled = true;
-                btnTurno.disabled = false;
-                if(btnPular) btnPular.style.display = "block";
-            } else if (stepTutorial === 4) {
-                msgEl.innerText = ui.tut4;
-                btnLoja.disabled = false;
-                btnTurno.disabled = false;
-            }
-        }
-
-        function getEspacosUsados() { return tabuleiro.reduce((a,c)=>a+(c.ocupaEspaco||0),0) + cartasEscolhidas.reduce((a,c)=>a+(c.ocupaEspaco||0),0); }
-        function getEspacosMaximos() { return espacosMaximosIniciais + cartasEscolhidas.reduce((a,c)=>a+(c.efeitos.espacoExtra || 0), 0); }
-        function getOuroTurno() { return ouroPorAnoBase + cartasEscolhidas.reduce((a,c)=>a+(c.efeitos.ouroPorAno||0),0); }
-        
-        function simularEfeitosEspeciaisTurno() {
-            let jurosTotal = 0; let altarCount = 0;
-            cartasEscolhidas.forEach(c => {
-                if(c.efeitos.jurosOuro) jurosTotal += Math.floor(ouro * c.efeitos.jurosOuro);
-                if(c.efeitos.altarEffect) altarCount++;
-            });
-            return { jurosTotal, altarCount };
-        }
-
-        function aplicarEfeitosEspeciais() {
-            let eff = simularEfeitosEspeciaisTurno();
-            let ouroGanho = eff.jurosTotal;
-            if (eff.jurosTotal > 0) floatText('cidade', `+${eff.jurosTotal} (Juros)`, '#FFD700');
-
-            for(let i=0; i<eff.altarCount; i++) {
-                if(Math.random() > 0.5) {
-                    hpMaximo += 30; hp += 30;
-                    floatText('cidade', '+30 HP MAX (Altar)', '#28a745');
-                } else {
-                    ouroGanho += 45;
-                    floatText('cidade', '+45 Ouro (Altar)', '#FFD700');
-                }
-            }
-            return ouroGanho;
-        }
-
-        function calcularDanoTotal() {
-            let total = 0, totalDanoBase = 0, totalSinergia = 0, totalTorre = 0;
-            let qArq = tabuleiro.filter(t=>t.id==="arqueiro").length;
-            let qTank = tabuleiro.filter(t=>t.id==="guerreiro"||t.id==="cavaleiro").length;
-            
-            // Buff Secreto Total
-            let sinergiaMult = globalAchievements.includes("sec_all") ? 2 : 1;
-
-            let tabSinergizado = tabuleiro.map(tropa => {
-                let d = tropa.efeitos.danoBase, sin = 0;
-                if(tropa.id==="arqueiro") sin = ((qArq-1)*10) * sinergiaMult;
-                if(tropa.id==="mago") sin = (qTank*20) * sinergiaMult;
-                d += sin; totalDanoBase += tropa.efeitos.danoBase; totalSinergia += sin;
-                return { ...tropa, danoCalculado: Math.floor(d * multDanoGlobal), bonusInfo: sin };
-            });
-
-            cartasEscolhidas.forEach(c => { if(c.efeitos.danoPassivo) totalTorre += c.efeitos.danoPassivo; });
-            total = tabSinergizado.reduce((a,b)=>a+b.danoCalculado, 0) + Math.floor(totalTorre * multDanoGlobal);
-            
-            return { total, tabSinergizado, breakdown: { base: totalDanoBase, sin: totalSinergia, torre: totalTorre } };
-        }
-
-        function atualizarInterface() {
-            traduzirElementosEstaticos(); const ui = traducoes[idiomaAtual].ui;
-            document.getElementById("ouro").textContent = Math.floor(ouro);
-            
-            let ext = simularEfeitosEspeciaisTurno(); 
-            let tExtra = ext.jurosTotal > 0 ? ` +Banco` : '';
-            if (ext.altarCount > 0) tExtra += ' +Altar';
-            document.getElementById("lbl-ouro-turno").textContent = `(+${getOuroTurno()}${tExtra}${ui.lblOuroTurno})`;
-            
-            document.getElementById("hp").textContent = hp; document.getElementById("hp-max").textContent = hpMaximo;
-            document.getElementById("ano").textContent = ano; document.getElementById("nivel-disp").textContent = nivel;
-            document.getElementById("inimigo-nome").textContent = inimigoAtual.nome; document.getElementById("inimigo-ataque").textContent = inimigoAtual.ataque;
-            document.getElementById("inimigo-vida").textContent = `${Math.max(0, inimigoAtual.vida)} / ${inimigoAtualVidaMax}`;
-            document.getElementById("espacos-usados").textContent = getEspacosUsados(); document.getElementById("espacos-max").textContent = getEspacosMaximos();
-            
-            document.getElementById("hp-progress-bar").style.width = `${Math.max(0,Math.min(100,(hp/hpMaximo)*100))}%`;
-            document.getElementById("inimigo-progress-bar").style.width = `${Math.max(0,Math.min(100,(inimigoAtual.vida/inimigoAtualVidaMax)*100))}%`;
-
-            renderizarTabuleiroEDano(); mostrarCartasEscolhidas();
-            
-            document.getElementById("lbl-stats").textContent = `Maior Dano: ${stats.maxDano} | Turnos Sobrevividos: ${ano}`;
-            
-            let conquistasTxt = stats.conquistas.length > 0 
-                ? "🏆 Conquistas nesta run: " + stats.conquistas.map(id => dicionarioConquistas[id].desc.split("(")[0].trim()).join(" | ") 
-                : "";
-            document.getElementById("lbl-achievements").textContent = conquistasTxt;
-        }
-
-        function renderizarTabuleiroEDano() {
-            const grid = document.getElementById("grid-tabuleiro"); grid.innerHTML = "";
-            const tCartas = traducoes[idiomaAtual].carta; const ui = traducoes[idiomaAtual].ui;
-            let calc = calcularDanoTotal();
-            
-            if(calc.total > stats.maxDano) stats.maxDano = calc.total;
-
-            calc.tabSinergizado.forEach((tropa, i) => {
-                const cT = tCartas[tropa.id]; const div = document.createElement("div"); div.className = "carta-tropa";
-                div.onmouseenter = (e) => showTooltip(e, cT.nome, cT.desc);
-                div.onmousemove = moveTooltip;
-                div.onmouseleave = hideTooltip;
-                
-                div.onclick = () => { sons.coin(); hideTooltip(); venderCarta(i, true); };
-                let sH = tropa.bonusInfo > 0 ? `<div class="sinergia">${cT.sinText.replace('{val}', tropa.bonusInfo)}</div>` : "";
-                div.innerHTML = `<span>${cT.nome}</span><small>⚔️ ${tropa.danoCalculado}</small>${sH}`;
-                grid.appendChild(div);
-            });
-            
-            document.getElementById("dano-total").textContent = calc.total;
-            let brk = `(${ui.danoBase} ${calc.breakdown.base} | ${ui.sinergia} ${calc.breakdown.sin}`;
-            if(calc.breakdown.torre > 0) brk += ` | ${ui.torreDano} ${calc.breakdown.torre}`;
-            if(multDanoGlobal > 1.0) brk += ` | ${ui.global} +${Math.round((multDanoGlobal-1)*100)}%`;
-            document.getElementById("dano-breakdown").textContent = brk + `)`;
-
-            let sobra = inimigoAtual.vida - calc.total;
-            if(sobra > 0) {
-                document.getElementById("previsao-inimigo").textContent = `${ui.prevSobra} ${sobra}`;
-                document.getElementById("previsao-reino").textContent = `${ui.prevRecebe} -${inimigoAtual.ataque}`;
-                document.getElementById("previsao-reino").style.color = '#ff9999';
-            } else {
-                document.getElementById("previsao-inimigo").textContent = `☠️ Morrerá neste turno!`;
-                document.getElementById("previsao-reino").textContent = `Seguro.`;
-                document.getElementById("previsao-reino").style.color = '#28a745';
-            }
-            
-            verificarConquistasTurno(calc.total);
-        }
-
-        function venderCarta(idx, isTropa) {
-            let c = isTropa ? tabuleiro[idx] : cartasEscolhidas[idx];
-            ouro += Math.floor(c.custo / 2); floatText('cidade', `+${Math.floor(c.custo/2)} Ouro`, '#FFD700');
-            if (isTropa) tabuleiro.splice(idx, 1);
-            else {
-                if (c.efeitos.saude !== undefined) { hpMaximo = Math.max(1, hpMaximo - c.efeitos.saude); hp = Math.min(hp, hpMaximo); }
-                cartasEscolhidas.splice(idx, 1);
-            }
-            atualizarInterface();
-        }
-
-        function abrirLoja() {
-            const msgs = traducoes[idiomaAtual].msgs;
-            if (ouro < custoRerollAtual) { showAlert(msgs.naoOuro); return; }
-            ouro -= custoRerollAtual; 
-            custoRerollAtual = CUSTO_REROLL; 
-            
-            stats.rerolls = (stats.rerolls || 0) + 1;
-            if (stats.rerolls >= 50) desbloquearConquista("consumista");
-
-            if(stepTutorial === 1) { stepTutorial = 2; atualizarTutorial(); }
-
-            cartasNaMao = [];
-            while (cartasNaMao.length < 3) {
-                const c = cartasDisponiveis[Math.floor(Math.random() * cartasDisponiveis.length)];
-                if (!cartasNaMao.includes(c)) cartasNaMao.push(c);
-            }
-
-            document.getElementById("cartas").style.display = "block";
-            document.getElementById("abrir-loja").disabled = true; document.getElementById("passar-turno").disabled = true;
-            
-            const lista = document.getElementById("lista-cartas"); lista.innerHTML = "";
-            cartasNaMao.forEach(c => {
-                const li = document.createElement("li"); const cT = traducoes[idiomaAtual].carta[c.id];
-                li.innerHTML = `<strong style="font-size:1.2em; color:#FFD700;">${cT.nome}</strong><br><div class="custo-carta">💰 ${c.custo} Ouro</div><br>${cT.desc}`;
-                li.onclick = () => {
-                    if (getEspacosUsados() + (c.ocupaEspaco||0) > getEspacosMaximos()) { showAlert(msgs.espacoCheio); return; }
-                    if (ouro < c.custo) { showAlert(msgs.naoOuro); return; }
-                    if (c.efeitos && c.efeitos.saude !== undefined && hp + c.efeitos.saude <= 0) { showAlert(msgs.mortePelaCarta); return; }
-                    
-                    ouro -= c.custo; sons.coin();
-                    if (c.tipo === "tropa") tabuleiro.push(c);
-                    else {
-                        if (c.efeitos.saude !== undefined) { hpMaximo += c.efeitos.saude; hp = Math.min(hp+c.efeitos.saude, hpMaximo); }
-                        cartasEscolhidas.push(c);
-                    }
-                    if(stepTutorial === 2) { stepTutorial = 3; atualizarTutorial(); }
-                    fecharLoja(); atualizarInterface();
-                };
-                lista.appendChild(li);
-            });
-            atualizarInterface(); 
-        }
-
-        function fecharLoja() {
-            document.getElementById("cartas").style.display = "none";
-            document.getElementById("abrir-loja").disabled = false; document.getElementById("passar-turno").disabled = (stepTutorial === 1 || stepTutorial === 2);
-        }
-
-        function mostrarCartasEscolhidas() {
-            const lista = document.getElementById("lista-cartas-escolhidas"); lista.innerHTML = "";
-            cartasEscolhidas.forEach((c, i) => {
-                const cT = traducoes[idiomaAtual].carta[c.id]; const li = document.createElement("li");
-                
-                li.onmouseenter = (e) => showTooltip(e, cT.nome, cT.desc);
-                li.onmousemove = moveTooltip;
-                li.onmouseleave = hideTooltip;
-
-                li.innerHTML = `<span><strong>${cT.nome}</strong></span><button class="btn-vender-edificio" onclick="sons.coin(); hideTooltip(); venderCarta(${i}, false)">${traducoes[idiomaAtual].ui.btnVender}</button>`;
-                lista.appendChild(li);
-            });
-        }
-
-        function eventoAleatorio() {
-            if(Math.random() > 0.15) return; 
-            const msgs = traducoes[idiomaAtual].msgs;
-            const ev = Math.floor(Math.random() * 3);
-            const evModal = document.getElementById('evento-modal');
-            const evDesc = document.getElementById('evento-desc');
-            
-            if(ev === 0) { evDesc.textContent = msgs.evBoaColheita; ouro += 120; }
-            else if(ev === 1) { evDesc.textContent = msgs.evPraga; hp -= 50; flashElement('cidade', 'shake'); }
-            else if(ev === 2) { evDesc.textContent = msgs.evMercador; custoRerollAtual = 0; }
-            
-            evModal.style.display = 'block';
-        }
-
-        function passarTurno() {
-            if (tabuleiro.length > 0) stats.usouTropa = true;
-            
-            sons.impact(); flashElement('inimigo-status', 'shake');
-            let calc = calcularDanoTotal(); floatText('inimigo-status', `-${calc.total}`, '#ff4444');
-            
-            if (inimigoAtual.vida - calc.total === 0) {
-                stats.perfects++;
-                if (stats.perfects >= 3) desbloquearConquista("perfect");
-            }
-            
-            inimigoAtual.vida -= calc.total;
-            if(stepTutorial === 3) { stepTutorial = 4; atualizarTutorial(); }
-
-            if(tabuleiro.some(t => t.id !== "arqueiro")) stats.puroArco = false;
-            if(tabuleiro.some(t => t.id !== "guerreiro" && t.id !== "cavaleiro")) stats.puroTank = false;
-            if(tabuleiro.some(t => t.id !== "mago")) stats.puroMago = false;
-
-            if (inimigoAtual.vida <= 0) {
-                sons.win();
-                nivel++;
-                let recompensaOuro = Math.floor((nivel * 60) * multRecursosAtual);
-                ouro += recompensaOuro; floatText('cidade', `+${recompensaOuro} Ouro!`, '#FFD700');
-                
-                if (nivel === 16) {
-                    if (stats.intocavel) desbloquearConquista("intocavel");
-                    if (stats.puroArco && tabuleiro.length > 0) desbloquearConquista("chuva_flechas");
-                    if (stats.puroTank && tabuleiro.length > 0) desbloquearConquista("tanque_guerra");
-                    if (stats.puroMago && tabuleiro.length > 0) desbloquearConquista("magico");
-                    if (hpMaximo < 250) desbloquearConquista("alta_aposta");
-                    if (!stats.usouTropa) desbloquearConquista("sem_exercito");
-                }
-
-                document.getElementById('reward-modal').style.display = 'block';
-                
-                if (nivel > inimigos.length) {
-                    const diffM = multiplicadoresDiff[dificuldadeAtual];
-                    const infMult = Math.pow(1.15, nivel - 15);
-                    inimigoAtual = { nome: `Rei do Abismo ${nivel-15}`, vida: Math.floor(18000 * diffM * infMult), ataque: Math.floor(4500 * diffM * infMult) };
-                } else { inimigoAtual = JSON.parse(JSON.stringify(inimigos[nivel - 1])); }
-                inimigoAtualVidaMax = inimigoAtual.vida;
-                
-            } else {
-                hp -= inimigoAtual.ataque; 
-                stats.intocavel = false; 
-                flashElement('cidade', 'shake'); floatText('cidade', `-${inimigoAtual.ataque}`, '#ff4444');
-                
-                if (hp === 1) desbloquearConquista("por_um_fio");
-
-                if (hp <= 0) { 
-                    showAlert(`${traducoes[idiomaAtual].msgs.perdeuJogo} ${inimigoAtual.nome}!`, true); 
-                    return; 
-                }
-            }
-
-            ano++;
-            let extraOuro = aplicarEfeitosEspeciais();
-            ouro += getOuroTurno() + extraOuro;
-            eventoAleatorio();
-            atualizarInterface();
-        }
-
-        document.getElementById("btn-rew-dano").onclick = () => { multDanoGlobal += 0.1; fecharReward(); };
-        document.getElementById("btn-rew-vida").onclick = () => { hpMaximo +=  50; hp += 50; fecharReward(); };
-        document.getElementById("btn-rew-espaco").onclick = () => { espacosMaximosIniciais += 1; fecharReward(); };
-        function fecharReward() { document.getElementById('reward-modal').style.display = 'none'; atualizarInterface(); sons.heal(); }
-
-        // --- INICIAR E BUFFS SECRETOS ---
-        function iniciarJogoUI(isLoad = false) { 
-            document.getElementById("start-screen").style.display = "none"; 
-            document.getElementById("game-screen").style.display = "block"; 
-            
-            if (!isLoad) {
-                // Aplica os Buffs Secretos caso o jogador inicie um Novo Jogo
-                if(globalAchievements.includes("sec_init")) hpMaximo += 100;
-                if(globalAchievements.includes("sec_norm")) ouro += 200;
-                if(globalAchievements.includes("sec_diff")) { ouroPorAnoBase += 75; multDanoGlobal += 0.20; }
-                if(globalAchievements.includes("sec_ins")) { multDanoGlobal += 0.30; hpMaximo += 250; espacosMaximosIniciais += 2; }
-                if(globalAchievements.includes("sec_all")) { hpMaximo += 150; multDanoGlobal += 0.30; ouroPorAnoBase += 125; }
-                hp = hpMaximo;
-            }
-
-            if(dificuldadeAtual === "arqueiro") { stepTutorial = 1; atualizarTutorial(); }
-            else { stepTutorial = 0; document.getElementById("tutorial-msg").style.display = "none"; }
-
-            atualizarInterface(); initAudio(); 
-        }
-
-        document.querySelectorAll(".diff-btn").forEach(btn => btn.addEventListener("click", (e) => { inicializarInimigos(e.target.dataset.diff); iniciarJogoUI(); }));
-        document.getElementById("abrir-loja").addEventListener("click", abrirLoja);
-        document.getElementById("pular-loja").addEventListener("click", fecharLoja);
-        
-        document.getElementById("recuperar-saude").addEventListener("click", () => {
-            const msgs = traducoes[idiomaAtual].msgs;
-            if (ouro >= custoCuraAtual) {
-                if(hp >= hpMaximo) return;
-                ouro -= custoCuraAtual; hp = Math.min(hp + VALOR_CURA, hpMaximo);
-                custoCuraAtual += 5; 
-                sons.heal(); flashElement('cidade', 'flash-green'); floatText('cidade', `+${VALOR_CURA} HP`, '#28a745');
-                atualizarInterface();
-            } else showAlert(msgs.naoOuro);
-        });
-
-        document.getElementById("passar-turno").addEventListener("click", passarTurno);
-        
-        // --- SISTEMA DE SAVE MULTI-SLOT ---
-        function abrirModalSlots(mode) {
-            slotMode = mode;
-            const ui = traducoes[idiomaAtual].ui;
-            document.getElementById('slots-title').innerText = mode === 'save' ? ui.btnSalvarModal : ui.btnCarregarModal;
-            const container = document.getElementById('slots-container');
-            container.innerHTML = "";
-
-            for(let i=0; i<3; i++) {
-                let slot = saveSlots[i];
-                let btn = document.createElement('button');
-                btn.style.width = "100%";
-                btn.style.textAlign = "left";
-                btn.style.fontSize = "1.1em";
-                
-                if(slot) {
-                    btn.innerHTML = `<strong>Slot ${i+1}:</strong> ${slot.name} - ${ui.slotTurno} ${slot.data.ano} (${slot.data.dificuldadeAtual})`;
-                    btn.style.backgroundColor = mode === 'save' ? "#fd7e14" : "#28a745"; 
-                } else {
-                    btn.innerHTML = `<strong>Slot ${i+1}:</strong> ${ui.slotVazio}`;
-                    if(mode === 'save') btn.style.backgroundColor = "#0056b3";
-                    else { btn.style.backgroundColor = "#555"; btn.disabled = true; }
-                }
-
-                btn.onclick = () => {
-                    if(mode === 'save') {
-                        let defName = slot ? slot.name : `${ui.defaultSaveName} ${new Date().toLocaleDateString()}`;
-                        let saveName = prompt("Nome do Save:", defName);
-                        if(saveName !== null && saveName.trim() !== "") {
-                            efetuarSave(i, saveName);
-                            document.getElementById('slots-modal').style.display='none';
-                        }
-                    } else {
-                        efetuarLoad(i);
-                        document.getElementById('slots-modal').style.display='none';
-                    }
-                };
-                container.appendChild(btn);
-            }
-            document.getElementById('slots-modal').style.display = 'block';
-        }
-
-        function efetuarSave(idx, name) {
-            let data = { ouro, hp, hpMaximo, espacosMaximosIniciais, nivel, ano, inimigoAtual, inimigoAtualVidaMax, tabuleiro, cartasEscolhidas, idiomaAtual, dificuldadeAtual, inimigos, multRecursosAtual, ouroPorAnoBase, custoCuraAtual, multDanoGlobal, stats, easterEggUsado };
-            saveSlots[idx] = { name: name, data: data };
-            localStorage.setItem("kp_slots", JSON.stringify(saveSlots));
-            showToast(traducoes[idiomaAtual].msgs.jogoSalvo);
-        }
-
-        function efetuarLoad(idx) {
-            let slot = saveSlots[idx];
-            if(!slot) return;
-            let e = slot.data;
-            ouro=e.ouro; hp=e.hp; hpMaximo=e.hpMaximo; espacosMaximosIniciais=e.espacosMaximosIniciais; nivel=e.nivel; ano=e.ano; inimigoAtual=e.inimigoAtual; inimigoAtualVidaMax=e.inimigoAtualVidaMax; tabuleiro=e.tabuleiro; cartasEscolhidas=e.cartasEscolhidas; idiomaAtual=e.idiomaAtual; dificuldadeAtual=e.dificuldadeAtual||"cavaleiro"; multRecursosAtual=e.multRecursosAtual||1.0; ouroPorAnoBase=e.ouroPorAnoBase||50; custoCuraAtual=e.custoCuraAtual||50; multDanoGlobal=e.multDanoGlobal||1.0; 
-            stats=e.stats||{maxDano:0, intocavel: true, puroArco: true, puroTank: true, puroMago: true, conquistas: [], perfects: 0, rerolls: 0, usouTropa: false}; 
-            inimigos=e.inimigos||[];
-            easterEggUsado = e.easterEggUsado || false;
-            
-            document.getElementById("idioma-select").value = idiomaAtual; 
-            iniciarJogoUI(true); // O 'true' garante que os buffs não sejam somados duplamente.
-            showToast(traducoes[idiomaAtual].msgs.jogoCarregado);
-        }
-
-        document.getElementById("salvar-jogo").addEventListener("click", () => abrirModalSlots('save'));
-        document.getElementById("carregar-jogo").addEventListener("click", () => abrirModalSlots('load'));
-        document.getElementById("carregar-jogo-inicio").addEventListener("click", () => abrirModalSlots('load'));
-        
-        document.getElementById("idioma-select").addEventListener("change", (e) => { idiomaAtual = e.target.value; traduzirElementosEstaticos(); if(document.getElementById("game-screen").style.display==="block") atualizarInterface(); });
-        document.getElementById("mostrar-regras").addEventListener("click", () => document.getElementById("regras-modal").style.display = "block");
-        
-        // Modal de Conquistas no Lobby com Categorias
-        document.getElementById("btn-conquistas-inicio").addEventListener("click", () => {
-            const grid = document.getElementById("grid-conquistas");
-            grid.innerHTML = "";
-            
-            const categorias = ["Inicial", "Normal", "Difícil", "Insana"];
-            const coresCat = { "Inicial": "#28a745", "Normal": "#007bff", "Difícil": "#fd7e14", "Insana": "#dc3545" };
-
-            categorias.forEach(cat => {
-                const title = document.createElement("h3");
-                title.style.color = coresCat[cat];
-                title.style.borderBottom = `1px solid ${coresCat[cat]}`;
-                title.style.marginTop = "20px";
-                title.style.paddingBottom = "5px";
-                title.style.marginBottom = "10px";
-                title.textContent = `Categoria: ${cat}`;
-                grid.appendChild(title);
-
-                for (const [id, info] of Object.entries(dicionarioConquistas)) {
-                    if (info.cat !== cat) continue;
-                    const unlocked = globalAchievements.includes(id);
-                    const div = document.createElement("div");
-                    div.style.padding = "10px";
-                    div.style.border = "1px solid #555";
-                    div.style.borderRadius = "5px";
-                    div.style.marginBottom = "8px";
-                    div.style.backgroundColor = unlocked ? "rgba(40, 167, 69, 0.2)" : "rgba(30, 30, 30, 0.8)";
-                    div.style.color = unlocked ? "#fff" : "#777";
-                    div.innerHTML = `<span style="font-size: 1.5em; margin-right: 10px;">${unlocked ? '🏆' : '🔒'}</span> <strong>${info.desc}</strong>`;
-                    grid.appendChild(div);
-                }
-            });
-            
-            document.getElementById("conquistas-modal").style.display = "block";
-        });
-
-        // --- EASTER EGG DE HP ---
-        document.getElementById("barra-vida-reino").addEventListener("click", () => {
-            if (easterEggUsado) return;
-            easterEggUsado = true;
-            hpMaximo += 1;
-            hp += 1;
-            atualizarInterface();
-            floatText('cidade', '+1 HP Máx (Segredo)', '#28a745');
-        });
-
-        traduzirElementosEstaticos();
-    </script>
+    <!-- Script Principal -->
+    <script src="script.js"></script>
 </body>
 </html>
